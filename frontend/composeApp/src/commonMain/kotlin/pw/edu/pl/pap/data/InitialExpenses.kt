@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class Home(
+data class InitialExpenses(
     val userExpenses: Double? = null,
     val expenses: Double? = null,
 )
