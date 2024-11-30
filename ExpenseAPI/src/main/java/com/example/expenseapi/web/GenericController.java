@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 public abstract class GenericController<T, ID> {
-    private final GenericService<T, ID> service;
+    protected final GenericService<T, ID> service;
 
     protected GenericController(GenericService<T, ID> service) {
         this.service = service;
@@ -28,6 +28,17 @@ public abstract class GenericController<T, ID> {
     public ResponseEntity<Void> delete(@PathVariable ID id) {
         service.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/all")
+    public ResponseEntity<Void> deleteAll() {
+        service.deleteAllData();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<T> update(@PathVariable ID id, @RequestBody T entity) {
+        return new ResponseEntity<>(service.update(id, entity), HttpStatus.OK);
     }
 
     @GetMapping("/all")
