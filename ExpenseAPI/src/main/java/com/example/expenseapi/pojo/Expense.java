@@ -3,6 +3,8 @@ package com.example.expenseapi.pojo;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Date;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,6 +18,9 @@ public class Expense {
 
     @Column(name = "price", nullable = false)
     private double price;
+
+    @Column(name = "date", nullable = false)
+    private Date date = new Date(System.currentTimeMillis());
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
