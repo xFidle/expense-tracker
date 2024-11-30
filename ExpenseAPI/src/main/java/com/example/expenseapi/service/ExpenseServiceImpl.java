@@ -1,6 +1,7 @@
 package com.example.expenseapi.service;
 
 import com.example.expenseapi.pojo.Expense;
+import com.example.expenseapi.pojo.ExpenseNotFound;
 import com.example.expenseapi.repository.ExpenseRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class ExpenseServiceImpl implements ExpenseService{
         expenseRepository.deleteById(id);
     }
     static Expense unwrapExpense(Optional<Expense> expense, Long id) {
-        return expense.orElse(null);
+        if (expense.isPresent()) return expense.get();
+        else throw new ExpenseNotFound(id);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.expenseapi.web;
 
 import com.example.expenseapi.pojo.Expense;
+import com.example.expenseapi.pojo.ExpenseNotFound;
 import com.example.expenseapi.service.ExpenseService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,11 @@ public class ExpenseController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Expense> getExpense(@PathVariable Long id) {
-        return new ResponseEntity<>(expenseService.getExpense(id), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(expenseService.getExpense(id), HttpStatus.OK);
+        } catch (ExpenseNotFound e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping
