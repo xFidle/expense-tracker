@@ -35,5 +35,6 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 }
             }
         }
+        PlusButton()
     }
 }
