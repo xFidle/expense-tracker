@@ -6,7 +6,7 @@ import com.example.expenseapi.repository.ExpenseRepository;
 import com.example.expenseapi.repository.UserGroupRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -113,5 +113,15 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         double groupSum = groupExpenses.stream().mapToDouble(Expense::getPrice).sum();
         double userSum = userExpenses.stream().mapToDouble(Expense::getPrice).sum();
         return new ExpInfo(userSum, groupSum);
+    }
+
+    @Override
+    public Map<LocalDate, List<Expense>> getAllAsMap() {
+        return StreamSupport.stream(expenseRepository.findAll().spliterator(), false)
+                .collect(Collectors.groupingBy(
+                        Expense::getDate,
+                        () -> new TreeMap<>(Comparator.reverseOrder()),
+                        Collectors.toList()
+                ));
     }
 }

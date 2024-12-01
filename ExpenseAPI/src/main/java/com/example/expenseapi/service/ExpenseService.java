@@ -1,6 +1,8 @@
 package com.example.expenseapi.service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import com.example.expenseapi.pojo.ExpInfo;
 import com.example.expenseapi.pojo.Expense;
@@ -17,4 +19,6 @@ public interface ExpenseService extends GenericService<Expense, Long> {
     List<Expense> getExpensesForGroup(String name);
 
     ExpInfo getExpInfo(String name, String userId);
+
+    Map<LocalDate, List<Expense>> getAllAsMap();
 }

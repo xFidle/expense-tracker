@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/expense")
@@ -85,6 +88,11 @@ public class ExpenseController extends GenericController<Expense, Long> {
     @ApiResponse(responseCode = "200", description = "Sum of expenses for given group and user", content = @Content(schema = @Schema(implementation = ExpInfo.class)))
     public ResponseEntity<ExpInfo> getState(@PathVariable String name, @PathVariable String userId) {
         return new ResponseEntity<>(((ExpenseService) service).getExpInfo(name, userId), HttpStatus.OK);
+    }
+
+    @GetMapping("/all/map")
+    public ResponseEntity<Map<LocalDate, List<Expense>>> getAllMap() {
+        return new ResponseEntity<>(((ExpenseService) service).getAllAsMap(), HttpStatus.OK);
     }
 
 }
