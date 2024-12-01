@@ -6,7 +6,6 @@ import com.example.expenseapi.pojo.Category;
 import com.example.expenseapi.repository.ExpenseRepository;
 import com.example.expenseapi.repository.UserRepository;
 import com.example.expenseapi.repository.CategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
