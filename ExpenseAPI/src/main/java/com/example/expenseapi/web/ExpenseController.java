@@ -91,6 +91,8 @@ public class ExpenseController extends GenericController<Expense, Long> {
     }
 
     @GetMapping("/all/map")
+    @Operation(summary = "Returns all objects grouped by date")
+    @ApiResponse(responseCode = "200", description = "All expenses grouped by date")
     public ResponseEntity<Map<LocalDate, List<Expense>>> getAllMap() {
         return new ResponseEntity<>(((ExpenseService) service).getAllAsMap(), HttpStatus.OK);
     }
