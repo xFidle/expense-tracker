@@ -16,17 +16,17 @@ import kotlinx.coroutines.flow.StateFlow
 import pw.edu.pl.pap.data.InputFieldData
 
 @Composable
-fun InputFields(inputFieldsdata: StateFlow<List<InputFieldData>>) {
+fun InputFields(inputFieldsdata: List<InputFieldData>) {
     createFields(inputFieldsdata)
 }
 
 @Composable
-fun createFields(inputFieldsdata: StateFlow<List<InputFieldData>>) {
+fun createFields(inputFieldsdata: List<InputFieldData>) {
     Box(
         modifier = Modifier.offset(x = 0.dp, y = 100.dp)
     ){
         LazyColumn {
-            items(inputFieldsdata.value) {
+            items(inputFieldsdata) {
                 data -> createField(data)
             }
         }

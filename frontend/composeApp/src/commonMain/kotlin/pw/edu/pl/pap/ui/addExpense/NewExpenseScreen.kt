@@ -5,16 +5,19 @@ import pw.edu.pl.pap.data.Record
 import pw.edu.pl.pap.data.User
 import pw.edu.pl.pap.data.InputFieldData
 import pw.edu.pl.pap.viewmodel.NewExpenseViewModel
+import pw.edu.pl.pap.apiclient.NewExpenseApiClient
 
 @Composable
 fun NewExpenseScreen(onClose: () -> Unit){
     var addButtonClicked by remember { mutableStateOf(false) }
-    var viewModel by remember { mutableStateOf(NewExpenseViewModel())}
+    var viewModel by remember { mutableStateOf(NewExpenseViewModel(NewExpenseApiClient()))}
+
+    viewModel.setupInputFieldsData()
 
 
 
     Header()
-    InputFields()
+    InputFields(viewModel.inputFieldsData)
 
     AddButton(addButtonClicked, onUpdate = {addButtonClicked = !addButtonClicked})
 
