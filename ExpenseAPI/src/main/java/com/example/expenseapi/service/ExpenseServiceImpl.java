@@ -3,6 +3,7 @@ package com.example.expenseapi.service;
 import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.repository.CategoryRepository;
 import com.example.expenseapi.repository.ExpenseRepository;
+import com.example.expenseapi.repository.UserGroupRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
@@ -13,11 +14,13 @@ import java.util.stream.StreamSupport;
 public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implements ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final CategoryRepository categoryRepository;
+    private final UserGroupRepository userGroupRepository;
 
-    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository) {
+    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, UserGroupRepository userGroupRepository) {
         super(repository);
         this.expenseRepository = repository;
         this.categoryRepository = categoryRepository;
+        this.userGroupRepository = userGroupRepository;
     }
 
     public List<Expense> getExpensesByEmail(String mail) {
@@ -35,6 +38,14 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             else {
                 categoryRepository.save(new Category());
                 entity.setCategory(categoryRepository.findById(1L).get());
+            }
+        }
+        if (entity.getUser().getUserGroup() == null) {
+            if(userGroupRepository.findById(1L).isPresent())
+                entity.getUser().setUserGroup(userGroupRepository.findById(1L).get());
+            else {
+                userGroupRepository.save(new UserGroup());
+                entity.getUser().setUserGroup(userGroupRepository.findById(1L).get());
             }
         }
         return super.save(entity);
