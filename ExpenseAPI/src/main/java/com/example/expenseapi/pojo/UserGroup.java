@@ -11,8 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "group")
-public class Group {
+@Table(name = "user_group")
+public class UserGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -21,7 +21,7 @@ public class Group {
     @Column(name = "name", nullable = false, columnDefinition = "VARCHAR2(255)")
     private String name = "family";
 
-    public Group(String name) {
+    public UserGroup(String name) {
         this.name = name;
     }
 }

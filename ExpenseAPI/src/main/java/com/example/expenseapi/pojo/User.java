@@ -28,13 +28,13 @@ public class User {
     private String email;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "group_id", referencedColumnName = "id")
-    private Group group;
+    @JoinColumn(name = "user_group_id", referencedColumnName = "id", nullable = false)
+    private UserGroup userGroup;
 
-    public User(String username, String surname, String email, Group group) {
+    public User(String username, String surname, String email, UserGroup userGroup) {
         this.name = username;
         this.surname = surname;
         this.email = email;
-        this.group = group;
+        this.userGroup = userGroup;
     }
 }
