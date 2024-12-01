@@ -40,4 +40,12 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         }
         return super.save(entity);
     }
+
+    @Override
+    public List<Expense> getExpensesByCategory(String category) {
+        Iterable<Expense> expenses = expenseRepository.findAll();
+        return StreamSupport.stream(expenses.spliterator(), false)
+                .filter(expense -> expense.getCategory().getName().equals(category))
+                .collect(Collectors.toList());
+    }
 }
