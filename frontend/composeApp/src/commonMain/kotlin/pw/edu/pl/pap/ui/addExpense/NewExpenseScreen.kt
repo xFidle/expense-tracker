@@ -3,10 +3,10 @@ package pw.edu.pl.pap.ui.addExpense
 import androidx.compose.runtime.*
 
 @Composable
-fun AddExpenseScreen(onClose: () -> Unit){
+fun NewExpenseScreen(onClose: () -> Unit){
     var addButtonClicked by remember { mutableStateOf(false) }
 
-
+    Header()
 
     AddButton(addButtonClicked, onUpdate = {addButtonClicked = !addButtonClicked})
 
