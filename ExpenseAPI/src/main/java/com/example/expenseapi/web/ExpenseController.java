@@ -23,4 +23,9 @@ public class ExpenseController extends GenericController<Expense, Long> {
     public ResponseEntity<List<Expense>> getByEmail(@PathVariable String email) {
         return new ResponseEntity<>(((ExpenseService) service).getExpensesByEmail(email), HttpStatus.OK);
     }
+
+    @GetMapping("/category/{name}")
+    public ResponseEntity<List<Expense>> getByCategory(@PathVariable String name) {
+        return new ResponseEntity<>(((ExpenseService) service).getExpensesByCategory(name), HttpStatus.OK);
+    }
 }
