@@ -73,6 +73,8 @@ public class ExpenseController extends GenericController<Expense, Long> {
     }
 
     @GetMapping("/group/{name}")
+    @Operation(summary = "Retrieves expenses for given user group")
+    @ApiResponse(responseCode = "200", description = "List of expense object for given user group", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
     public ResponseEntity<List<Expense>> getByGroup(@PathVariable String name) {
         return new ResponseEntity<>(((ExpenseService) service).getExpensesForGroup(name), HttpStatus.OK);
     }
