@@ -20,9 +20,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     public List<Expense> getExpensesByEmail(String mail) {
-        Iterable<Expense> expanses = expenseRepository.findAll();
-        return StreamSupport.stream(expanses.spliterator(), false)
-                .filter(expanse -> expanse.getUser().getEmail().equals(mail))
+        Iterable<Expense> expenses = expenseRepository.findAll();
+        return StreamSupport.stream(expenses.spliterator(), false)
+                .filter(expense -> expense.getUser().getEmail().equals(mail))
                 .collect(Collectors.toList());
     }
 
