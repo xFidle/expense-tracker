@@ -13,13 +13,11 @@ import pw.edu.pl.pap.apiclient.ApiClient
 import pw.edu.pl.pap.data.InputFieldData
 import pw.edu.pl.pap.data.Record
 import pw.edu.pl.pap.data.User
+import pw.edu.pl.pap.data.Category
 
 class NewExpenseViewModel(private val apiClient: ApiClient) : ViewModel() {
     private val _inputFieldsData = mutableStateListOf<InputFieldData>() // Backing mutable state
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData // Immutable public view
-    var record: MutableState<Record> = mutableStateOf(
-        Record(0, 0f, User(0, "", "", ""))
-    )
 
     var price: MutableState<String> = mutableStateOf("")
 
@@ -64,7 +62,7 @@ class NewExpenseViewModel(private val apiClient: ApiClient) : ViewModel() {
         // download to set ID
         // find user
         // save record
-        val record = Record(0, price.value.toFloat(), User(0, "", "", ""))
+        val record = Record(0, price.value.toFloat(), "", User(0, "", "", ""), Category(0, "") )
         println("confirmed " + record.price)
     }
 }

@@ -48,7 +48,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
     } else if (showAddExpenseScreen) {
         NewExpenseScreen(
             viewModel = NewExpenseViewModel(viewModel.passApiClient()),
-            onClose = { showAddExpenseScreen = false }
+            onClose = { showAddExpenseScreen = false } )
     } else {
         Text(
             text = "No data available",
