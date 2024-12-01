@@ -9,8 +9,8 @@ import pw.edu.pl.pap.apiclient.ApiClient
 import pw.edu.pl.pap.data.*
 
 class HomeViewModel(private val apiClient: ApiClient) : ViewModel() {
-    private val _expensesInfo = MutableStateFlow<InitialExpenses?>(null)
-    val expensesInfo: StateFlow<InitialExpenses?> = _expensesInfo
+    private val _expensesInfo = MutableStateFlow<TotalExpenses?>(null)
+    val expensesInfo: StateFlow<TotalExpenses?> = _expensesInfo
 
     private val _records = MutableStateFlow<List<Record>>(emptyList())
     val records: StateFlow<List<Record>> = _records
@@ -18,7 +18,7 @@ class HomeViewModel(private val apiClient: ApiClient) : ViewModel() {
     fun fetchHomeInfo() {
         viewModelScope.launch {
             try {
-                val homeData = apiClient.getHome("herkules1@gmail.com")
+                val homeData = apiClient.getTotalExpenses("family", "herkules1@gmail.com")
                 _expensesInfo.value = homeData
             } catch (e: Exception) {
                 e.printStackTrace()
