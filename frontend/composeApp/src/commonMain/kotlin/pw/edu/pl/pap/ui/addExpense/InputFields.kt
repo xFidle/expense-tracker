@@ -33,12 +33,6 @@ fun createFields(inputFieldsdata: List<InputFieldData>) {
     }
 }
 
-
-//struktura do przekazywania kontentu tutaj
-// w screen wszystkie zmienne
-// launcher effect zależny od tych zmiennych, który uaktualnia record
-// wszystko przekazywane od screena
-
 @Composable
 fun createField(data: InputFieldData) {
     Card(
