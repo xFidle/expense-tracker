@@ -1,14 +1,12 @@
 package com.example.expenseapi.pojo;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.lang.NonNull;
 
 @Getter
 @Setter
-@AllArgsConstructor
+@RequiredArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
@@ -18,12 +16,15 @@ public class User {
     @Column(name = "id")
     private Long id;
 
+    @NonNull
     @Column(name = "name", nullable = false, columnDefinition = "VARCHAR2(255)")
     private String name;
 
+    @NonNull
     @Column(name = "surname", nullable = false, columnDefinition = "VARCHAR2(255)")
     private String surname;
 
+    @NonNull
     @Column(name = "email", nullable = false, columnDefinition = "VARCHAR2(255)")
     private String email;
 
