@@ -8,6 +8,8 @@ import androidx.compose.ui.unit.dp
 import pw.edu.pl.pap.viewmodel.HomeViewModel
 import pw.edu.pl.pap.ui.common.LoadingScreen
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
@@ -24,16 +26,28 @@ fun HomeScreen(viewModel: HomeViewModel) {
     if (isLoading) {
         LoadingScreen()
     } else if (homeInfo != null) {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            TopSection(homeInfo)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(16.dp)
+        ) {
+            item {
+                TopSection(homeInfo)
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
-            LazyColumn {
-                items(records) { record ->
-                    RecordBlock(record) {}
+            items(records) { record ->
+                RecordBlock(record) { clickedRecord ->
+                    println("Clicked record: $clickedRecord")
                 }
             }
         }
+    } else {
+        Text(
+            text = "No data available",
+            modifier = Modifier.fillMaxSize(),
+            textAlign = TextAlign.Center
+        )
     }
 }
