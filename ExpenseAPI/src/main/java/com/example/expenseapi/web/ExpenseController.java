@@ -34,48 +34,6 @@ public class ExpenseController extends GenericController<Expense, Long> {
         return new ResponseEntity<>(((ExpenseService) service).getExpensesByEmail(email), HttpStatus.OK);
     }
 
-    @GetMapping("/category/{name}")
-    @Operation(summary = "Retrieves expenses with given category")
-    @ApiResponse(responseCode = "200", description = "List of expense objects with given category", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
-    public ResponseEntity<List<Expense>> getByCategory(@PathVariable String name) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesByCategory(name), HttpStatus.OK);
-    }
-
-    @GetMapping("/date/{date}")
-    @Operation(summary = "Retrieves expenses with given date")
-    @ApiResponse(responseCode = "200", description = "List of expense objects with given date", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
-    public ResponseEntity<List<Expense>> getByDate(@PathVariable String date) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesByDate(date), HttpStatus.OK);
-    }
-
-    @GetMapping("/date/{begin}/{end}")
-    @Operation(summary = "Retrieves expenses between given dates")
-    @ApiResponse(responseCode = "200", description = "List of expense objects between given dates", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
-    public ResponseEntity<List<Expense>> getByPeriod(@PathVariable String begin, @PathVariable String end) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesByPeriod(begin, end), HttpStatus.OK);
-    }
-
-    @GetMapping("/price/{begin}/{end}")
-    @Operation(summary = "Retrieves expenses between given prices")
-    @ApiResponse(responseCode = "200", description = "List of expense object between given prices", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
-    public ResponseEntity<List<Expense>> getByPriceRange(@PathVariable double begin, @PathVariable double end) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesWherePriceInRange(begin, end), HttpStatus.OK);
-    }
-
-    @GetMapping("/price/lower/{price}")
-    @Operation(summary = "Retrieves expenses lower than given price")
-    @ApiResponse(responseCode = "200", description = "List of expense object which price is lower than given", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
-    public ResponseEntity<List<Expense>> getByPriceLowerThan(@PathVariable double price) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesWherePriceIsLower(price), HttpStatus.OK);
-    }
-
-    @GetMapping("/price/greater/{price}")
-    @Operation(summary = "Retrieves expenses greater than given price")
-    @ApiResponse(responseCode = "200", description = "List of expense object which price is greater than given", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
-    public ResponseEntity<List<Expense>> getByPriceGreaterThan(@PathVariable double price) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesWherePriceIsGreater(price), HttpStatus.OK);
-    }
-
     @GetMapping("/group/{name}")
     @Operation(summary = "Retrieves expenses for given user group")
     @ApiResponse(responseCode = "200", description = "List of expense object for given user group", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
