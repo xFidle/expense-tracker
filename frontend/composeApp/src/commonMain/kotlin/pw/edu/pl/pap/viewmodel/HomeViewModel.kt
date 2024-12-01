@@ -42,10 +42,4 @@ class HomeViewModel(private val apiClient: ApiClient) : ViewModel() {
     fun passApiClient(): ApiClient {
         return apiClient
     }
-
-    private fun groupRecordsByDate(records: List<Record>): Map<LocalDate, List<Record>> {
-        return records.groupBy { record ->
-            record.date
-        }
-    }
 }
