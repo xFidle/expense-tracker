@@ -9,8 +9,7 @@ import com.example.expenseapi.repository.CategoryRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Arrays;
 
 @SpringBootApplication
@@ -45,8 +44,8 @@ public class ExpenseApiApplication implements CommandLineRunner {
         categoryRepository.saveAll((Arrays.asList(categories)));
 
         Expense[] expenses = new Expense[]{
-                new Expense(100, users[0], categories[0], new Date(System.currentTimeMillis() - 86400000L)),
-                new Expense(200, users[1], categories[1], new Date(System.currentTimeMillis() - 86400000L)),
+                new Expense(100, users[0], categories[0], LocalDate.of(2024, 11, 30)),
+                new Expense(200, users[1], categories[1], LocalDate.of(2024, 11, 30)),
                 new Expense(300, users[2], categories[0]),
                 new Expense(300, users[2], categories[0]),
         };

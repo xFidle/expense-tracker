@@ -3,7 +3,8 @@ package com.example.expenseapi.pojo;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.Date;
+import java.time.LocalDate;
+
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class Expense {
     private double price;
 
     @Column(name = "date", nullable = false)
-    private Date date = new Date(System.currentTimeMillis());
+    private LocalDate date = LocalDate.now();
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -36,7 +37,7 @@ public class Expense {
         this.category = category;
     }
 
-    public Expense(double price, @NonNull User user, Category category, Date date) {
+    public Expense(double price, @NonNull User user, Category category, LocalDate date) {
         this.price = price;
         this.user = user;
         this.category = category;
