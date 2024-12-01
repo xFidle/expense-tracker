@@ -12,29 +12,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import pw.edu.pl.pap.ui.home.RecordBlock
-import pw.edu.pl.pap.ui.home.TopSection
+import kotlinx.coroutines.flow.StateFlow
+import pw.edu.pl.pap.data.InputFieldData
 
 @Composable
-fun InputFields() {
-    createFields()
+fun InputFields(inputFieldsdata: StateFlow<List<InputFieldData>>) {
+    createFields(inputFieldsdata)
 }
 
 @Composable
-fun createFields() {
+fun createFields(inputFieldsdata: StateFlow<List<InputFieldData>>) {
     Box(
         modifier = Modifier.offset(x = 0.dp, y = 100.dp)
     ){
         LazyColumn {
-            items(listOf("Price", "Name")) { title ->
-                createField(title)
+            items(inputFieldsdata.value) {
+                data -> createField(data)
             }
         }
     }
 }
 
+
+//struktura do przekazywania kontentu tutaj
+// w screen wszystkie zmienne
+// launcher effect zależny od tych zmiennych, który uaktualnia record
+// wszystko przekazywane od screena
+
 @Composable
-fun createField(title: String) {
+fun createField(data: InputFieldData) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -50,8 +56,8 @@ fun createField(title: String) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = title)
-            TextField(value = "variable", onValueChange = {})
+            Text(text = data.title)
+            TextField(value = data.parameter, onValueChange = {newParameter -> data.onChange(newParameter)})
         }
     }
 }

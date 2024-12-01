@@ -1,13 +1,16 @@
 package pw.edu.pl.pap.ui.addExpense
 
 import androidx.compose.runtime.*
-//import pw.edu.pl.pap.data.Record
-//import pw.edu.pl.pap.data.User
+import pw.edu.pl.pap.data.Record
+import pw.edu.pl.pap.data.User
+import pw.edu.pl.pap.data.InputFieldData
+import pw.edu.pl.pap.viewmodel.NewExpenseViewModel
 
 @Composable
 fun NewExpenseScreen(onClose: () -> Unit){
     var addButtonClicked by remember { mutableStateOf(false) }
-//    var newRecord by remember { mutableStateOf(Record(0, 0.toFloat(),0))}
+    var viewModel by remember { mutableStateOf(NewExpenseViewModel())}
+
 
 
     Header()
