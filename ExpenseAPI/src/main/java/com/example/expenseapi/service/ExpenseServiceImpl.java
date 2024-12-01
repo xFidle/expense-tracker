@@ -4,9 +4,7 @@ import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.repository.CategoryRepository;
 import com.example.expenseapi.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;

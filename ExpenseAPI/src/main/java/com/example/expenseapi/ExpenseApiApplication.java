@@ -29,7 +29,7 @@ public class ExpenseApiApplication implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         User[] users = new User[]{
             new User("Herkules1", "Herkules1", "herkules1@gmail.com"),
             new User("Herkules2", "Herkules2", "herkules2@gmail.com"),

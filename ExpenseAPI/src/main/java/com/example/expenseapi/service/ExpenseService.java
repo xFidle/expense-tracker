@@ -4,8 +4,8 @@ import java.util.List;
 import com.example.expenseapi.pojo.Expense;
 
 public interface ExpenseService extends GenericService<Expense, Long> {
-    public List<Expense> getExpensesByEmail(String email);
-    public List<Expense> getExpensesByCategory(String category);
-    public List<Expense> getExpensesByDate(String date);
-    public List<Expense> getExpensesByPeriod(String begin, String end);
+    List<Expense> getExpensesByEmail(String email);
+    List<Expense> getExpensesByCategory(String category);
+    List<Expense> getExpensesByDate(String date);
+    List<Expense> getExpensesByPeriod(String begin, String end);
 }
