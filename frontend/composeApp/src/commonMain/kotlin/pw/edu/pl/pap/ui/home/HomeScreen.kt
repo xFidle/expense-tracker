@@ -31,7 +31,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
             LazyColumn {
                 items(records) { record ->
-                    RecordBlock(record)
+                    RecordBlock(record) {}
                 }
             }
         }
