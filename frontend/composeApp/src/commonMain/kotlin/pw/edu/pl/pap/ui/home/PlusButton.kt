@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.*
 
 @Composable
-fun PlusButton(): Unit {
+fun PlusButton(buttonClicked: Boolean, onUpdate: (Boolean) -> Unit): Unit {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -28,7 +28,7 @@ fun PlusButton(): Unit {
 //                .padding(16.dp),
             colors = ButtonColors(Color.DarkGray, Color.Cyan, Color.DarkGray, Color.Cyan),
             contentPadding = PaddingValues(0.dp),
-            onClick = {}
+            onClick = {onUpdate(buttonClicked)}
         ) {
             Text(
                 text = "+",
