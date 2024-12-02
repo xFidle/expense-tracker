@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/expense")
@@ -61,6 +62,13 @@ public class ExpenseController extends GenericController<Expense, Long> {
     @ApiResponse(responseCode = "200", description = "All expenses grouped by category")
     public ResponseEntity<Map<Category, List<Expense>>> getCategoryExpenseMap() {
         return new ResponseEntity<>(((ExpenseService) service).getCategoryExpenseAsMap(), HttpStatus.OK);
+    }
+
+    @GetMapping("/recent")
+    @Operation(summary = "Returns recent Expense object")
+    @ApiResponse(responseCode = "200", description = "The most recent Expense object", content = @Content(schema = @Schema(implementation = Expense.class)))
+    public ResponseEntity<Optional<Expense>> getRecent() {
+        return new ResponseEntity<>(((ExpenseService) service).getRecentExpense(), HttpStatus.OK);
     }
 
 }
