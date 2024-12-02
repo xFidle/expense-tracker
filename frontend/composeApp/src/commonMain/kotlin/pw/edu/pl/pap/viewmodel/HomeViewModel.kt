@@ -39,6 +39,20 @@ class HomeViewModel(private val apiClient: ApiClient) : ViewModel() {
         }
     }
 
+    fun updateLatestRecord() {
+        viewModelScope.launch {
+            try {
+                apiClient.getRecentRecord().collect { record: Record ->
+                    val currentMap = _groupedRecords.value
+                    val currentList = currentMap[record.date] ?: emptyList()
+                    _groupedRecords.value = currentMap + (record.date to currentList + record)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun passApiClient(): ApiClient {
         return apiClient
     }

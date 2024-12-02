@@ -25,7 +25,6 @@ fun PlusButton(buttonClicked: Boolean, onUpdate: (Boolean) -> Unit): Unit {
                 .height(60.dp)
                 .align(Alignment.BottomEnd)
                 .offset(x= (-20).dp, y= (-20).dp),
-//                .padding(16.dp),
             colors = ButtonColors(Color.DarkGray, Color.Cyan, Color.DarkGray, Color.Cyan),
             contentPadding = PaddingValues(0.dp),
             onClick = {onUpdate(buttonClicked)}
@@ -42,8 +41,6 @@ fun PlusButton(buttonClicked: Boolean, onUpdate: (Boolean) -> Unit): Unit {
                         .offset(x = 0.dp, y = (-10).dp)
                 )
             }
-
         }
     }
-
 }

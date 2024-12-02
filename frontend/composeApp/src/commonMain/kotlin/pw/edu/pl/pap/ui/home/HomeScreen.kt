@@ -12,13 +12,14 @@ import pw.edu.pl.pap.ui.addExpense.NewExpenseScreen
 import pw.edu.pl.pap.viewmodel.NewExpenseViewModel
 import androidx.compose.material3.Text
 import androidx.compose.ui.text.style.TextAlign
+import pw.edu.pl.pap.data.NewExpense
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
     var showAddExpenseScreen by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
     val homeInfo = viewModel.expensesInfo.collectAsState().value
-    val groupedRecords = viewModel.groupedRecords.collectAsState().value
+    var groupedRecords = viewModel.groupedRecords.collectAsState().value
 
 
 //    var homeInfo by remember { mutableStateOf(viewModel.expensesInfo.collectAsState().value)}
@@ -53,7 +54,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
     } else if (showAddExpenseScreen) {
         NewExpenseScreen(
             viewModel = NewExpenseViewModel(viewModel.passApiClient()),
-            onClose = {
+            onClose =  {
+                viewModel.updateLatestRecord()
                 showAddExpenseScreen = false
             })
     } else {

@@ -7,6 +7,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.LocalDate
@@ -36,6 +37,14 @@ class ApiClient(private val baseUrl: String = "http://localhost:8080") {
         emit(getRecordsApi())
     }
 
+    private suspend fun getRecentRecordApi(): Record {
+        return httpClient.get("$baseUrl/expense/recent").body()
+    }
+
+    fun getRecentRecord() = flow {
+        emit(getRecentRecordApi())
+    }
+
     suspend fun postNewExpense(newExpense: NewExpense){
 
         println("record to be uploaded  " + newExpense)
@@ -47,4 +56,6 @@ class ApiClient(private val baseUrl: String = "http://localhost:8080") {
 
         println("Response  " + response.body())
     }
+
+
 }
