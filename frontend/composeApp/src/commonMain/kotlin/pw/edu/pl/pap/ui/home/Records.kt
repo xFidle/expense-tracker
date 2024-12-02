@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.LocalDate
 import pw.edu.pl.pap.data.Record
 import pw.edu.pl.pap.util.formatDate
+import pw.edu.pl.pap.util.formatNumber
 
 
 @Composable
@@ -55,7 +56,7 @@ fun RecordBlock(record: Record, onClick: (Record) -> Unit) {
             }
 
             Text(
-                text = "${record.price} zł",
+                text = "${formatNumber(record.price)} zł",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Light,
                 color = Color.Gray,
