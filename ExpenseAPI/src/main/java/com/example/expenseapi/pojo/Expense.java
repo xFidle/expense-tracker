@@ -32,7 +32,7 @@ public class Expense {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_id", referencedColumnName = "id")
-    private Category category = new Category();
+    private Category category;
 
     public Expense(double price, @NonNull User user, Category category) {
         this.price = price;
