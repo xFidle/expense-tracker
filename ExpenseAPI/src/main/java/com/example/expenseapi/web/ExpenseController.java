@@ -65,6 +65,8 @@ public class ExpenseController extends GenericController<Expense, Long> {
     }
 
     @GetMapping("/recent")
+    @Operation(summary = "Returns recent Expense object")
+    @ApiResponse(responseCode = "200", description = "The most recent Expense object")
     public ResponseEntity<Optional<Expense>> getRecent() {
         return new ResponseEntity<>(((ExpenseService) service).getRecentExpense(), HttpStatus.OK);
     }
