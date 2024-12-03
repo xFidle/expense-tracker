@@ -2,8 +2,24 @@
 
 Dla uruchomienia prototypu konieczne jest posiadanie zaistalowanej Javy w wersji 21.
 
-- Linux   - ./start.sh
-- Windows - ./start.bat
+### Linux
+Zainstalowanie Javy
+```
+sudo apt-get install openjdk-21-jdk     # ubuntu
+
+sudo dnf install java-21-openjdk-devel  # fedora
+```
+
+Uruchomienie
+```
+chmod +x start.sh
+./start.sh
+```
+
+### Windows
+```
+./start.bat
+```
 
 
 

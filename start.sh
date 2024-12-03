@@ -1,10 +1,8 @@
 #!/bin/bash
 
-(
-    cd ./ExpenseAPI
-    ./mvnw clean spring-boot:run >> /dev/null &
-)
-
+cd ./ExpenseAPI
+chmod +x ./mvnw
+./mvnw clean spring-boot:run >> /dev/null &
 BACKEND_PID=$!
 
 
@@ -16,9 +14,9 @@ done
 
 echo -e "\nBackend server is up. Starting frontend..."
 
-(
-    cd ./frontend
-    ./gradlew run
-)
+cd ../frontend
+chmod +x ./gradlew
+./gradlew run
+
 
 kill $BACKEND_PID
