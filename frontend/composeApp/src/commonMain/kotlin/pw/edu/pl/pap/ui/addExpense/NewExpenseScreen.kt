@@ -2,11 +2,7 @@ package pw.edu.pl.pap.ui.addExpense
 
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
-import pw.edu.pl.pap.data.Record
-import pw.edu.pl.pap.data.User
-import pw.edu.pl.pap.data.InputFieldData
 import pw.edu.pl.pap.viewmodel.NewExpenseViewModel
-import pw.edu.pl.pap.apiclient.NewExpenseApiClient
 
 @Composable
 fun NewExpenseScreen(
@@ -18,6 +14,7 @@ fun NewExpenseScreen(
     var backButtonClicked by remember { mutableStateOf(false) }
 
     Header()
+    viewModel.setupInputFields()
     InputFields(viewModel.inputFieldsData)
 
     AddButton(addButtonClicked, onUpdate = {addButtonClicked = !addButtonClicked})

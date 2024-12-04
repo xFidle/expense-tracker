@@ -22,18 +22,16 @@ class NewExpenseViewModel(private val apiClient: ApiClient) : ViewModel() {
 
     var price: MutableState<String> = mutableStateOf("")
 
-    init {
-        setupInputFields()
-    }
 
-    private fun setupInputFields() {
+    @Composable
+    fun setupInputFields() {
         _inputFieldsData.addAll(
             listOf(
                 InputFieldData(
                     title = "Price: ",
                     parameter = price,
                     onChange = { newParameter ->
-                        updatePrice(newParameter)
+                        viewModelScope.launch { updatePrice(newParameter, price) }
                     }
                 )
 //                ,
@@ -48,19 +46,11 @@ class NewExpenseViewModel(private val apiClient: ApiClient) : ViewModel() {
         )
     }
 
-    private fun updatePrice(newPrice: String) {
-        try {
-            price.value = newPrice
-            println("Updated record " + price.value)
-        } catch (e: Exception) {
-            println("Incorrect")
-        }
-    }
+
 
 
     @Composable
     fun expenseConfirmed(onConfirm: () -> Unit) {
-        val scope = rememberCoroutineScope()
         // download to set ID
         // find user
         // save record
@@ -71,12 +61,22 @@ class NewExpenseViewModel(private val apiClient: ApiClient) : ViewModel() {
 //        val record: Record = Record(id, price.value.toFloat(), user, date, category )
         val newExpense: NewExpense = NewExpense(price.value.toFloat(), date, user)
 
-        scope.launch{
+        viewModelScope.launch{
             apiClient.postNewExpense(newExpense)
             onConfirm()
         }
 
         println("confirmed " + newExpense.price)
+    }
+}
+
+
+suspend fun updatePrice(newPrice: String, price: MutableState<String>) {
+    try {
+        price.value = newPrice
+        println("Updated record " + price.value)
+    } catch (e: Exception) {
+        println("Incorrect")
     }
 }
 
