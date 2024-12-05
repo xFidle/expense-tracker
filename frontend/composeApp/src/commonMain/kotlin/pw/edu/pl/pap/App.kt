@@ -17,6 +17,7 @@ fun App(baseUrl: String, rootComponent: RootComponent) {
     val apiClient = remember { ApiClient(baseUrl) }
     val viewModel = remember(apiClient) { HomeViewModel(apiClient) }
 
+
     MaterialTheme(colorScheme = darkColorScheme()) {
         val childStack = rootComponent.childStack.subscribeAsState()
         Children(
