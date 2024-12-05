@@ -8,6 +8,7 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushNew
 import pw.edu.pl.pap.ui.home.HomeScreen
+import pw.edu.pl.pap.viewmodel.HomeViewModel
 
 class RootComponent(
     componentContext: ComponentContext

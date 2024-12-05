@@ -5,11 +5,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalDecomposeApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val rootComponent = retainedComponent { componentContext ->
+            RootComponent(
+                componentContext = componentContext
+            )
+        }
+
         setContent {
-            App(BuildConfig.BASE_URL)
+            App(BuildConfig.BASE_URL, rootComponent)
         }
     }
 }
