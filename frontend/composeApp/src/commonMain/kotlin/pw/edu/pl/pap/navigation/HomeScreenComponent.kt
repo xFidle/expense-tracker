@@ -14,7 +14,8 @@ class HomeScreenComponent (
     componentContext: ComponentContext,
     private val apiClient: ApiClient,
     private val coroutineScope: CoroutineScope,
-    val onAddExpenseButtonClicked: () -> Unit
+    val onAddExpenseButtonClicked: () -> Unit,
+    val onRecordClick: (Record) -> Unit
 ) : ComponentContext by componentContext {
 
     private val _expensesInfo = MutableStateFlow<TotalExpenses?>(null)
