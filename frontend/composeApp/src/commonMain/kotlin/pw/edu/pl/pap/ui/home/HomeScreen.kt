@@ -17,12 +17,12 @@ import pw.edu.pl.pap.ui.common.LoadingScreen
 fun HomeScreen(component: HomeScreenComponent) {
     var isLoading by remember { mutableStateOf(true) }
     val homeInfo = component.expensesInfo.collectAsState().value
-    val groupedRecords = component.groupedRecords.collectAsState().value
+    val groupedExpenses = component.groupedExpenses.collectAsState().value
 
 
     LaunchedEffect(Unit) {
         component.fetchHomeInfo()
-        component.fetchRecords()
+        component.fetchExpenses()
         isLoading = false
     }
 
@@ -41,8 +41,8 @@ fun HomeScreen(component: HomeScreenComponent) {
             }
 
             item {
-                GroupedRecordsList(groupedRecords, onRecordClick = { record ->
-                    component.onRecordClick(record)
+                GroupedExpensesList(groupedExpenses, onExpenseClick = { expense ->
+                    component.onExpenseClick(expense)
                 })
             }
         }

@@ -31,7 +31,7 @@ fun InputFields(inputFieldsdata: List<InputFieldData>) {
 
 @Composable
 fun createField(data: InputFieldData) {
-//    println("Parameter passed: " + data.record.value.price)
+//    println("Parameter passed: " + data.expense.value.price)
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier

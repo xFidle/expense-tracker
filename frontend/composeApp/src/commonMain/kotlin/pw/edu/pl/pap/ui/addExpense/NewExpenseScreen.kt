@@ -3,6 +3,7 @@ package pw.edu.pl.pap.ui.addExpense
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import pw.edu.pl.pap.navigation.NewExpenseScreenComponent
+import pw.edu.pl.pap.ui.common.Header
 
 @Composable
 fun NewExpenseScreen(
@@ -10,7 +11,7 @@ fun NewExpenseScreen(
     ){
     val scope = rememberCoroutineScope()
 
-    Header()
+    Header("New expense")
     component.setupInputFields()
     InputFields(component.inputFieldsData)
 

@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.Serializable
 import pw.edu.pl.pap.apiclient.ApiClient
-import pw.edu.pl.pap.data.Record
+import pw.edu.pl.pap.data.Expense
 
 class RootComponent(
     componentContext: ComponentContext,
@@ -31,7 +31,7 @@ class RootComponent(
         data object NewExpenseScreen : Configuration()
 
         @Serializable
-        data class ExpenseDetailsScreen(val record: Record) : Configuration()
+        data class ExpenseDetailsScreen(val expense: Expense) : Configuration()
     }
 
     sealed class Child {
@@ -52,8 +52,8 @@ class RootComponent(
                         onAddExpenseButtonClicked = {
                             navigation.pushNew(Configuration.NewExpenseScreen)
                         },
-                        onRecordClick = { record ->
-                            navigation.pushNew(Configuration.ExpenseDetailsScreen(record))
+                        onExpenseClick = { expense ->
+                            navigation.pushNew(Configuration.ExpenseDetailsScreen(expense))
                         }
                     )
                 )
@@ -73,7 +73,7 @@ class RootComponent(
                     componentContext = componentContext,
                     apiClient = apiClient,
                     coroutineScope = coroutineScope,
-                    record = configuration.record,
+                    expense = configuration.expense,
                     onBack = { navigation.pop() }
                 )
             )
