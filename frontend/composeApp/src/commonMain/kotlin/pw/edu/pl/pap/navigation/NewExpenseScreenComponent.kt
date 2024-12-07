@@ -39,7 +39,7 @@ class NewExpenseScreenComponent (
                     parameter = price,
                     onChange = { newParameter ->
                         val sanitizedInput = sanitizePriceInput(newParameter)
-                        if (sanitizedInput != "") {
+                        if (sanitizedInput != null) {
                             coroutineScope.launch { updatePrice(sanitizedInput, price) }
                         }
                     },

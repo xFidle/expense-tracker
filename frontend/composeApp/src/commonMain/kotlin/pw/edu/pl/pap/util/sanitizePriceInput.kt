@@ -1,6 +1,6 @@
 package pw.edu.pl.pap.util
 
-fun sanitizePriceInput(newParameter: String): String {
+fun sanitizePriceInput(newParameter: String): String? {
     val sanitizedInput = newParameter.replace(" ", "").replace(",", ".")
 
     return if (sanitizedInput.all { it.isDigit() || it == '.' } &&
@@ -8,6 +8,6 @@ fun sanitizePriceInput(newParameter: String): String {
     ) {
         sanitizedInput
     } else {
-        ""
+        null
     }
 }
