@@ -14,6 +14,7 @@ import pw.edu.pl.pap.apiclient.ApiClient
 import pw.edu.pl.pap.data.InputFieldData
 import pw.edu.pl.pap.data.NewExpense
 import pw.edu.pl.pap.data.User
+import pw.edu.pl.pap.util.sanitizePriceInput
 import pw.edu.pl.pap.util.updatePrice
 
 class NewExpenseScreenComponent (
@@ -37,8 +38,9 @@ class NewExpenseScreenComponent (
                     title = "Price: ",
                     parameter = price,
                     onChange = { newParameter ->
-                        if (newParameter.all { it.isDigit() }) {
-                            coroutineScope.launch { updatePrice(newParameter, price) }
+                        val sanitizedInput = sanitizePriceInput(newParameter)
+                        if (sanitizedInput != "") {
+                            coroutineScope.launch { updatePrice(sanitizedInput, price) }
                         }
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
