@@ -18,8 +18,8 @@ class RootComponent(
 ) : ComponentContext by componentContext {
 
     private val navigation = StackNavigation<Configuration>()
-    val apiClient = ApiClient(baseUrl)
-    val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val apiClient = ApiClient(baseUrl)
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     @Serializable
     sealed class Configuration {
@@ -60,6 +60,7 @@ class RootComponent(
             )
         }
 
+    @OptIn(ExperimentalDecomposeApi::class)
     val childStack = childStack(
         source = navigation,
         serializer = Configuration.serializer(),

@@ -25,7 +25,7 @@ class NewExpenseScreenComponent (
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData // Immutable public view
 
 
-    var price: MutableState<String> = mutableStateOf("")
+    private var price: MutableState<String> = mutableStateOf("")
 
 
     fun setupInputFields() {
