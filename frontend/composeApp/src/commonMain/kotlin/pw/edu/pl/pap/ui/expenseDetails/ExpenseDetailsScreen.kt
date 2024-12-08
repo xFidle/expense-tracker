@@ -28,8 +28,11 @@ fun ExpenseDetailsScreen(
 
     BackButton {
         scope.launch {
-//            component.onBack()
-            showConfirmDialog = true
+            if (component.noChange) {
+                component.onBack()
+            } else {
+                showConfirmDialog = true
+            }
         }
     }
 

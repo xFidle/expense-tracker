@@ -22,7 +22,7 @@ fun HomeScreen(component: HomeScreenComponent) {
 
     LaunchedEffect(Unit) {
         component.fetchHomeInfo()
-        component.fetchExpenses()
+        component.fetchAllExpenses()
         isLoading = false
     }
 

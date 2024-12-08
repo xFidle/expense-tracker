@@ -27,7 +27,9 @@ class ExpenseDetailsScreenComponent(
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
 
     private var newPrice: MutableState<String> = mutableStateOf("${expense.price}")
+
     val canSave by derivedStateOf { newPrice.value.isNotEmpty() }
+    val noChange by derivedStateOf { canSave && newPrice.value.toFloat() == expense.price }
 
     fun setupInputFields() {
         _inputFieldsData.clear()
