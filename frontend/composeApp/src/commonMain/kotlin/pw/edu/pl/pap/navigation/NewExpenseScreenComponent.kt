@@ -19,6 +19,7 @@ import pw.edu.pl.pap.util.sanitizePriceInput
 import pw.edu.pl.pap.util.updatePrice
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import pw.edu.pl.pap.data.inputFields.DropdownListData
 
 class NewExpenseScreenComponent (
     componentContext: ComponentContext,
@@ -32,6 +33,8 @@ class NewExpenseScreenComponent (
 
 
     private var price: MutableState<String> = mutableStateOf("")
+
+    private var selectedIndex: MutableState<Int> = mutableStateOf(0)
 
 //    private var price by remember { mutableStateOf("")}
 
@@ -54,15 +57,18 @@ class NewExpenseScreenComponent (
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
+                ),
+                InputFieldData(
+                    title = "Currency",
+                    isDropdownList = true,
+                    dropdownListData = DropdownListData(
+                        itemList = listOf("PLN", "EUR", "USD"),
+                        selectedIndex = selectedIndex,
+                        onItemClick = {
+                            selectedIndex.value = it
+                        }
+                    )
                 )
-//                ,
-//                InputFieldData(
-//                    title = "Description",
-//                    expense = expense,
-//                    onChange = { newParameter: String ->
-//                        updateField("Description", newParameter)
-//                    }
-//                )
             )
         )
     }
