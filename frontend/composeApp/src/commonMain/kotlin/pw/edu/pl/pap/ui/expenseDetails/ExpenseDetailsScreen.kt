@@ -21,7 +21,7 @@ fun ExpenseDetailsScreen(
     component.setupInputFields()
     InputFields(component.inputFieldsData)
 
-    ConfirmButton("SAVE") {
+    ConfirmButton("SAVE", component.canSave) {
         scope.launch {
             component.confirmChanges()
         }
