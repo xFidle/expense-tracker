@@ -1,6 +1,7 @@
 package pw.edu.pl.pap.navigation
 
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.KeyboardType
 import com.arkivanov.decompose.ComponentContext
@@ -9,7 +10,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import pw.edu.pl.pap.apiclient.ApiClient
 import pw.edu.pl.pap.data.Expense
-import pw.edu.pl.pap.data.InputFieldData
+import pw.edu.pl.pap.data.inputFields.InputFieldData
+import pw.edu.pl.pap.data.inputFields.TextFieldData
 import pw.edu.pl.pap.util.sanitizePriceInput
 import pw.edu.pl.pap.util.updatePrice
 
@@ -33,15 +35,18 @@ class ExpenseDetailsScreenComponent(
             listOf(
                 InputFieldData(
                     title = "Price: ",
-                    parameter = newPrice,
-                    onChange = { newParameter ->
-                        val sanitizedInput = sanitizePriceInput(newParameter)
+                    isDropdownList = false,
+                    textFieldData = TextFieldData(
+                        parameter = newPrice,
+                        onChange = { newParameter ->
+                            val sanitizedInput = sanitizePriceInput(newParameter)
 
-                        if (sanitizedInput != null) {
-                            coroutineScope.launch { updatePrice(sanitizedInput, newPrice) }
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            if (sanitizedInput != null) {
+                                coroutineScope.launch { updatePrice(sanitizedInput, newPrice) }
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
                 )
             )
         )

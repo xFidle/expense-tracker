@@ -13,8 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import pw.edu.pl.pap.data.InputFieldData
-
+import pw.edu.pl.pap.data.inputFields.DropdownListData
+import pw.edu.pl.pap.data.inputFields.InputFieldData
+import pw.edu.pl.pap.data.inputFields.TextFieldData
 
 
 @Composable
@@ -48,16 +49,29 @@ fun createField(data: InputFieldData) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = data.title)
-            TextField(
-                value = data.parameter.value,
-                onValueChange = {newParameter -> data.onChange(newParameter)},
-                keyboardOptions = data.keyboardOptions ?: KeyboardOptions.Default
-            )
+            if(!data.isDropdownList){
+                createTextField(data.textFieldData!!)
+            } else {
+                createDropdownList(data.dropdownListData!!)
+            }
         }
     }
 }
 
 @Composable
+fun createTextField(
+    data: TextFieldData
+){
+    TextField(
+        value = data.parameter.value,
+        onValueChange = {newParameter -> data.onChange(newParameter)},
+        keyboardOptions = data.keyboardOptions ?: KeyboardOptions.Default
+    )
+}
+
+@Composable
 fun createDropdownList(
-    data: InputFieldData
-)
+    data: DropdownListData
+){
+
+}

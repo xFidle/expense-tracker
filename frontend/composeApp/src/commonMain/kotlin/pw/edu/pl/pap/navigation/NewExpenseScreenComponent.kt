@@ -11,9 +11,10 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import pw.edu.pl.pap.apiclient.ApiClient
-import pw.edu.pl.pap.data.InputFieldData
+import pw.edu.pl.pap.data.inputFields.InputFieldData
 import pw.edu.pl.pap.data.NewExpense
 import pw.edu.pl.pap.data.User
+import pw.edu.pl.pap.data.inputFields.TextFieldData
 import pw.edu.pl.pap.util.sanitizePriceInput
 import pw.edu.pl.pap.util.updatePrice
 
@@ -36,14 +37,17 @@ class NewExpenseScreenComponent (
             listOf(
                 InputFieldData(
                     title = "Price: ",
-                    parameter = price,
-                    onChange = { newParameter ->
-                        val sanitizedInput = sanitizePriceInput(newParameter)
-                        if (sanitizedInput != null) {
-                            coroutineScope.launch { updatePrice(sanitizedInput, price) }
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    isDropdownList = false,
+                    textFieldData = TextFieldData(
+                        parameter = price,
+                        onChange = { newParameter ->
+                            val sanitizedInput = sanitizePriceInput(newParameter)
+                            if (sanitizedInput != null) {
+                                coroutineScope.launch { updatePrice(sanitizedInput, price) }
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
                 )
 //                ,
 //                InputFieldData(
