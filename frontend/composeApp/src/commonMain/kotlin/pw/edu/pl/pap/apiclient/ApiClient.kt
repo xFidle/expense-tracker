@@ -28,12 +28,16 @@ class ApiClient(private val baseUrl: String = "http://localhost:8080") {
         return httpClient.get("$baseUrl/expense/state/group/$userGroup/user/$userEmail").body()
     }
 
-    private suspend fun getExpensesApi(): Map<LocalDate, List<Expense>> {
+    private suspend fun getAllExpensesApi(): Map<LocalDate, List<Expense>> {
         return httpClient.get("$baseUrl/expense/all/dateMap").body()
     }
 
-    fun getExpenses() = flow {
-        emit(getExpensesApi())
+    fun getAllExpenses() = flow {
+        emit(getAllExpensesApi())
+    }
+
+    suspend fun getExpense(id: Long): Expense {
+        return httpClient.get("$baseUrl/expense/$id").body()
     }
 
     private suspend fun getRecentExpenseApi(): Expense {

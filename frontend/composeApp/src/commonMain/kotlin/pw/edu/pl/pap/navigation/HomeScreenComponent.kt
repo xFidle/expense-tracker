@@ -38,7 +38,7 @@ class HomeScreenComponent (
     fun fetchExpenses() {
         coroutineScope.launch {
             try {
-                apiClient.getExpenses().collect { expenses ->
+                apiClient.getAllExpenses().collect { expenses ->
                     _groupedExpenses.value = expenses
                 }
             } catch (e: Exception) {
