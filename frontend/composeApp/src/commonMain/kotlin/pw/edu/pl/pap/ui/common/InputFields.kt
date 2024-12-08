@@ -1,5 +1,6 @@
 package pw.edu.pl.pap.ui.common
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,9 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import pw.edu.pl.pap.data.inputFields.DropdownListData
 import pw.edu.pl.pap.data.inputFields.InputFieldData
 import pw.edu.pl.pap.data.inputFields.TextFieldData
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 
 @Composable
@@ -73,5 +79,13 @@ fun createTextField(
 fun createDropdownList(
     data: DropdownListData
 ){
-
+    var showDropdown by remember { mutableStateOf(false) }
+    Box(
+        modifier = Modifier
+            .clickable { showDropdown = !showDropdown },
+        contentAlignment = Alignment.Center
+        )
+    {
+        Text(text = data.itemList[data.selectedIndex.value], modifier = Modifier.padding(3.dp))
+    }
 }
