@@ -4,7 +4,11 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
-fun formatNumber(number: Float): String {
+fun formatNumber(number: Float?): String {
+
+    if (number == null) {
+        return "null"
+    }
 
     val symbols = DecimalFormatSymbols(Locale.getDefault()).apply {
         decimalSeparator = ','   // Use ',' for decimal separator

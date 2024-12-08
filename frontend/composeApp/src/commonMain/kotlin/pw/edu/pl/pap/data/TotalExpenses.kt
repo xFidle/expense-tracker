@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TotalExpenses(
-    val groupExpenses: Double? = null,
-    val userExpenses: Double? = null,
+    val groupExpenses: Float? = null,
+    val userExpenses: Float? = null,
 )
