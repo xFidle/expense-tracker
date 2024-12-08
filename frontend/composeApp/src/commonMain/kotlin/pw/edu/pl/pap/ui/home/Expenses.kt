@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.LocalDate
 import pw.edu.pl.pap.data.Expense
 import pw.edu.pl.pap.util.formatDate
-import pw.edu.pl.pap.util.formatNumber
+import pw.edu.pl.pap.util.formatForDisplay
 
 
 @Composable
@@ -56,7 +56,7 @@ fun ExpenseBlock(expense: Expense, onClick: (Expense) -> Unit) {
             }
 
             Text(
-                text = "${formatNumber(expense.price)} zł",
+                text = "${formatForDisplay(expense.price)} zł",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Light,
                 color = Color.Gray,

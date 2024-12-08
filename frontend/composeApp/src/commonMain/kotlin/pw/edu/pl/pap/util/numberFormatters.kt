@@ -4,7 +4,7 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
-fun formatNumber(number: Float?): String {
+fun formatForDisplay(number: Float?): String {
 
     if (number == null) {
         return "null"
@@ -17,6 +17,15 @@ fun formatNumber(number: Float?): String {
 
     val pattern = "#,###.##"
     val decimalFormat = DecimalFormat(pattern, symbols)
+
+    return decimalFormat.format(number)
+}
+
+fun formatForTextField(number: Float?): String {
+    if (number == null) {
+        return ""
+    }
+    val decimalFormat = DecimalFormat("0.##")
 
     return decimalFormat.format(number)
 }

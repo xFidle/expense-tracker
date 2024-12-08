@@ -9,7 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pw.edu.pl.pap.data.TotalExpenses
-import pw.edu.pl.pap.util.formatNumber
+import pw.edu.pl.pap.util.formatForDisplay
 
 @Composable
 fun TopSection(homeInfo: TotalExpenses) {
@@ -21,7 +21,7 @@ fun TopSection(homeInfo: TotalExpenses) {
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = "${formatNumber(homeInfo.userExpenses)} zł",
+                text = "${formatForDisplay(homeInfo.userExpenses)} zł",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -34,7 +34,7 @@ fun TopSection(homeInfo: TotalExpenses) {
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = "${formatNumber(homeInfo.groupExpenses)} zł",
+                text = "${formatForDisplay(homeInfo.groupExpenses)} zł",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium
             )

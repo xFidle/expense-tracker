@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import pw.edu.pl.pap.apiclient.ApiClient
 import pw.edu.pl.pap.data.Expense
+import pw.edu.pl.pap.util.formatForTextField
 
 class ExpenseDetailsScreenComponent(
     componentContext: ComponentContext,
@@ -16,11 +17,11 @@ class ExpenseDetailsScreenComponent(
     onBack: () -> Unit
 ) : BaseExpenseScreenComponent(componentContext, apiClient, coroutineScope, onBack) {
 
-    override var newPrice: MutableState<String> = mutableStateOf("${expense.price}")
+    override var newPrice: MutableState<String> = mutableStateOf(formatForTextField(expense.price))
 
     override var selectedIndex: MutableState<Int> = mutableStateOf(0)
 
-    val noChange by derivedStateOf { canConfirm && newPrice.value.toFloat() == expense.price }
+    val noChange by derivedStateOf { canConfirm && newPrice.value == formatForTextField(expense.price) }
 
     override fun confirm() {
         val newExpense = expense.copy(price = newPrice.value.toFloat())
