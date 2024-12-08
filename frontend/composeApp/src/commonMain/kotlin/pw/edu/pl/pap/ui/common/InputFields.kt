@@ -1,14 +1,11 @@
 package pw.edu.pl.pap.ui.common
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -86,7 +83,8 @@ fun createDropdownList(
     val scrollState = rememberScrollState()
 
     Column(
-        modifier = Modifier,
+        modifier = Modifier
+            .width(250.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
 
@@ -105,16 +103,14 @@ fun createDropdownList(
             if (showDropdown) {
                 Popup(
                     alignment = Alignment.TopCenter,
-//                properties = PopupProperties(
-//                    excludeFromSystemGesture = true,
-//                ),
-                    // to dismiss on click outside
                     onDismissRequest = { showDropdown = false }
                 ) {
 
                     Column(
                         modifier = Modifier
                             .heightIn(max = 90.dp)
+                            .width(250.dp)
+                            .background(Color.Gray)
                             .verticalScroll(state = scrollState)
                             .border(width = 1.dp, color = Color.Gray),
                         horizontalAlignment = Alignment.CenterHorizontally,
