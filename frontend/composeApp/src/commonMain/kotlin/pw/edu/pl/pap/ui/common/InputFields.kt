@@ -106,7 +106,7 @@ fun createDropdownList(
 
                     Column(
                         modifier = Modifier
-                            .heightIn(max = 90.dp)
+                            .heightIn(max = 200.dp)
                             .width(250.dp)
                             .background(Color.Gray)
                             .verticalScroll(state = scrollState)
