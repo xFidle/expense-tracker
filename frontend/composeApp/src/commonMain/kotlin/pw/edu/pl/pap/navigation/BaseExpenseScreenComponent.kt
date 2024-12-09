@@ -23,10 +23,31 @@ open class BaseExpenseScreenComponent(
     private val _inputFieldsData = mutableStateListOf<InputFieldData>()
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
 
+    protected open var title: MutableState<String> = mutableStateOf("")
+
+    private val categories = listOf("Food", "Health", "Transport")
+    //TODO fetch categories
+    protected open var categoryIndex: MutableState<Int> = mutableStateOf(0)
+
+
+    protected open var date: MutableState<String> = mutableStateOf("")
+    //TODO implement data selection from calendar
+
+
     protected open var newPrice: MutableState<String> = mutableStateOf("")
 
     private val currencies = listOf("PLN", "EUR", "USD")
-    protected  open var selectedIndex: MutableState<Int> = mutableStateOf(0)
+    //TODO fetch currencies
+    protected open var currencyIndex: MutableState<Int> = mutableStateOf(0)
+
+    private val methodsOfPayment = listOf("Cash", "Card", "W naturze")
+    //TODO fetch methods of payment
+    protected open var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(0)
+
+    private val users = listOf("Herkules", "Zeus", "Posejdon")
+    //TODO fetch available users
+    protected open var userIndex: MutableState<Int> = mutableStateOf(0)
+
 
     val canConfirm by derivedStateOf { newPrice.value.isNotEmpty() }
 
@@ -34,6 +55,39 @@ open class BaseExpenseScreenComponent(
         _inputFieldsData.clear()
         _inputFieldsData.addAll(
             listOf(
+                InputFieldData(
+                    title = "Title: ",
+                    isDropdownList = false,
+                    textFieldData = TextFieldData(
+                        parameter = title,
+                        onChange = {
+                            coroutineScope.launch { title.value = it }
+                        }
+                    )
+                ),
+                InputFieldData(
+                    title = "Category: ",
+                    isDropdownList = true,
+                    dropdownListData = DropdownListData(
+                        itemList = categories,
+                        selectedIndex = categoryIndex,
+                        onItemClick = {
+                            coroutineScope.launch { categoryIndex.value = it }
+                        }
+                    )
+                ),
+                InputFieldData(
+                    title = "Date: ",
+                    isDropdownList = false,
+                    textFieldData = TextFieldData(
+                        parameter = date,
+                        onChange = {
+                            coroutineScope.launch { date.value = it }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        //not sanitizing data input because its a temporary solution (hopefully)
+                    )
+                ),
                 InputFieldData(
                     title = "Price: ",
                     isDropdownList = false,
@@ -54,13 +108,34 @@ open class BaseExpenseScreenComponent(
                     isDropdownList = true,
                     dropdownListData = DropdownListData(
                         itemList = currencies,
-                        selectedIndex = selectedIndex,
+                        selectedIndex = currencyIndex,
                         onItemClick = {
-                            selectedIndex.value = it
+                            currencyIndex.value = it
+                        }
+                    )
+                ),
+                InputFieldData(
+                    title = "Method of payment: ",
+                    isDropdownList = true,
+                    dropdownListData = DropdownListData(
+                        itemList = methodsOfPayment,
+                        selectedIndex = methodOfPaymentIndex,
+                        onItemClick = {
+                            coroutineScope.launch { methodOfPaymentIndex.value = it }
+                        }
+                    )
+                ),
+                InputFieldData(
+                    title = "User: ",
+                    isDropdownList = true,
+                    dropdownListData = DropdownListData(
+                        itemList = users,
+                        selectedIndex = userIndex,
+                        onItemClick = {
+                            coroutineScope.launch { userIndex.value = it }
                         }
                     )
                 )
-
             )
         )
     }

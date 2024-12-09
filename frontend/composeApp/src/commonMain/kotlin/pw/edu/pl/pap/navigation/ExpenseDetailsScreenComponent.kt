@@ -19,7 +19,7 @@ class ExpenseDetailsScreenComponent(
 
     override var newPrice: MutableState<String> = mutableStateOf(formatForTextField(expense.price))
 
-    override var selectedIndex: MutableState<Int> = mutableStateOf(0)
+    override var currencyIndex: MutableState<Int> = mutableStateOf(0)
 
     val noChange by derivedStateOf { canConfirm && newPrice.value == formatForTextField(expense.price) }
 
