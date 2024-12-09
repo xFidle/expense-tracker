@@ -57,7 +57,6 @@ open class BaseExpenseScreenComponent(
             listOf(
                 InputFieldData(
                     title = "Title: ",
-                    isDropdownList = false,
                     textFieldData = TextFieldData(
                         parameter = title,
                         onChange = {
@@ -78,7 +77,6 @@ open class BaseExpenseScreenComponent(
                 ),
                 InputFieldData(
                     title = "Date: ",
-                    isDropdownList = false,
                     textFieldData = TextFieldData(
                         parameter = date,
                         onChange = {
@@ -90,7 +88,6 @@ open class BaseExpenseScreenComponent(
                 ),
                 InputFieldData(
                     title = "Price: ",
-                    isDropdownList = false,
                     textFieldData = TextFieldData(
                         parameter = newPrice,
                         onChange = { newParameter ->
