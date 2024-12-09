@@ -3,8 +3,6 @@ package pw.edu.pl.pap.ui.expenseDetails
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import pw.edu.pl.pap.navigation.ExpenseDetailsScreenComponent
-import pw.edu.pl.pap.ui.common.BackButton
-import pw.edu.pl.pap.ui.common.ConfirmButton
 import pw.edu.pl.pap.ui.common.Header
 import pw.edu.pl.pap.ui.common.InputFields
 import pw.edu.pl.pap.ui.common.DismissChangesPopup
@@ -20,21 +18,17 @@ fun ExpenseDetailsScreen(
     component.setupInputFields()
     InputFields(component.inputFieldsData)
 
-    ConfirmButton("SAVE", component.canConfirm) {
-        scope.launch {
-            component.confirm()
-        }
-    }
-
-    BackButton {
-        scope.launch {
-            if (component.noChange) {
-                component.onBack()
-            } else {
-                showConfirmDialog = true
+    ExpenseDetailsButtonRow(
+        onBack = {
+            scope.launch {
+                handleBack(component) { showConfirmDialog = it }
             }
-        }
-    }
+        },
+        onConfirm = { scope.launch { component.confirm() } },
+        onDelete = {},
+        isConfirmEnabled = component.canConfirm
+
+    )
 
     if (showConfirmDialog) {
         DismissChangesPopup(
@@ -46,5 +40,13 @@ fun ExpenseDetailsScreen(
                 showConfirmDialog = false
             }
         )
+    }
+}
+
+fun handleBack(component: ExpenseDetailsScreenComponent, showConfirmDialog: (Boolean) -> Unit) {
+    if (component.noChange) {
+        component.onBack()
+    } else {
+        showConfirmDialog(true)
     }
 }
