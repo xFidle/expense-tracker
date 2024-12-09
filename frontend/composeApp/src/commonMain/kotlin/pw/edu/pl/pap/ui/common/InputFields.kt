@@ -92,6 +92,7 @@ fun createDropdownList(
         // button
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .clickable { showDropdown = true },
             contentAlignment = Alignment.Center
         )
@@ -148,6 +149,7 @@ fun createDatePicker(
     var showDatePicker by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
+            .width(250.dp)
             .clickable { showDatePicker = true },
         contentAlignment = Alignment.Center
     )
