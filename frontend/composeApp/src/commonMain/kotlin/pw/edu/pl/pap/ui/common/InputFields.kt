@@ -20,6 +20,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Popup
+import kotlinx.datetime.LocalDate
+import pw.edu.pl.pap.data.inputFields.DatePickerData
 
 
 @Composable
@@ -53,10 +55,12 @@ fun createField(data: InputFieldData) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = data.title)
-            if(!data.isDropdownList){
-                createTextField(data.textFieldData!!)
-            } else {
+            if(data.isDropdownList){
                 createDropdownList(data.dropdownListData!!)
+            } else if(data.isDatePicker) {
+                createDatePicker(data.datePickerData!!)
+            } else {
+                createTextField(data.textFieldData!!)
             }
         }
     }
@@ -89,6 +93,7 @@ fun createDropdownList(
         // button
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .clickable { showDropdown = true },
             contentAlignment = Alignment.Center
         )
@@ -136,4 +141,53 @@ fun createDropdownList(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun createDatePicker(
+    data: DatePickerData
+){
+    var showDatePicker by remember { mutableStateOf(false) }
+    var selectedDate by remember { mutableStateOf<LocalDate>(data.date.value) }
+    val datePickerState = rememberDatePickerState()
+
+    Box(
+        modifier = Modifier
+            .width(250.dp)
+            .clickable { showDatePicker = true },
+        contentAlignment = Alignment.Center
+    )
+    {
+        Text(text = data.date.value.toString(), modifier = Modifier.padding(3.dp))
+    }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = {showDatePicker = false},
+            confirmButton = {
+                TextButton(onClick = {
+                    val millis = datePickerState.selectedDateMillis
+                    if (millis != null) {
+                        data.onDateConfirm(millis)
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            },
+            content = {
+                DatePicker(
+                    state = datePickerState,
+                    showModeToggle = true // Allows toggling between calendar and text input
+                )
+            }
+        )
+    }
+
 }
