@@ -2,6 +2,9 @@ package pw.edu.pl.pap.apiclient
 
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.cache.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -15,13 +18,17 @@ import pw.edu.pl.pap.data.TotalExpenses
 import pw.edu.pl.pap.data.Expense
 
 class ApiClient(private val baseUrl: String = "http://localhost:8080") {
-    private val httpClient = HttpClient() {
+    private val httpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
                 prettyPrint = true
                 ignoreUnknownKeys = true
             })
         }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 3000
+        }
+        install(HttpCache)
     }
 
     suspend fun getTotalExpenses(userGroup: String, userEmail: String): TotalExpenses {
@@ -36,8 +43,12 @@ class ApiClient(private val baseUrl: String = "http://localhost:8080") {
         emit(getAllExpensesApi())
     }
 
-    suspend fun getExpense(id: Long): Expense {
+    suspend fun getExpenseApi(id: Long): Expense {
         return httpClient.get("$baseUrl/expense/$id").body()
+    }
+
+    fun getExpense(id: Long) = flow {
+        emit(getExpenseApi(id))
     }
 
     private suspend fun getRecentExpenseApi(): Expense {

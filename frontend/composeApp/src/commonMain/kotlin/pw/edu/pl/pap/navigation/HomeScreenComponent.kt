@@ -10,7 +10,7 @@ import pw.edu.pl.pap.apiclient.ApiClient
 import pw.edu.pl.pap.data.Expense
 import pw.edu.pl.pap.data.TotalExpenses
 
-class HomeScreenComponent (
+class HomeScreenComponent(
     componentContext: ComponentContext,
     private val apiClient: ApiClient,
     private val coroutineScope: CoroutineScope,
@@ -18,10 +18,46 @@ class HomeScreenComponent (
     val onExpenseClick: (Expense) -> Unit
 ) : ComponentContext by componentContext {
 
-    private val _expensesInfo = MutableStateFlow<TotalExpenses?>(null)
-    val expensesInfo: StateFlow<TotalExpenses?> = _expensesInfo
+    sealed class NavigationState {
+        data object InitialLoad : NavigationState()
+        data object FromNewExpenseScreen : NavigationState()
+        data class FromExpenseDetailsScreen(val expense: Expense) : NavigationState()
+        data object Empty : NavigationState()
+    }
 
-    fun fetchHomeInfo() {
+    private val _navigationState = MutableStateFlow<NavigationState>(NavigationState.InitialLoad)
+    val navigationState: StateFlow<NavigationState> get() = _navigationState
+
+
+    fun updateNavigationState(newState: NavigationState) {
+        _navigationState.value = newState
+    }
+
+    fun handleNavigationBasedOnState() {
+        when (_navigationState.value) {
+            is NavigationState.InitialLoad -> {
+                fetchHomeInfo()
+                fetchAllExpenses()
+            }
+            is NavigationState.FromNewExpenseScreen -> {
+                getRecentExpense()
+            }
+            is NavigationState.FromExpenseDetailsScreen -> {
+                val expense = (_navigationState.value as NavigationState.FromExpenseDetailsScreen).expense
+                updateExpense(expense)
+            }
+            is NavigationState.Empty -> {
+                // Do nothing
+            }
+        }
+
+        updateNavigationState(NavigationState.Empty)
+    }
+
+    private val _expensesInfo = MutableStateFlow<TotalExpenses?>(null)
+    val expensesInfo: StateFlow<TotalExpenses?> get() = _expensesInfo
+
+    private fun fetchHomeInfo() {
         coroutineScope.launch {
             try {
                 val homeData = apiClient.getTotalExpenses("family", "herkules1@gmail.com")
@@ -33,9 +69,10 @@ class HomeScreenComponent (
     }
 
     private val _groupedExpenses = MutableStateFlow<Map<LocalDate, List<Expense>>>(emptyMap())
-    val groupedExpenses: StateFlow<Map<LocalDate, List<Expense>>> = _groupedExpenses
+    val groupedExpenses: StateFlow<Map<LocalDate, List<Expense>>> get() = _groupedExpenses
 
-    fun fetchExpenses() {
+    private fun fetchAllExpenses() {
+        println("FETCH EXPENSES")
         coroutineScope.launch {
             try {
                 apiClient.getAllExpenses().collect { expenses ->
@@ -47,13 +84,14 @@ class HomeScreenComponent (
         }
     }
 
-    fun updateRecentExpense() {
+    private fun getRecentExpense() {
+        println("RECENT EXPENSE")
         coroutineScope.launch {
             try {
                 apiClient.getRecentExpense().collect { expense: Expense ->
                     val currentMap = _groupedExpenses.value
                     val currentList = currentMap[expense.date] ?: emptyList()
-                    _groupedExpenses.value = currentMap + (expense.date to currentList + expense)
+                    _groupedExpenses.value = currentMap + (expense.date to listOf(expense) + currentList)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -61,6 +99,22 @@ class HomeScreenComponent (
         }
     }
 
-
-
+    private fun updateExpense(expense: Expense) {
+        println("UPDATE EXPENSE")
+        coroutineScope.launch {
+            try {
+                apiClient.getExpense(expense.id).collect { updatedExpense ->
+                    val currentMap = _groupedExpenses.value
+                    val dateKey = updatedExpense.date
+                    val currentList = currentMap[dateKey] ?: emptyList()
+                    val updatedList = currentList.map { expense ->
+                        if (expense.id == updatedExpense.id) updatedExpense else expense
+                    }
+                    _groupedExpenses.value = currentMap + (dateKey to updatedList)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 }

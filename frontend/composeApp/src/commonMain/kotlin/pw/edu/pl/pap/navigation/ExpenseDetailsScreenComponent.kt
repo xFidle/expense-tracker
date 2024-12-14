@@ -1,63 +1,51 @@
 package pw.edu.pl.pap.navigation
 
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
-import androidx.compose.ui.text.input.KeyboardType
 import com.arkivanov.decompose.ComponentContext
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import pw.edu.pl.pap.apiclient.ApiClient
 import pw.edu.pl.pap.data.Expense
-import pw.edu.pl.pap.data.InputFieldData
-import pw.edu.pl.pap.util.sanitizePriceInput
-import pw.edu.pl.pap.util.updatePrice
+import pw.edu.pl.pap.util.formatForTextField
 
 class ExpenseDetailsScreenComponent(
     componentContext: ComponentContext,
-    private val apiClient: ApiClient,
-    private val coroutineScope: CoroutineScope,
-    val expense: Expense,
-    val onBack: () -> Unit
-) : ComponentContext by componentContext {
+    apiClient: ApiClient,
+    coroutineScope: CoroutineScope,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit,
+    private val expense: Expense
+    ) : BaseExpenseScreenComponent(componentContext, apiClient, coroutineScope, onDismiss, onSave) {
 
-    private val _inputFieldsData = mutableStateListOf<InputFieldData>()
-    val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
+    override var title: MutableState<String> = mutableStateOf("")
+    //TODO fetch title
+    override var categoryIndex: MutableState<Int> = mutableStateOf(expense.category.id.toInt())
 
-    private var newPrice: MutableState<String> = mutableStateOf("${expense.price}")
-    val canSave by derivedStateOf { newPrice.value.isNotEmpty() }
+    override var date: MutableState<LocalDate> = mutableStateOf(expense.date)
 
-    fun setupInputFields() {
-        _inputFieldsData.clear()
-        _inputFieldsData.addAll(
-            listOf(
-                InputFieldData(
-                    title = "Price: ",
-                    parameter = newPrice,
-                    onChange = { newParameter ->
-                        val sanitizedInput = sanitizePriceInput(newParameter)
+    override var newPrice: MutableState<String> = mutableStateOf(formatForTextField(expense.price))
+    override var currencyIndex: MutableState<Int> = mutableStateOf(0)
+    //TODO fetch currency
+    override var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(0)
+    //TODO fetch method of payment
 
-                        if (sanitizedInput != null) {
-                            coroutineScope.launch { updatePrice(sanitizedInput, newPrice) }
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            )
-        )
-    }
+    override var userIndex: MutableState<Int> = mutableStateOf(expense.user.id.toInt())
 
-    fun confirmChanges() {
+    val noChange by derivedStateOf { canConfirm && newPrice.value == formatForTextField(expense.price) }
+
+    override fun confirm() {
         val newExpense = expense.copy(price = newPrice.value.toFloat())
 
         if (newExpense == expense) {
-            onBack()
+            onDismiss()
             return
         }
 
         coroutineScope.launch {
             if (apiClient.updateExpense(newExpense).status.isSuccess()) {
-                onBack()
+                onSave()
             }
         }
 

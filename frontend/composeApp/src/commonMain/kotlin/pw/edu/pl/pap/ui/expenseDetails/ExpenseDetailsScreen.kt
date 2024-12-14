@@ -2,13 +2,10 @@ package pw.edu.pl.pap.ui.expenseDetails
 
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
-import pw.edu.pl.pap.data.Expense
 import pw.edu.pl.pap.navigation.ExpenseDetailsScreenComponent
-import pw.edu.pl.pap.ui.common.BackButton
-import pw.edu.pl.pap.ui.common.ConfirmButton
 import pw.edu.pl.pap.ui.common.Header
 import pw.edu.pl.pap.ui.common.InputFields
-import pw.edu.pl.pap.util.ConfirmChangesPopup
+import pw.edu.pl.pap.ui.common.DismissChangesPopup
 
 @Composable
 fun ExpenseDetailsScreen(
@@ -21,28 +18,35 @@ fun ExpenseDetailsScreen(
     component.setupInputFields()
     InputFields(component.inputFieldsData)
 
-    ConfirmButton("SAVE") {
-        scope.launch {
-            component.confirmChanges()
-        }
-    }
+    ExpenseDetailsButtonRow(
+        onBack = {
+            scope.launch {
+                handleBack(component) { showConfirmDialog = it }
+            }
+        },
+        onConfirm = { scope.launch { component.confirm() } },
+        onDelete = {},
+        isConfirmEnabled = component.canConfirm
 
-    BackButton {
-        scope.launch {
-//            component.onBack()
-            showConfirmDialog = true
-        }
-    }
+    )
 
     if (showConfirmDialog) {
-        ConfirmChangesPopup(
+        DismissChangesPopup(
             onDismiss = {
                 showConfirmDialog = false
-                component.onBack()
+                component.onDismiss()
             },
             onConfirm = {
                 showConfirmDialog = false
             }
         )
+    }
+}
+
+fun handleBack(component: ExpenseDetailsScreenComponent, showConfirmDialog: (Boolean) -> Unit) {
+    if (component.noChange) {
+        component.onDismiss()
+    } else {
+        showConfirmDialog(true)
     }
 }
