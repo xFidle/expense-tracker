@@ -6,13 +6,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import pw.edu.pl.pap.apiclient.ApiClient
+import pw.edu.pl.pap.api.ApiService
 import pw.edu.pl.pap.data.Expense
 import pw.edu.pl.pap.data.TotalExpenses
 
 class HomeScreenComponent(
     componentContext: ComponentContext,
-    private val apiClient: ApiClient,
+    private val apiService: ApiService,
     private val coroutineScope: CoroutineScope,
     val onAddExpenseButtonClicked: () -> Unit,
     val onExpenseClick: (Expense) -> Unit
@@ -54,14 +54,14 @@ class HomeScreenComponent(
         updateNavigationState(NavigationState.Empty)
     }
 
-    private val _expensesInfo = MutableStateFlow<TotalExpenses?>(null)
-    val expensesInfo: StateFlow<TotalExpenses?> get() = _expensesInfo
+    private val _homeInfo = MutableStateFlow<TotalExpenses?>(null)
+    val homeInfo: StateFlow<TotalExpenses?> get() = _homeInfo
 
     private fun fetchHomeInfo() {
         coroutineScope.launch {
             try {
-                val homeData = apiClient.getTotalExpenses("family", "herkules1@gmail.com")
-                _expensesInfo.value = homeData
+                val homeData = apiService.expenseApiClient.getTotalExpenses("family", "herkules1@gmail.com")
+                _homeInfo.value = homeData
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -72,10 +72,10 @@ class HomeScreenComponent(
     val groupedExpenses: StateFlow<Map<LocalDate, List<Expense>>> get() = _groupedExpenses
 
     private fun fetchAllExpenses() {
-        println("FETCH EXPENSES")
+//        println("FETCH EXPENSES")
         coroutineScope.launch {
             try {
-                apiClient.getAllExpenses().collect { expenses ->
+                apiService.expenseApiClient.getAllExpenses().collect { expenses ->
                     _groupedExpenses.value = expenses
                 }
             } catch (e: Exception) {
@@ -85,10 +85,10 @@ class HomeScreenComponent(
     }
 
     private fun getRecentExpense() {
-        println("RECENT EXPENSE")
+//        println("RECENT EXPENSE")
         coroutineScope.launch {
             try {
-                apiClient.getRecentExpense().collect { expense: Expense ->
+                apiService.expenseApiClient.getRecentExpense().collect { expense: Expense ->
                     val currentMap = _groupedExpenses.value
                     val currentList = currentMap[expense.date] ?: emptyList()
                     _groupedExpenses.value = currentMap + (expense.date to listOf(expense) + currentList)
@@ -100,10 +100,10 @@ class HomeScreenComponent(
     }
 
     private fun updateExpense(expense: Expense) {
-        println("UPDATE EXPENSE")
+//        println("UPDATE EXPENSE")
         coroutineScope.launch {
             try {
-                apiClient.getExpense(expense.id).collect { updatedExpense ->
+                apiService.expenseApiClient.getExpense(expense.id).collect { updatedExpense ->
                     val currentMap = _groupedExpenses.value
                     val dateKey = updatedExpense.date
                     val currentList = currentMap[dateKey] ?: emptyList()

@@ -16,7 +16,7 @@ import pw.edu.pl.pap.ui.common.LoadingScreen
 @Composable
 fun HomeScreen(component: HomeScreenComponent) {
     var isLoading by remember { mutableStateOf(true) }
-    val homeInfo = component.expensesInfo.collectAsState().value
+    val homeInfo = component.homeInfo.collectAsState().value
     val groupedExpenses = component.groupedExpenses.collectAsState().value
 
 
