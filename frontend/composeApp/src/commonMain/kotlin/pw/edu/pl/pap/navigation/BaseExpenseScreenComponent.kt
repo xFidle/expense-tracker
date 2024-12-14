@@ -10,7 +10,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
-import pw.edu.pl.pap.apiclient.ApiClient
+import pw.edu.pl.pap.api.ApiService
 import pw.edu.pl.pap.data.inputFields.DatePickerData
 import pw.edu.pl.pap.data.inputFields.DropdownListData
 import pw.edu.pl.pap.data.inputFields.InputFieldData
@@ -20,7 +20,7 @@ import pw.edu.pl.pap.util.updatePrice
 
 open class BaseExpenseScreenComponent(
     componentContext: ComponentContext,
-    protected val apiClient: ApiClient,
+    protected val apiService: ApiService,
     protected val coroutineScope: CoroutineScope,
     val onDismiss: () -> Unit,
     val onSave: () -> Unit

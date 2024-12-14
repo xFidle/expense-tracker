@@ -6,18 +6,18 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import pw.edu.pl.pap.apiclient.ApiClient
+import pw.edu.pl.pap.api.ApiService
 import pw.edu.pl.pap.data.Expense
 import pw.edu.pl.pap.util.formatForTextField
 
 class ExpenseDetailsScreenComponent(
     componentContext: ComponentContext,
-    apiClient: ApiClient,
+    apiService: ApiService,
     coroutineScope: CoroutineScope,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
     private val expense: Expense
-    ) : BaseExpenseScreenComponent(componentContext, apiClient, coroutineScope, onDismiss, onSave) {
+    ) : BaseExpenseScreenComponent(componentContext, apiService, coroutineScope, onDismiss, onSave) {
 
     override var title: MutableState<String> = mutableStateOf("")
     //TODO fetch title
@@ -44,7 +44,7 @@ class ExpenseDetailsScreenComponent(
         }
 
         coroutineScope.launch {
-            if (apiClient.updateExpense(newExpense).status.isSuccess()) {
+            if (apiService.expenseApiClient.updateExpense(newExpense).status.isSuccess()) {
                 onSave()
             }
         }
