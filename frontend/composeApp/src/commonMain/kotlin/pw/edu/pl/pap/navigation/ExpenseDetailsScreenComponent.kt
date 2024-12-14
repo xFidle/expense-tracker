@@ -16,6 +16,7 @@ class ExpenseDetailsScreenComponent(
     coroutineScope: CoroutineScope,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
+    private val onDelete: () -> Unit,
     private val expense: Expense
     ) : BaseExpenseScreenComponent(componentContext, apiService, coroutineScope, onDismiss, onSave) {
 
@@ -50,5 +51,14 @@ class ExpenseDetailsScreenComponent(
         }
 
         println("Updated Expense ${newExpense.id} from ${expense.price} to ${newExpense.price}")
+    }
+    
+    fun deleteExpense() {
+        println("Deleting expense $expense")
+        coroutineScope.launch { 
+            if (apiService.expenseApiClient.deleteExpense(expense.id).status.isSuccess()) {
+                onDelete()
+            }
+        }
     }
 }

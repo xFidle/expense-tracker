@@ -83,7 +83,13 @@ class RootComponent(
                     onSave = {
                         navigation.pop()
                         (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
-                            HomeScreenComponent.NavigationState.FromExpenseDetailsScreen(configuration.expense)
+                            HomeScreenComponent.NavigationState.FromExpenseDetailsScreenEdit(configuration.expense)
+                        )
+                    },
+                    onDelete = {
+                        navigation.pop()
+                        (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
+                            HomeScreenComponent.NavigationState.FromExpenseDetailsScreenDelete(configuration.expense)
                         )
                     },
                     expense = configuration.expense

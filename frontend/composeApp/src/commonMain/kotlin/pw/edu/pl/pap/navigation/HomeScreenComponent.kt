@@ -21,7 +21,8 @@ class HomeScreenComponent(
     sealed class NavigationState {
         data object InitialLoad : NavigationState()
         data object FromNewExpenseScreen : NavigationState()
-        data class FromExpenseDetailsScreen(val expense: Expense) : NavigationState()
+        data class FromExpenseDetailsScreenEdit(val expense: Expense) : NavigationState()
+        data class FromExpenseDetailsScreenDelete(val expense: Expense) : NavigationState()
         data object Empty : NavigationState()
     }
 
@@ -42,9 +43,13 @@ class HomeScreenComponent(
             is NavigationState.FromNewExpenseScreen -> {
                 getRecentExpense()
             }
-            is NavigationState.FromExpenseDetailsScreen -> {
-                val expense = (_navigationState.value as NavigationState.FromExpenseDetailsScreen).expense
+            is NavigationState.FromExpenseDetailsScreenEdit -> {
+                val expense = (_navigationState.value as NavigationState.FromExpenseDetailsScreenEdit).expense
                 updateExpense(expense)
+            }
+            is NavigationState.FromExpenseDetailsScreenDelete -> {
+                val expense = (_navigationState.value as NavigationState.FromExpenseDetailsScreenDelete).expense
+                deleteExpense(expense)
             }
             is NavigationState.Empty -> {
                 // Do nothing
@@ -116,5 +121,13 @@ class HomeScreenComponent(
                 e.printStackTrace()
             }
         }
+    }
+
+    private fun deleteExpense(expense: Expense) {
+        val currentMap = _groupedExpenses.value
+        val dateKey = expense.date
+        val currentList = currentMap[dateKey] ?: emptyList()
+        val updatedList = currentList.filter { it.id != expense.id }
+        _groupedExpenses.value = currentMap + (dateKey to updatedList)
     }
 }

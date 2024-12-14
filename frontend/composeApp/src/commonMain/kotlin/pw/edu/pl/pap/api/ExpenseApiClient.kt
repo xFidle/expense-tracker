@@ -50,4 +50,8 @@ class ExpenseApiClient(baseUrl: String, httpClient: HttpClient) : BaseApiClient(
 
         println("Response  " + response.body())
     }
+
+    suspend fun deleteExpense(id: Long): HttpResponse {
+        return delete("delete/$id")
+    }
 }
