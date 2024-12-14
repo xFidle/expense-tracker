@@ -9,25 +9,25 @@ open class BaseApiClient(
     private val baseUrl: String,
     private val httpClient: HttpClient
 ) {
-    suspend fun get(endpoint: String): HttpResponse {
+    protected suspend fun get(endpoint: String): HttpResponse {
         return httpClient.get("$baseUrl$endpoint")
     }
 
-    suspend fun post(endpoint: String, body: Any): HttpResponse {
+    protected suspend fun post(endpoint: String, body: Any): HttpResponse {
         return httpClient.post("$baseUrl$endpoint") {
             contentType(ContentType.Application.Json)
             setBody(body)
         }
     }
 
-    suspend fun put(endpoint: String, body: Any): HttpResponse {
+    protected suspend fun put(endpoint: String, body: Any): HttpResponse {
         return httpClient.put("$baseUrl$endpoint") {
             contentType(ContentType.Application.Json)
             setBody(body)
         }
     }
 
-    suspend fun delete(endpoint: String): HttpResponse {
+    protected suspend fun delete(endpoint: String): HttpResponse {
         return httpClient.delete("$baseUrl$endpoint")
     }
 }
