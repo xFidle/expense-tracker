@@ -17,15 +17,15 @@ public class Currency {
 
     @NonNull
     @Column(name = "name", nullable = false)
-    private String name;
+    private String name = "Zlotowka";
 
     @NonNull
     @Column(name = "symbol", nullable = false)
-    private String symbol;
+    private String symbol = "PLN";
 
     @NonNull
     @Column(name = "exchange_rate", nullable = false)
-    private double exchangeRate;
+    private double exchangeRate = 1.0;
 
     public Currency(String name, String symbol, double exchangeRate) {
         this.name = name;
