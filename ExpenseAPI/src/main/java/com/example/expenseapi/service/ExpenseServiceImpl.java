@@ -12,12 +12,14 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     private final ExpenseRepository expenseRepository;
     private final CategoryRepository categoryRepository;
     private final UserGroupRepository userGroupRepository;
+    private final MembershipRepository membershipRepository;
 
-    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, UserGroupRepository userGroupRepository) {
+    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, UserGroupRepository userGroupRepository, MembershipRepository membershipRepository) {
         super(repository);
         this.expenseRepository = repository;
         this.categoryRepository = categoryRepository;
         this.userGroupRepository = userGroupRepository;
+        this.membershipRepository = membershipRepository;
     }
 
     public List<Expense> getExpensesByEmail(String mail) {
@@ -34,11 +36,11 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
                     .orElseGet(() -> categoryRepository.save(new Category()));
             entity.setCategory(defaultCategory);
         }
-        if (entity.getUser() != null && entity.getUser().getUserGroup() == null) {
-            UserGroup defaultUserGroup = userGroupRepository.findById(1L)
-                    .orElseGet(() -> userGroupRepository.save(new UserGroup()));
-            entity.getUser().setUserGroup(defaultUserGroup);
-        }
+//        if (entity.getUser() != null && entity.getUser().getUserGroup() == null) {
+//            UserGroup defaultUserGroup = userGroupRepository.findById(1L)
+//                    .orElseGet(() -> userGroupRepository.save(new UserGroup()));
+//            entity.getUser().setUserGroup(defaultUserGroup);
+//        }
         return super.save(entity);
     }
 
@@ -89,9 +91,15 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public List<Expense> getExpensesForGroup(String name) {
-        Iterable<Expense> expenses = expenseRepository.findAll();
-        return StreamSupport.stream(expenses.spliterator(), false)
-                .filter(expense -> expense.getUser().getUserGroup().getName().equals(name))
+        List<Membership> membershipsInGroup = StreamSupport.stream(membershipRepository.findAll().spliterator(), false)
+                .filter(membership -> membership.getGroup().getName().equals(name))
+                .toList();
+        return StreamSupport.stream(expenseRepository.findAll().spliterator(), false)
+                .filter(expense -> {
+                    User user = expense.getUser();
+                    return membershipsInGroup.stream()
+                            .anyMatch(membership -> membership.getUser().equals(user));
+                })
                 .collect(Collectors.toList());
     }
 
