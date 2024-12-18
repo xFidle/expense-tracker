@@ -26,4 +26,10 @@ public class Currency {
     @NonNull
     @Column(name = "exchange_rate", nullable = false)
     private double exchangeRate;
+
+    public Currency(String name, String symbol, double exchangeRate) {
+        this.name = name;
+        this.symbol = symbol;
+        this.exchangeRate = exchangeRate;
+    }
 }
