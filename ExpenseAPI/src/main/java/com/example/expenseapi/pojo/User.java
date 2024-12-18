@@ -32,9 +32,4 @@ public class User {
 
     @Column(name = "creationDate", nullable = false)
     private LocalDate creationDate = LocalDate.now();
-
-    @NonNull
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_group_id", referencedColumnName = "id", nullable = false)
-    private UserGroup userGroup;
 }
