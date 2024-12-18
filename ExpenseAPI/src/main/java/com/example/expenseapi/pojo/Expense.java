@@ -34,14 +34,19 @@ public class Expense {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
-    public Expense(double price, @NonNull User user, Category category) {
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "currency_id", referencedColumnName = "id")
+    private Currency currency;
+
+    public Expense(double price, @NonNull User user, Category category, Currency currency) {
         this.price = price;
         this.user = user;
         this.category = category;
+        this.currency = currency;
     }
 
-    public Expense(double price, @NonNull User user, Category category, LocalDate date) {
-        this(price, user, category);
+    public Expense(double price, @NonNull User user, Category category, LocalDate date, Currency currency) {
+        this(price, user, category, currency);
         this.setDate(date);
     }
 }
