@@ -14,12 +14,14 @@ public class ExpenseApiApplication implements CommandLineRunner {
     final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final UserGroupRepository groupRepository;
+    private final MembershipRepository membershipRepository;
 
-    public ExpenseApiApplication(ExpenseRepository expenseRepository, UserRepository userRepository, CategoryRepository categoryRepository, UserGroupRepository groupRepository) {
+    public ExpenseApiApplication(ExpenseRepository expenseRepository, UserRepository userRepository, CategoryRepository categoryRepository, UserGroupRepository groupRepository, MembershipRepository membershipRepository) {
         this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.groupRepository = groupRepository;
+        this.membershipRepository = membershipRepository;
     }
 
     public static void main(String[] args) {
@@ -28,18 +30,24 @@ public class ExpenseApiApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        UserGroup[] groups = new UserGroup[]{
-                new UserGroup("family"),
-                new UserGroup("workers"),
+        Group[] groups = new Group[]{
+                new Group("family"),
+                new Group("workers"),
         };
+
         groupRepository.saveAll(Arrays.asList(groups));
         User[] users = new User[]{
-            new User("Herkules1", "Herkules1", "herkules1@gmail.com", groups[0]),
-            new User("Herkules2", "Herkules2", "herkules2@gmail.com", groups[1]),
-            new User("Herkules3", "Herkules3", "herkules3@gmail.com" , groups[0]),
+            new User("Herkules1", "Herkules1", "herkules1@gmail.com"),
+            new User("Herkules2", "Herkules2", "herkules2@gmail.com"),
+            new User("Herkules3", "Herkules3", "herkules3@gmail.com" ),
         };
         userRepository.saveAll(Arrays.asList(users));
-
+        Membership[] memberships = new Membership[]{
+                new Membership(users[0], groups[0], "family"),
+                new Membership(users[1], groups[0], "family"),
+                new Membership(users[2], groups[0], "family"),
+        };
+        membershipRepository.saveAll(Arrays.asList(memberships));
         Category[] categories = new Category[]{
                 new Category(),
                 new Category("Transport")
