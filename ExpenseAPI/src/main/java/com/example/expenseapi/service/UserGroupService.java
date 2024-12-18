@@ -1,5 +1,5 @@
 package com.example.expenseapi.service;
 
-import com.example.expenseapi.pojo.UserGroup;
+import com.example.expenseapi.pojo.Group;
 
-public interface UserGroupService extends GenericService<UserGroup, Long> {}
+public interface UserGroupService extends GenericService<Group, Long> {}
