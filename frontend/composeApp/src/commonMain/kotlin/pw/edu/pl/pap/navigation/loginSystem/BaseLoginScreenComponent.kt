@@ -23,14 +23,15 @@ open class BaseLoginScreenComponent(
     protected val coroutineScope: CoroutineScope,
     val onConfirm: () -> Unit
 ) : ComponentContext by componentContext {
-    private val _inputFieldsData = mutableStateListOf<InputFieldData>()
+
+    protected open val _inputFieldsData = mutableStateListOf<InputFieldData>()
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
 
     protected open var email: MutableState<String> = mutableStateOf("")
 
     protected open var password: MutableState<String> = mutableStateOf("")
 
-    fun setupLoginInputFields() {
+    open fun setupInputFields() {
         _inputFieldsData.clear()
         _inputFieldsData.addAll(
             listOf(
@@ -49,7 +50,8 @@ open class BaseLoginScreenComponent(
                         parameter = password,
                         onChange = {
                             coroutineScope.launch { password.value = it }
-                        }
+                        },
+                        password = true
                     )
                 )
             )
