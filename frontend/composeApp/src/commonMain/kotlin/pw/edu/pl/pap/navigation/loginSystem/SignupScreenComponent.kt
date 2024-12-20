@@ -13,8 +13,9 @@ class SignupScreenComponent(
     componentContext: ComponentContext,
     apiService: ApiService,
     coroutineScope: CoroutineScope,
-    onConfirm: () -> Unit
-) : BaseLoginScreenComponent(componentContext, apiService, coroutineScope, onConfirm){
+    onConfirm: () -> Unit,
+    setToken: (String) -> Unit
+) : BaseLoginScreenComponent(componentContext, apiService, coroutineScope, onConfirm, setToken){
 
     private var confirmedPassword: MutableState<String> = mutableStateOf("")
 

@@ -22,6 +22,9 @@ class RootComponent(
     private val apiService = ApiService(baseUrl)
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
+    private var user_token: String = ""
+    //TODO (optional in the future) remember user token from previous session and fetch here
+
     @Serializable
     sealed class Configuration {
         @Serializable

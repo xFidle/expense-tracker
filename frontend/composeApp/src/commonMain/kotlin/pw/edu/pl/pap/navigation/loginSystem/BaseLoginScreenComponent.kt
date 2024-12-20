@@ -21,7 +21,8 @@ open class BaseLoginScreenComponent(
     componentContext: ComponentContext,
     protected val apiService: ApiService,
     protected val coroutineScope: CoroutineScope,
-    val onConfirm: () -> Unit
+    val onConfirm: () -> Unit,
+    val setToken: (String) -> Unit
 ) : ComponentContext by componentContext {
 
     protected open val _inputFieldsData = mutableStateListOf<InputFieldData>()

@@ -11,8 +11,9 @@ class LoginScreenComponent(
     componentContext: ComponentContext,
     apiService: ApiService,
     coroutineScope: CoroutineScope,
-    onConfirm: () -> Unit
-) : BaseLoginScreenComponent(componentContext, apiService, coroutineScope, onConfirm){
+    onConfirm: () -> Unit,
+    setToken: (String) -> Unit
+) : BaseLoginScreenComponent(componentContext, apiService, coroutineScope, onConfirm, setToken){
 
     override fun confirm() {
         //TODO push and wait for response
