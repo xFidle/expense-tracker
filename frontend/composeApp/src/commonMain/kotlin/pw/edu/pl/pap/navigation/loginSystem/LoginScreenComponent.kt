@@ -18,5 +18,6 @@ class LoginScreenComponent(
     override fun confirm() {
         //TODO push and wait for response
         //TODO set token
+        onConfirm()
     }
 }

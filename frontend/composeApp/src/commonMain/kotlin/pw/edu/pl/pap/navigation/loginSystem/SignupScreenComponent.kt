@@ -68,6 +68,7 @@ class SignupScreenComponent(
         //TODO push new user
         //TODO wait for response
         //TODO set token
+        onConfirm()
     }
 
 }

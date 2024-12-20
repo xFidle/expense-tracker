@@ -1,4 +1,4 @@
-package pw.edu.pl.pap.ui.logInSignUpSelection
+package pw.edu.pl.pap.ui.loginSystem
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
