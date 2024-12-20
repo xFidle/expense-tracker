@@ -1,6 +1,7 @@
 package pw.edu.pl.pap.navigation.loginSystem
 
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Text
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -10,10 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import pw.edu.pl.pap.api.ApiService
-import pw.edu.pl.pap.data.inputFields.DatePickerData
-import pw.edu.pl.pap.data.inputFields.DropdownListData
-import pw.edu.pl.pap.data.inputFields.InputFieldData
-import pw.edu.pl.pap.data.inputFields.TextFieldData
+import pw.edu.pl.pap.data.inputFields.*
 import pw.edu.pl.pap.util.sanitizePriceInput
 import pw.edu.pl.pap.util.updatePrice
 
@@ -28,9 +26,9 @@ open class BaseLoginScreenComponent(
     protected open val _inputFieldsData = mutableStateListOf<InputFieldData>()
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
 
-    protected open var email: MutableState<String> = mutableStateOf("")
+    protected var email: MutableState<String> = mutableStateOf("")
 
-    protected open var password: MutableState<String> = mutableStateOf("")
+    protected var password: MutableState<String> = mutableStateOf("")
 
     open fun setupInputFields() {
         _inputFieldsData.clear()
@@ -47,12 +45,12 @@ open class BaseLoginScreenComponent(
                 ),
                 InputFieldData(
                     title = "Password",
+                    isPassword = true,
                     textFieldData = TextFieldData(
                         parameter = password,
                         onChange = {
-                            coroutineScope.launch { password.value = it }
-                        },
-                        password = true
+                            coroutineScope.launch {password.value = it}
+                        }
                     )
                 )
             )

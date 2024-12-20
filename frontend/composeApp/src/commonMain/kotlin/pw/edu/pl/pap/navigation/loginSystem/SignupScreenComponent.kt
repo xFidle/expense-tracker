@@ -29,12 +29,12 @@ class SignupScreenComponent(
             listOf(
                 InputFieldData(
                     title = "Confirm password",
+                    isPassword = true,
                     textFieldData = TextFieldData(
                         parameter = confirmedPassword,
                         onChange = {
                             coroutineScope.launch { confirmedPassword.value = it }
                         },
-                        password = true
                     )
                 ),
                 InputFieldData(
@@ -44,7 +44,6 @@ class SignupScreenComponent(
                         onChange = {
                             coroutineScope.launch { name.value = it }
                         },
-                        password = true
                     )
                 ),
                 InputFieldData(
@@ -54,7 +53,6 @@ class SignupScreenComponent(
                         onChange = {
                             coroutineScope.launch { surname.value = it }
                         },
-                        password = true
                     )
                 )
             )
