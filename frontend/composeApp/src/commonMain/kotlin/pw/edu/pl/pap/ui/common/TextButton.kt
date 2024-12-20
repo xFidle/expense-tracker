@@ -18,13 +18,13 @@ fun TextButton(
     isEnabled: Boolean = true,
     modifier: Modifier = Modifier,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
-    onUpdate: () -> Unit = {}
+    onUpdate: () -> Unit = {},
+    changeSize: Boolean = false
 ) {
+
     Button(
         shape = RoundedCornerShape(20),
-        modifier = modifier
-            .width(100.dp)
-            .height(60.dp),
+        modifier = if (!changeSize) modifier.width(100.dp).height(60.dp) else modifier,
         colors = colors,
         contentPadding = PaddingValues(0.dp),
         onClick = { onUpdate() },
