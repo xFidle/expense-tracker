@@ -22,7 +22,7 @@ class ExpenseDetailsScreenComponent(
 
     override var title: MutableState<String> = mutableStateOf("")
     //TODO fetch title
-    override var categoryIndex: MutableState<Int> = mutableStateOf(expense.category.id.toInt())
+    override var categoryIndex: MutableState<Int> = mutableStateOf(expense.category.id.toInt() - 1)
 
     override var date: MutableState<LocalDate> = mutableStateOf(expense.date)
 

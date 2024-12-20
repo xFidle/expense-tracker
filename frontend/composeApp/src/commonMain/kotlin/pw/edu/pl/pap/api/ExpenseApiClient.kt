@@ -4,10 +4,7 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.LocalDate
-import pw.edu.pl.pap.data.Expense
-import pw.edu.pl.pap.data.NewExpense
-import pw.edu.pl.pap.data.TotalExpenses
+import pw.edu.pl.pap.data.*
 
 class ExpenseApiClient(baseUrl: String, httpClient: HttpClient) : BaseApiClient(baseUrl, httpClient) {
 
@@ -15,12 +12,23 @@ class ExpenseApiClient(baseUrl: String, httpClient: HttpClient) : BaseApiClient(
         return get("state/group/$userGroup/user/$userEmail").body()
     }
 
-    private suspend fun getAllExpensesApi(): Map<LocalDate, List<Expense>> {
-        return get("all/dateMap").body()
+    private suspend fun getExpenseDateMapApi(): ExpenseMap {
+        val originalMap: Map<GroupMapKey.DateKey, List<Expense>> = get("all/dateMap").body()
+        return originalMap.toMap(ExpenseMap(initialGroupingOrder = Order.DESCENDING))
     }
 
-    fun getAllExpenses() = flow {
-        emit(getAllExpensesApi())
+
+    fun getExpenseDateMap() = flow {
+        emit(getExpenseDateMapApi())
+    }
+
+    private suspend fun getExpenseCatMapApi(): ExpenseMap {
+        val originalMap: Map<GroupMapKey.StringKey, List<Expense>> = get("all/categoryMap").body()
+        return originalMap.toMap(ExpenseMap(initialGroupingOrder = Order.ASCENDING))
+    }
+
+    fun getExpenseCatMap() = flow {
+        emit(getExpenseCatMapApi())
     }
 
     private suspend fun getExpenseApi(id: Long): Expense {

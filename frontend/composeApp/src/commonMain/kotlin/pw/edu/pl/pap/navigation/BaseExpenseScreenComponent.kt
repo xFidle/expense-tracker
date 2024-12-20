@@ -31,7 +31,7 @@ open class BaseExpenseScreenComponent(
 
     protected open var title: MutableState<String> = mutableStateOf("")
 
-    private val categories = listOf("Food", "Health", "Transport")
+    private val categories = listOf("Food", "Transport", "Bills")
     //TODO fetch categories
     protected open var categoryIndex: MutableState<Int> = mutableStateOf(0)
 
