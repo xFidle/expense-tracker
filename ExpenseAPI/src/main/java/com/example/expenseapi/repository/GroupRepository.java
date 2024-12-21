@@ -1,6 +1,6 @@
 package com.example.expenseapi.repository;
 
 import com.example.expenseapi.pojo.Group;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GroupRepository extends CrudRepository<Group, Long> {}
+public interface GroupRepository extends JpaRepository<Group, Long> {}

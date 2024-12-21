@@ -1,6 +1,8 @@
 package com.example.expenseapi.repository;
 
 import com.example.expenseapi.pojo.Membership;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MembershipRepository extends CrudRepository<Membership, Long> {}
+
+public interface MembershipRepository extends JpaRepository<Membership, Long> {
+}

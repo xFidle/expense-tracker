@@ -3,6 +3,7 @@ package com.example.expenseapi.service;
 import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.pojo.Currency;
 import com.example.expenseapi.repository.*;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
@@ -25,11 +26,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         this.currencyRepository = currencyRepository;
     }
 
+    @Override
     public List<Expense> getExpensesByEmail(String mail) {
-        Iterable<Expense> expenses = expenseRepository.findAll();
-        return StreamSupport.stream(expenses.spliterator(), false)
-                .filter(expense -> expense.getUser().getEmail().equals(mail))
-                .collect(Collectors.toList());
+        return expenseRepository.findByUserEmail(mail);
     }
 
     @Override
@@ -49,69 +48,46 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public List<Expense> getExpensesByCategory(String category) {
-        Iterable<Expense> expenses = expenseRepository.findAll();
-        return StreamSupport.stream(expenses.spliterator(), false)
-                .filter(expense -> expense.getCategory().getName().equals(category))
-                .collect(Collectors.toList());
+        return expenseRepository.findByCategoryName(category);
     }
 
     @Override
     public List<Expense> getExpensesByDate(String date) {
-        LocalDate localDate = LocalDate.parse(date);
-        Iterable<Expense> expenses = expenseRepository.findAll();
-        return StreamSupport.stream(expenses.spliterator(), false)
-                .filter(expense -> expense.getDate().equals(localDate))
-                .collect(Collectors.toList());
+        LocalDate dateObject = LocalDate.parse(date);
+        return expenseRepository.findByDate(dateObject);
     }
 
     @Override
     public List<Expense> getExpensesByPeriod(String begin, String end) {
         LocalDate beginDate = LocalDate.parse(begin);
         LocalDate endDate = LocalDate.parse(end);
-        Iterable<Expense> expenses = expenseRepository.findAll();
-        return StreamSupport.stream(expenses.spliterator(), false)
-                .filter(expense -> !expense.getDate().isBefore(beginDate) && !expense.getDate().isAfter(endDate))
-                .collect(Collectors.toList());
+        return expenseRepository.findByDateBetween(beginDate, endDate);
     }
 
     @Override
     public List<Expense> getExpensesWherePriceInRange(double left_end, double right_end) {
-        Iterable<Expense> expenses = expenseRepository.findAll();
-        return StreamSupport.stream(expenses.spliterator(), false)
-                .filter(expense -> expense.getPrice() >= left_end && expense.getPrice() <= right_end)
-                .collect(Collectors.toList());
+        return expenseRepository.findByPriceBetween(left_end, right_end);
     }
 
     @Override
     public List<Expense> getExpensesWherePriceIsLower(double price) {
-        return getExpensesWherePriceInRange(0, price);
+        return expenseRepository.findByPriceLessThan(price);
     }
 
     @Override
     public List<Expense> getExpensesWherePriceIsGreater(double price) {
-        return getExpensesWherePriceInRange(price, Double.POSITIVE_INFINITY);
+        return expenseRepository.findByPriceGreaterThan(price);
     }
 
     @Override
     public List<Expense> getExpensesForGroup(String name) {
-        List<Membership> membershipsInGroup = StreamSupport.stream(membershipRepository.findAll().spliterator(), false)
-                .filter(membership -> membership.getGroup().getName().equals(name))
-                .toList();
-        return StreamSupport.stream(expenseRepository.findAll().spliterator(), false)
-                .filter(expense -> {
-                    User user = expense.getUser();
-                    return membershipsInGroup.stream()
-                            .anyMatch(membership -> membership.getUser().equals(user));
-                })
-                .collect(Collectors.toList());
+        return expenseRepository.findByUserGroupName(name);
     }
 
     @Override
     public ExpInfo getExpInfo(String name, String email) {
         List<Expense> groupExpenses = getExpensesForGroup(name);
-        List<Expense> userExpenses = groupExpenses.stream()
-                .filter(expense -> expense.getUser().getEmail().equals(email))
-                .toList();
+        List<Expense> userExpenses = expenseRepository.findByUserEmail(email);
         double groupSum = groupExpenses.stream().mapToDouble(Expense::getPrice).sum();
         double userSum = userExpenses.stream().mapToDouble(Expense::getPrice).sum();
         return new ExpInfo(userSum, groupSum);
@@ -119,7 +95,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public Map<LocalDate, List<Expense>> getDateExpenseAsMap() {
-        return StreamSupport.stream(expenseRepository.findAll().spliterator(), false)
+        return expenseRepository.findAllByOrderByDateDesc().stream()
                 .collect(Collectors.groupingBy(
                         Expense::getDate,
                         () -> new TreeMap<>(Comparator.reverseOrder()),
@@ -129,7 +105,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public Map<Category, List<Expense>> getCategoryExpenseAsMap() {
-        return StreamSupport.stream(expenseRepository.findAll().spliterator(), false)
+        return expenseRepository.findAll().stream()
                 .collect(Collectors.groupingBy(
                         Expense::getCategory
                 ));
@@ -137,7 +113,6 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public Optional<Expense> getRecentExpense() {
-        return StreamSupport.stream(expenseRepository.findAll().spliterator(), false)
-                .max(Comparator.comparingLong(Expense::getId));
+        return expenseRepository.findTopByOrderByIdDesc();
     }
 }
