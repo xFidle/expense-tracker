@@ -10,4 +10,5 @@ data class Expense(
     val user: User,
     val date: LocalDate,
     val category: Category,
+    val currency: Currency
 )
