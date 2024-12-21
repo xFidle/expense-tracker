@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,11 +59,11 @@ public class ExpenseController extends GenericController<Expense, Long> {
         return new ResponseEntity<>(((ExpenseService) service).getExpensesForGroup(groupName), HttpStatus.OK);
     }
 
-    @GetMapping("/state/group/{name}/user/{userId}")
-    @Operation(summary = "Returns sum of expenses for given group and user")
-    @ApiResponse(responseCode = "200", description = "Sum of expenses for given group and user", content = @Content(schema = @Schema(implementation = ExpInfo.class)))
-    public ResponseEntity<ExpInfo> getState(@PathVariable String name, @PathVariable String userId) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpInfo(name, userId), HttpStatus.OK);
+    @GetMapping("/state")
+    @Operation(summary = "Returns sum of expenses for logged-in user and his group")
+    @ApiResponse(responseCode = "200", description = "Sum of expenses for logged-in user and his group", content = @Content(schema = @Schema(implementation = ExpInfo.class)))
+    public ResponseEntity<ExpInfo> getState() {
+        return new ResponseEntity<>(((ExpenseService) service).getExpInfo(), HttpStatus.OK);
     }
 
     @GetMapping("/all/dateMap")
