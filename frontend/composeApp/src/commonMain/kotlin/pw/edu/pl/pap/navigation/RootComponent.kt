@@ -2,10 +2,7 @@ package pw.edu.pl.pap.navigation
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.childStack
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.pushNew
+import com.arkivanov.decompose.router.stack.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -82,7 +79,7 @@ class RootComponent(
                         apiService = apiService,
                         coroutineScope = coroutineScope,
                         onConfirm = {
-                            navigation.pushNew(Configuration.HomeScreen)
+                            navigation.replaceAll(Configuration.HomeScreen)
                         },
                         setToken = {
                             newToken -> user_token = newToken
@@ -98,7 +95,7 @@ class RootComponent(
                         apiService = apiService,
                         coroutineScope = coroutineScope,
                         onConfirm = {
-                            navigation.pushNew(Configuration.HomeScreen)
+                            navigation.replaceAll(Configuration.HomeScreen)
                         },
                         setToken = {
                                 newToken -> user_token = newToken
