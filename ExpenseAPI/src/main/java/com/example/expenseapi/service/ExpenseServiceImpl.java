@@ -123,7 +123,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public Map<Category, List<Expense>> getCategoryExpenseAsMap() {
-        return expenseRepository.findAll().stream()
+        List<Expense> groupExpenses = getExpensesForGroup();
+        return groupExpenses.stream()
                 .collect(Collectors.groupingBy(
                         Expense::getCategory
                 ));
