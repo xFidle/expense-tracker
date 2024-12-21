@@ -91,15 +91,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public ExpInfo getExpInfo() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        Optional<User> user = userRepository.findByEmail(email);
-        String name = null;
-        if (user.isPresent()) {
-            name = membershipRepository.findBaseGroupsByUser_Id(user.get().getId()).getFirst().getName();
-        }
-        List<Expense> groupExpenses = getExpensesForGroup(name);
-        List<Expense> userExpenses = expenseRepository.findByUserEmail(email);
+        List<Expense> groupExpenses = getExpensesForGroup();
+        List<Expense> userExpenses = expenseRepository.findByUserEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         double groupSum = groupExpenses.stream().mapToDouble(Expense::getPrice).sum();
         double userSum = userExpenses.stream().mapToDouble(Expense::getPrice).sum();
         return new ExpInfo(userSum, groupSum);
@@ -107,12 +100,25 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public Map<LocalDate, List<Expense>> getDateExpenseAsMap() {
-        return expenseRepository.findAllByOrderByDateDesc().stream()
+        List<Expense> groupExpenses = getExpensesForGroup();
+        return groupExpenses.stream()
+                .sorted(Comparator.comparing(Expense::getDate).reversed())
                 .collect(Collectors.groupingBy(
                         Expense::getDate,
-                        () -> new TreeMap<>(Comparator.reverseOrder()),
+                        LinkedHashMap::new,
                         Collectors.toList()
                 ));
+    }
+
+    private List<Expense> getExpensesForGroup() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Optional<User> user = userRepository.findByEmail(email);
+        String name = null;
+        if (user.isPresent()) {
+            name = membershipRepository.findBaseGroupsByUser_Id(user.get().getId()).getFirst().getName();
+        }
+        return getExpensesForGroup(name);
     }
 
     @Override
