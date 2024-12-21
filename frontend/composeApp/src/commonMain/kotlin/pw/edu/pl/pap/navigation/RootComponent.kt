@@ -3,11 +3,20 @@ package pw.edu.pl.pap.navigation
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.router.stack.*
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.cache.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import pw.edu.pl.pap.api.ApiService
+import pw.edu.pl.pap.api.authApi.LoginApi
+import pw.edu.pl.pap.api.authApi.SignUpApi
 import pw.edu.pl.pap.data.Expense
 import pw.edu.pl.pap.navigation.loginSystem.LoginScreenComponent
 import pw.edu.pl.pap.navigation.loginSystem.SelectionLoginSignupScreenComponent
@@ -15,15 +24,25 @@ import pw.edu.pl.pap.navigation.loginSystem.SignupScreenComponent
 
 class RootComponent(
     componentContext: ComponentContext,
-    baseUrl: String
+    private val baseUrl: String
 ) : ComponentContext by componentContext {
 
     private val navigation = StackNavigation<Configuration>()
     private val apiService = ApiService(baseUrl)
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    private var user_token: String = ""
-    //TODO (optional in the future) remember user token from previous session and fetch here
+    private val httpClient = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(Json {
+                prettyPrint = true
+                ignoreUnknownKeys = true
+            })
+        }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 3000
+        }
+        install(HttpCache)
+    }
 
     @Serializable
     sealed class Configuration {
