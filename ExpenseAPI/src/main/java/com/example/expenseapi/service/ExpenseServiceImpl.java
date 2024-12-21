@@ -14,7 +14,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     private final CategoryRepository categoryRepository;
     private final CurrencyRepository currencyRepository;
 
-    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, GroupRepository groupRepository, MembershipRepository membershipRepository, CurrencyRepository currencyRepository) {
+    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository) {
         super(repository);
         this.expenseRepository = repository;
         this.categoryRepository = categoryRepository;
