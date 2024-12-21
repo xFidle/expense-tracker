@@ -16,13 +16,15 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     private final CategoryRepository categoryRepository;
     private final CurrencyRepository currencyRepository;
     private final UserRepository userRepository;
+    private final MembershipRepository membershipRepository;
 
-    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository, UserRepository userRepository) {
+    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository, UserRepository userRepository, MembershipRepository membershipRepository) {
         super(repository);
         this.expenseRepository = repository;
         this.categoryRepository = categoryRepository;
         this.currencyRepository = currencyRepository;
         this.userRepository = userRepository;
+        this.membershipRepository = membershipRepository;
     }
 
     @Override
@@ -88,7 +90,14 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
-    public ExpInfo getExpInfo(String name, String email) {
+    public ExpInfo getExpInfo() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Optional<User> user = userRepository.findByEmail(email);
+        String name = null;
+        if (user.isPresent()) {
+            name = membershipRepository.findBaseGroupsByUser_Id(user.get().getId()).getFirst().getName();
+        }
         List<Expense> groupExpenses = getExpensesForGroup(name);
         List<Expense> userExpenses = expenseRepository.findByUserEmail(email);
         double groupSum = groupExpenses.stream().mapToDouble(Expense::getPrice).sum();
