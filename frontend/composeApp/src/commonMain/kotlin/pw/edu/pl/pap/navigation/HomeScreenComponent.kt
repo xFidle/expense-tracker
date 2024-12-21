@@ -78,18 +78,18 @@ class HomeScreenComponent(
     private val _groupedExpenses = MutableStateFlow(ExpenseMap())
     val groupedExpenses: StateFlow<ExpenseMap> get() = _groupedExpenses
 
-    private val _currentGroupKey = MutableStateFlow(GroupKey.DATE)
-    val currentGroupKey: StateFlow<GroupKey> get() = _currentGroupKey
+    private val _currentGroupingKey = MutableStateFlow(GroupKey.DATE)
+    val currentGroupingKey: StateFlow<GroupKey> get() = _currentGroupingKey
 
     val currentGroupingOrder: StateFlow<Order>
         get() = _groupedExpenses.value.groupingOrder
 
     fun updateGroupingKey(key: GroupKey) {
-        _currentGroupKey.value = key
+        _currentGroupingKey.value = key
     }
 
     private fun currentExpenseMethod(): () -> Flow<ExpenseMap> {
-        return when (_currentGroupKey.value) {
+        return when (_currentGroupingKey.value) {
             GroupKey.DATE -> apiService.expenseApiClient::getExpenseDateMap
             GroupKey.CATEGORY -> apiService.expenseApiClient::getExpenseCatMap
         }
@@ -102,6 +102,9 @@ class HomeScreenComponent(
                 val getExpenseMap = currentExpenseMethod()
                 getExpenseMap().collect { expenses ->
                     _groupedExpenses.value = expenses
+                    println(expenses.groupingOrder.value)
+                    println(_groupedExpenses.value.groupingOrder.value)
+                    println(currentGroupingOrder.value)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -116,6 +119,7 @@ class HomeScreenComponent(
                 apiService.expenseApiClient.getRecentExpense().collect { expense: Expense ->
                     _groupedExpenses.value.addExpense(getCurrentKey(expense), expense)
                 }
+                _groupedExpenses.value = _groupedExpenses.value
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -140,13 +144,15 @@ class HomeScreenComponent(
     }
 
     private fun getCurrentKey(expense: Expense): GroupMapKey {
-        return when (_currentGroupKey.value) {
+        return when (_currentGroupingKey.value) {
             GroupKey.DATE -> GroupMapKey.DateKey(expense.date)
             GroupKey.CATEGORY -> GroupMapKey.StringKey(expense.category.name)
         }
     }
 
     fun sortGroups() {
-        _groupedExpenses.value.switchGroupingOrder()
+        coroutineScope.launch {
+            _groupedExpenses.value.switchGroupingOrder()
+        }
     }
 }
