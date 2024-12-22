@@ -37,7 +37,7 @@ fun SignUpScreen (
     )
 
     WarningPopup(
-        subText = "Passwords are not the same.",
+        subText = "Incorrect passwords.",
         showWarning = component.showPasswordsWarning.value,
         onDismiss = {
             component.showPasswordsWarning.value = (!component.showPasswordsWarning.value)

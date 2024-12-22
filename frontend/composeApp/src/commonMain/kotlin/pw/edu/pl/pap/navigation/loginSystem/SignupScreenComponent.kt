@@ -67,16 +67,16 @@ class SignupScreenComponent(
             showEmailWarning.value = true
             return
         }
-        if (password.value != confirmedPassword.value) {
+        if (password.value != confirmedPassword.value || password.value == "") {
             showPasswordsWarning.value = true
             return
         }
         //TODO push new user
         //TODO wait for response
         //TODO set token
-        showFailedLoginWarning.value = true
-        //TODO set failedLoginMessage
-        failedLoginMessage.value = "Something went wrong"
+            showFailedLoginWarning.value = true
+            //TODO set failedLoginMessage
+            failedLoginMessage.value = "Something went wrong"
         onConfirm()
     }
 
