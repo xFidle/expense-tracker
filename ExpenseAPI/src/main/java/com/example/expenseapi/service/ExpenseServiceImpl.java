@@ -17,14 +17,16 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     private final CurrencyRepository currencyRepository;
     private final UserRepository userRepository;
     private final MembershipRepository membershipRepository;
+    private final MethodOfPaymentRepository methodOfPaymentRepository;
 
-    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository, UserRepository userRepository, MembershipRepository membershipRepository) {
+    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository, UserRepository userRepository, MembershipRepository membershipRepository, MethodOfPaymentRepository methodOfPaymentRepository) {
         super(repository);
         this.expenseRepository = repository;
         this.categoryRepository = categoryRepository;
         this.currencyRepository = currencyRepository;
         this.userRepository = userRepository;
         this.membershipRepository = membershipRepository;
+        this.methodOfPaymentRepository = methodOfPaymentRepository;
     }
 
     @Override
@@ -42,6 +44,11 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             Category defaultCategory = categoryRepository.findById(1L)
                     .orElseGet(() -> categoryRepository.save(new Category()));
             entity.setCategory(defaultCategory);
+        }
+        if (entity.getMethod() == null) {
+            MethodOfPayment defaultMethod = methodOfPaymentRepository.findById(1L)
+                    .orElseGet(() -> methodOfPaymentRepository.save(new MethodOfPayment()));
+            entity.setMethod(defaultMethod);
         }
         if (entity.getCurrency() == null) {
             Currency defaultCurrency = currencyRepository.findById(1L)

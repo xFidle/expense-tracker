@@ -21,8 +21,9 @@ public class ExpenseApiApplication implements CommandLineRunner {
     private final ArchivedGroupRepository archivedGroupRepository;
     private final CurrencyRepository currencyRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MethodOfPaymentRepository methodOfPaymentRepository;
 
-    public ExpenseApiApplication(ExpenseRepository expenseRepository, UserRepository userRepository, CategoryRepository categoryRepository, GroupRepository groupRepository, MembershipRepository membershipRepository, ArchivedGroupRepository archivedGroupRepository, CurrencyRepository currencyRepository, PasswordEncoder passwordEncoder) {
+    public ExpenseApiApplication(ExpenseRepository expenseRepository, UserRepository userRepository, CategoryRepository categoryRepository, GroupRepository groupRepository, MembershipRepository membershipRepository, ArchivedGroupRepository archivedGroupRepository, CurrencyRepository currencyRepository, PasswordEncoder passwordEncoder, MethodOfPaymentRepository methodOfPaymentRepository) {
         this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -31,6 +32,7 @@ public class ExpenseApiApplication implements CommandLineRunner {
         this.archivedGroupRepository = archivedGroupRepository;
         this.currencyRepository = currencyRepository;
         this.passwordEncoder = passwordEncoder;
+        this.methodOfPaymentRepository = methodOfPaymentRepository;
     }
 
     public static void main(String[] args) {
@@ -75,11 +77,16 @@ public class ExpenseApiApplication implements CommandLineRunner {
                 new Currency("Euro", "EUR", CurrencyRatesFetcher.getCurrencyRates("EUR"))
         };
         currencyRepository.saveAll(Arrays.asList(currencies));
+        MethodOfPayment[] methods = new MethodOfPayment[] {
+                new MethodOfPayment("cash"),
+                new MethodOfPayment("debt-card")
+        };
+        methodOfPaymentRepository.saveAll((Arrays.asList(methods)));
         Expense[] expenses = new Expense[]{
-                new Expense(100, users[0], categories[0], LocalDate.of(2024, 11, 30), currencies[0]),
-                new Expense(200, users[1], categories[1], LocalDate.of(2024, 11, 30), currencies[1]),
-                new Expense(300, users[2], categories[0], currencies[0]),
-                new Expense(300, users[2], categories[0], currencies[2]),
+                new Expense("dinner",100, users[0], categories[0], LocalDate.of(2024, 11, 30), currencies[0], methods[0]),
+                new Expense("train-ticket", 200, users[1], categories[1], LocalDate.of(2024, 11, 30), currencies[1], methods[1]),
+                new Expense("groceries", 300, users[2], categories[0], currencies[0], methods[0]),
+                new Expense("fast-food", 300, users[2], categories[0], currencies[2], methods[1]),
         };
         expenseRepository.saveAll(Arrays.asList(expenses));
 
