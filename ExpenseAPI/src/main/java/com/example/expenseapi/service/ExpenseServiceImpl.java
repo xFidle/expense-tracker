@@ -59,10 +59,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     @Override
     public List<Expense> getExpensesByDate(String date) {
         LocalDate dateObject = LocalDate.parse(date);
-        return getExpensesForGroup()
-                .stream()
-                .filter(expense -> expense.getDate().isEqual(dateObject))
-                .collect(Collectors.toList());
+        return expenseRepository.findByDate(dateObject, getGroupName());
     }
 
     @Override

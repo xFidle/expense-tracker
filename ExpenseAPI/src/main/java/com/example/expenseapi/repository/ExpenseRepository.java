@@ -18,7 +18,11 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             "AND e.category.name = :category")
     List<Expense> findByCategoryName(String category, String groupName);
 
-//    List<Expense> findByDate(LocalDate date, String groupName);
+    @Query("SELECT e FROM Expense e " +
+            "where e.user IN " +
+            "(SELECT m.user FROM Membership m WHERE m.group.name = :groupName)" +
+            "AND e.date = :date")
+    List<Expense> findByDate(LocalDate date, String groupName);
 //    List<Expense> findByDateBetween(LocalDate begin, LocalDate end, String groupName);
 //    List<Expense> findByPriceBetween(double leftEnd, double rightEnd, String groupName);
 //    List<Expense> findByPriceLessThan(double price, String groupName);
