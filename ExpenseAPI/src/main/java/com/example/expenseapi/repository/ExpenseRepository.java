@@ -51,4 +51,13 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     @Query("SELECT e FROM Expense e WHERE e.user IN (SELECT m.user FROM Membership m WHERE m.name = :name)")
     List<Expense> findByUserGroupName(String name);
+
+
+    @Query("SELECT TO_CHAR(e.date, 'Month') AS month_name, SUM(e.price) " +
+            "FROM Expense e " +
+            "WHERE e.user IN " +
+            "(SELECT m.user FROM Membership m WHERE m.group.name = :groupName) " +
+            "AND EXTRACT(YEAR FROM e.date) = :year " +
+            "GROUP BY TO_CHAR(e.date, 'Month'), EXTRACT(MONTH FROM e.date)")
+    List<Object[]> findTotalExpensesForMonths(String year, String groupName);
 }
