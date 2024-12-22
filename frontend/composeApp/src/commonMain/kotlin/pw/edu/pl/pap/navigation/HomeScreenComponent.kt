@@ -142,6 +142,7 @@ class HomeScreenComponent(
 
     private fun deleteExpense(expense: Expense) {
         _groupedExpenses.value.deleteExpense(getCurrentKey(expense), expense.id)
+        _groupedExpenses.value = _groupedExpenses.value
     }
 
     private fun getCurrentKey(expense: Expense): GroupMapKey {
