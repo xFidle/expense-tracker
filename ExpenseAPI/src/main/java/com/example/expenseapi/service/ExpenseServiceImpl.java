@@ -76,10 +76,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public List<Expense> getExpensesWherePriceIsLower(double price) {
-        return getExpensesForGroup()
-                .stream()
-                .filter(expense -> expense.getPrice() <= price)
-                .collect(Collectors.toList());
+        return expenseRepository.findByPriceLessThan(price, getGroupName());
     }
 
     @Override
