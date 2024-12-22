@@ -96,7 +96,7 @@ class HomeScreenComponent(
     }
 
     private fun fetchAllExpenses() {
-//        println("FETCH EXPENSES")
+        println("FETCH EXPENSES")
         coroutineScope.launch {
             try {
                 val getExpenseMap = currentExpenseMethod()

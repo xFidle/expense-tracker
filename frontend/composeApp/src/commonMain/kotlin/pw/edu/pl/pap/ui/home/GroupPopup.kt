@@ -5,14 +5,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import pw.edu.pl.pap.data.GroupKey
 import pw.edu.pl.pap.data.Order
 import pw.edu.pl.pap.navigation.HomeScreenComponent
+import pw.edu.pl.pap.ui.common.LoadingPopup
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,9 +21,13 @@ fun GroupPopup(
 ) {
     val currentOrder by component.currentGroupingOrder.collectAsState()
     val selectedOption by component.currentGroupingKey.collectAsState()
+    var isLoading by remember {mutableStateOf(false)}
     println("$selectedOption - $currentOrder")
 
 //    println("$selectedOption - $currentOrder")
+    LoadingPopup(
+        isLoading = isLoading
+    )
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -48,7 +51,9 @@ fun GroupPopup(
                 }
 
                 val onOrderClick = {
-                    component.sortGroups()
+                    isLoading = true // Show loading popup
+                    component.sortGroups() // Perform the sorting operation
+                    isLoading = false
                 }
 
                 GroupAndSortButton(groupKey, isSelected, currentOrder, onGroupClick, onOrderClick)

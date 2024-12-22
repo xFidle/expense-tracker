@@ -17,7 +17,8 @@ class LoginScreenComponent(
 ) : BaseLoginScreenComponent(componentContext, coroutineScope, apiClient, onConfirm, setToken) {
 
     override fun confirm() {
-        val userLoginData = UserLoginData(email.value, password.value)
+//        val userLoginData = UserLoginData(email.value, password.value)
+        val userLoginData = UserLoginData("herkules1@gmail.com", "123")
 
         coroutineScope.launch {
             val response = apiClient.post(userLoginData)
