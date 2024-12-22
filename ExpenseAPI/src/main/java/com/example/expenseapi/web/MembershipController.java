@@ -32,12 +32,13 @@ public class MembershipController extends GenericController<Membership, Long> {
     public ResponseEntity<HttpStatus> save(@RequestBody Membership entity, @AuthenticationPrincipal org.springframework.security.core.userdetails.User user) {
         String email = user.getUsername();
         Optional<User> mUser = userService.findByEmail(email);
-        if (((MembershipService) service)
+        if (Objects.equals(((MembershipService) service)
                 .getMembershipsByUserId(mUser.get().getId())
-                .getFirst()
-                .getRole()
-                .getName()
-                .equals("admin")) {
+                .stream()
+                .filter(membership -> membership.getGroup().equals(entity.getGroup()))
+                .findFirst()
+                .get().getRole().getName(), "admin"))
+        {
             membershipService.save(entity);
             return new ResponseEntity<>(HttpStatus.OK);
         }
