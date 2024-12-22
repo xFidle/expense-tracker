@@ -31,6 +31,8 @@ open class BaseLoginScreenComponent(
 
     protected var password: MutableState<String> = mutableStateOf("")
 
+    var showEmailWarning: MutableState<Boolean> = mutableStateOf(false)
+
     open fun setupInputFields() {
         _inputFieldsData.clear()
         _inputFieldsData.addAll(

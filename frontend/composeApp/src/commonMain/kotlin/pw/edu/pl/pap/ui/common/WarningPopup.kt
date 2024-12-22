@@ -9,17 +9,20 @@ import androidx.compose.runtime.Composable
 fun WarningPopup(
     mainText: String = "Warning",
     subText: String,
+    showWarning: Boolean,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = {onDismiss()}, // Prevent dismissal by user actions
-        title = {
-            Text(mainText)
-        },
-        text = {
-            Text(subText)
-        },
-        confirmButton = {}, // No confirm button for a loading dialog
-        dismissButton = {}  // No dismiss button for a loading dialog
-    )
+    if (showWarning) {
+        AlertDialog(
+            onDismissRequest = {onDismiss()}, // Prevent dismissal by user actions
+            title = {
+                Text(mainText)
+            },
+            text = {
+                Text(subText)
+            },
+            confirmButton = {}, // No confirm button for a loading dialog
+            dismissButton = {}  // No dismiss button for a loading dialog
+        )
+    }
 }

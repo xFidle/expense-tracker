@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import pw.edu.pl.pap.api.authApi.UserAuthApi
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
 import pw.edu.pl.pap.data.uiSetup.inputFields.TextFieldData
+import pw.edu.pl.pap.util.validateEmail
 
 class SignupScreenComponent(
     componentContext: ComponentContext,
@@ -61,6 +62,10 @@ class SignupScreenComponent(
 
     override fun confirm() {
         //TODO verify email
+        if (!validateEmail(email.value)) {
+            showEmailWarning.value = true
+            return
+        }
         //TODO verify passwords
         //TODO show warning screen if incorrect data
         //TODO push new user

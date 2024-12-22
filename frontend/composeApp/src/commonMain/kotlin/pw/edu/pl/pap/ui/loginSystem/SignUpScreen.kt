@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,6 +15,7 @@ import pw.edu.pl.pap.navigation.loginSystem.SignupScreenComponent
 import pw.edu.pl.pap.ui.common.Header
 import pw.edu.pl.pap.ui.common.InputFields
 import pw.edu.pl.pap.ui.common.TextButton
+import pw.edu.pl.pap.ui.common.WarningPopup
 
 
 @Composable
@@ -24,6 +27,14 @@ fun SignUpScreen (
     Header("Sign Up")
     component.setupInputFields()
     InputFields(component.inputFieldsData)
+
+    WarningPopup(
+        subText = "Incorrect email.",
+        showWarning = component.showEmailWarning.value,
+        onDismiss = {
+            component.showEmailWarning.value = (!component.showEmailWarning.value)
+        }
+    )
 
 
     Box(
