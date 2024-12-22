@@ -12,6 +12,8 @@ class ExpenseMap(
     private val _groupingOrder = MutableStateFlow(initialGroupingOrder)
     val groupingOrder = _groupingOrder.asStateFlow()
 
+    private var updated: Boolean = false
+
     fun switchGroupingOrder() {
         _groupingOrder.value = if (_groupingOrder.value == Order.ASCENDING) Order.DESCENDING else Order.ASCENDING
     }
@@ -21,6 +23,7 @@ class ExpenseMap(
             add(0, expense)
         } ?: mutableListOf(expense)
         this[key] = expenseList.toList()
+        updated = true
     }
 
     fun deleteExpense(key: GroupMapKey, expenseId: Long) {
@@ -31,6 +34,7 @@ class ExpenseMap(
         } else {
             this[key] = updatedList
         }
+        updated = true
     }
 
     fun updateExpense(key: GroupMapKey, updatedExpense: Expense) {
@@ -39,6 +43,7 @@ class ExpenseMap(
             if (it.id == updatedExpense.id) updatedExpense else it
         }
         this[key] = updatedList
+        updated = true
     }
 
     fun <T : Comparable<T>> sortEachList(keySelector: (Expense) -> T, order: Order) {
@@ -49,6 +54,19 @@ class ExpenseMap(
             }
             this[mapKey] = sortedList.toMutableList()
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (!updated) {
+            return super.equals(other)
+        } else {
+            updated = false
+            return false
+        }
+    }
+
+    override fun hashCode(): Int {
+        return super.hashCode()
     }
 }
 
