@@ -14,7 +14,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     @Query("SELECT e FROM Expense e " +
             "where e.user IN " +
-            "(SELECT m.user FROM Membership m WHERE m.name = :groupName)" +
+            "(SELECT m.user FROM Membership m WHERE m.group.name = :groupName)" +
             "AND e.category.name = :category")
     List<Expense> findByCategoryName(String category, String groupName);
 
