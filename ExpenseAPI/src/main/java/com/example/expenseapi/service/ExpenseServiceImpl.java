@@ -129,13 +129,30 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     private String getGroupName() {
+        return getAllGroups().getFirst().getName();
+    }
+
+    private List<BaseGroup> getAllGroups() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         Optional<User> user = userRepository.findByEmail(email);
-        String name = null;
+        List<BaseGroup> groups = null;
         if (user.isPresent()) {
-            name = membershipRepository.findBaseGroupsByUser_Id(user.get().getId()).getFirst().getName();
+            groups = membershipRepository.findBaseGroupsByUser_Id(user.get().getId());
         }
-        return name;
+        return groups;
+    }
+
+    @Override
+    public Map<String, Map<LocalDate, List<Expense>>> getGroupExpenseAsMap() {
+        List<BaseGroup> groups = getAllGroups();
+        Map<String, Map<LocalDate, List<Expense>>> groupExpenseAsMap = new HashMap<>();
+        for (BaseGroup baseGroup : groups) {
+            List<Expense> expenses = getExpensesForGroup(baseGroup.getName());
+            Map<LocalDate, List<Expense>> expensesByDate = expenses.stream()
+                    .collect(Collectors.groupingBy(Expense::getDate));
+            groupExpenseAsMap.put(baseGroup.getName(), expensesByDate);
+        }
+        return groupExpenseAsMap;
     }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.example.expenseapi.pojo.BaseGroup;
 import com.example.expenseapi.pojo.Category;
 import com.example.expenseapi.pojo.ExpInfo;
 import com.example.expenseapi.pojo.Expense;
@@ -22,4 +23,6 @@ public interface ExpenseService extends GenericService<Expense, Long> {
     Map<LocalDate, List<Expense>> getDateExpenseAsMap();
     Map<Category, List<Expense>> getCategoryExpenseAsMap();
     Optional<Expense> getRecentExpense();
+
+    Map<String, Map<LocalDate, List<Expense>>> getGroupExpenseAsMap();
 }

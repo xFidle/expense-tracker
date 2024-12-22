@@ -1,4 +1,5 @@
 package com.example.expenseapi.web;
+import com.example.expenseapi.pojo.BaseGroup;
 import com.example.expenseapi.pojo.Category;
 import com.example.expenseapi.pojo.ExpInfo;
 import com.example.expenseapi.pojo.Expense;
@@ -17,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -78,6 +80,11 @@ public class ExpenseController extends GenericController<Expense, Long> {
     @ApiResponse(responseCode = "200", description = "All expenses grouped by category")
     public ResponseEntity<Map<Category, List<Expense>>> getCategoryExpenseMap() {
         return new ResponseEntity<>(((ExpenseService) service).getCategoryExpenseAsMap(), HttpStatus.OK);
+    }
+
+    @GetMapping("/all/group/{name}")
+    public ResponseEntity<Map<LocalDate, List<Expense>>> getGroupExpenseMap(@PathVariable String name) {
+        return new ResponseEntity<>(((ExpenseService) service).getGroupExpenseAsMap().get(name), HttpStatus.OK);
     }
 
     @GetMapping("/recent")
