@@ -71,10 +71,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public List<Expense> getExpensesWherePriceInRange(double left_end, double right_end) {
-        return getExpensesForGroup()
-                .stream()
-                .filter(expense -> expense.getPrice() >= left_end && expense.getPrice() <=right_end)
-                .collect(Collectors.toList());
+        return expenseRepository.findByPriceBetween(left_end, right_end, getGroupName());
     }
 
     @Override
