@@ -125,14 +125,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     private List<Expense> getExpensesForGroup() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        Optional<User> user = userRepository.findByEmail(email);
-        String name = null;
-        if (user.isPresent()) {
-            name = membershipRepository.findBaseGroupsByUser_Id(user.get().getId()).getFirst().getName();
-        }
-        return getExpensesForGroup(name);
+        return getExpensesForGroup(getGroupName());
     }
 
     private String getGroupName() {
