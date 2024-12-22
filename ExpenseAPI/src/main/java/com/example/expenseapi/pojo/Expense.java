@@ -27,7 +27,7 @@ public class Expense {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "expense_date", nullable = false)
     private LocalDate date = LocalDate.now();
 
     @ManyToOne(optional = false)
