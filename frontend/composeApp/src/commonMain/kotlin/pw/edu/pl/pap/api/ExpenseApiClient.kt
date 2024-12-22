@@ -9,8 +9,8 @@ import pw.edu.pl.pap.data.*
 class ExpenseApiClient(baseUrl: String, httpClient: HttpClient, userToken: String) :
     BaseApiClient(baseUrl, httpClient, userToken) {
 
-    suspend fun getTotalExpenses(userGroup: String, userEmail: String): TotalExpenses {
-        return get("state/group/$userGroup/user/$userEmail").body()
+    suspend fun getTotalExpenses(): TotalExpenses {
+        return get("state").body()
     }
 
     private suspend fun getExpenseDateMapApi(): ExpenseMap {

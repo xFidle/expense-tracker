@@ -67,7 +67,7 @@ class HomeScreenComponent(
     private fun fetchHomeInfo() {
         coroutineScope.launch {
             try {
-                val homeData = apiService.expenseApiClient.getTotalExpenses("family", "herkules1@gmail.com")
+                val homeData = apiService.expenseApiClient.getTotalExpenses()
                 _homeInfo.value = homeData
             } catch (e: Exception) {
                 e.printStackTrace()
