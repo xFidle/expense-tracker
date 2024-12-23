@@ -23,10 +23,10 @@ public class ChartController {
         return new ResponseEntity<>(service.getMonthlyExpensesForGroup(year), HttpStatus.OK);
     }
 
-    @GetMapping("/my/expenses/{year}")
+    @GetMapping("/my/expenses/{year}/{currCode}")
     @Operation(summary = "Retrieves map <Month, ExpensesSum> for given year (user-scoped)")
-    public ResponseEntity<Map<String, Double>> getGroupMonthlyExpensesMap(@PathVariable String year) {
-        return new ResponseEntity<>(service.getMonthlyExpensesForUser(year), HttpStatus.OK);
+    public ResponseEntity<Map<String, Double>> getGroupMonthlyExpensesMap(@PathVariable String year, @PathVariable String currCode) {
+        return new ResponseEntity<>(service.getMonthlyExpensesForUser(year, currCode), HttpStatus.OK);
     }
 
     @GetMapping("/my/group/categories/{begin}/{end}")
