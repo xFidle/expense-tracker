@@ -69,4 +69,22 @@ class ExpenseApiClient(baseUrl: String, httpClient: HttpClient, userToken: Strin
     suspend fun deleteExpense(id: Long): HttpResponse {
         return delete("delete/$id")
     }
+
+    private suspend fun getExpenseDateMapForGroupApi(group: String): ExpenseMap {
+        val originalMap: Map<GroupMapKey.DateKey, List<Expense>> = get("all/dateMap/group/$group").body()
+        return originalMap.toMap(ExpenseMap(initialGroupingOrder = Order.DESCENDING))
+    }
+
+    fun getExpenseDateMapForGroup(group: String) = flow {
+        emit(getExpenseDateMapForGroupApi(group))
+    }
+
+    private suspend fun getExpenseCatMapForGroupApi(group: String): ExpenseMap {
+        val originalMap: Map<GroupMapKey.DateKey, List<Expense>> = get("all/categoryMap/group/$group").body()
+        return originalMap.toMap(ExpenseMap(initialGroupingOrder = Order.ASCENDING))
+    }
+
+    fun getExpenseCatMapForGroup(group: String) = flow {
+        emit(getExpenseCatMapForGroupApi(group))
+    }
 }
