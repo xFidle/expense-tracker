@@ -43,7 +43,6 @@ class HomeScreenComponent(
     }
 
     fun getDataBasedOnState() {
-        fetchHomeInfo()
         when (_navigationState.value) {
             is NavigationState.InitialLoad -> {
                 fetchAllExpenses()
@@ -76,10 +75,14 @@ class HomeScreenComponent(
     private val _currentUserGroup = MutableStateFlow<UserGroup?>(null)
     val currentUserGroup: StateFlow<UserGroup?> get() = _currentUserGroup
 
+    fun updateUserGroup(key: UserGroup) {
+        _currentUserGroup.value = key
+    }
+
     private val _homeInfo = MutableStateFlow<TotalExpenses?>(null)
     val homeInfo: StateFlow<TotalExpenses?> get() = _homeInfo
 
-    private fun fetchHomeInfo() {
+    fun fetchHomeInfo() {
         runBlocking {
             try {
                 val homeData = apiService.expenseApiClient.getTotalExpenses()

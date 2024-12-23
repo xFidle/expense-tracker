@@ -60,7 +60,7 @@ fun UserGroupPopup(
                 val onGroupClick: () -> Unit = if (!isSelected) {
                     {
                         pendingAction = {
-//                            clickAction(userGroup, component)
+                            clickAction(userGroup, component)
                         }
                     }
                 } else {
@@ -89,5 +89,11 @@ private fun GroupButton(
     ) {
         userGroup.name?.let { Text(text = it, style = MaterialTheme.typography.bodyLarge) }
     }
+}
+
+private fun clickAction(userGroup: UserGroup, component: HomeScreenComponent) {
+    component.updateUserGroup(userGroup)
+    component.updateNavigationState(HomeScreenComponent.NavigationState.InitialLoad)
+    component.getDataBasedOnState()
 }
 

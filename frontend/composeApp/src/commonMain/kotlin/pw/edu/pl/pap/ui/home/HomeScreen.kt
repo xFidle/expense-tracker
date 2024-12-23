@@ -25,6 +25,7 @@ fun HomeScreen(component: HomeScreenComponent) {
 //    val groupedExpenses by component.groupedExpenses.collectAsState()
 
     LaunchedEffect(component.navigationState.collectAsState()) {
+        component.fetchHomeInfo()
         component.getDataBasedOnState()
         isLoading = false
     }
