@@ -163,4 +163,8 @@ class HomeScreenComponent(
             _groupedExpenses.value.switchGroupingOrder()
         }
     }
+
+    private val _currentUserGroup = MutableStateFlow(GroupKey.DATE)
+    // change here
+    val currentUserGroup: StateFlow<GroupKey> get() = _currentGroupingKey
 }

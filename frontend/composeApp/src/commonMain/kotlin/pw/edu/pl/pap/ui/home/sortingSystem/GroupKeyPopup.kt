@@ -15,7 +15,7 @@ import pw.edu.pl.pap.ui.common.LoadingPopup
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GroupPopup(
+fun GroupKeyPopup(
     component: HomeScreenComponent,
     onDismiss: () -> Unit,
 ) {

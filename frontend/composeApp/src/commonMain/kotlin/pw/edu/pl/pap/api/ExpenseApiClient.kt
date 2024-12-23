@@ -23,7 +23,6 @@ class ExpenseApiClient(baseUrl: String, httpClient: HttpClient, userToken: Strin
         return originalMap.toMap(ExpenseMap(initialGroupingOrder = Order.DESCENDING))
     }
 
-
     fun getExpenseDateMap() = flow {
         emit(getExpenseDateMapApi())
     }
