@@ -1,6 +1,7 @@
 package com.example.expenseapi.repository;
 
 import com.example.expenseapi.pojo.Expense;
+import com.example.expenseapi.service.ExpenseService;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -57,11 +58,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             "AND EXTRACT(YEAR FROM e.date) = :year")
     List<Expense> findByUserEmailAndYear(String email, String year);
 
-    @Query("SELECT TO_CHAR(e.date, 'Month'), SUM(e.price) " +
-            "FROM Expense e " +
-            "WHERE e.user IN " +
-            "(SELECT m.user FROM Membership m WHERE m.group.name = :groupName) " +
-            "AND EXTRACT(YEAR FROM e.date) = :year " +
-            "GROUP BY TO_CHAR(e.date, 'Month'), EXTRACT(MONTH FROM e.date)")
-    List<Object[]> findTotalExpensesForMonthsGroup(String year, String groupName);
+    @Query("SELECT e FROM Expense e " +
+            "WHERE e.user IN (SELECT m.user FROM Membership m WHERE m.name = :name) " +
+            "AND EXTRACT(YEAR FROM e.date) = :year")
+    List<Expense> findByUserGroupNameAndYear(String groupName, String year);
 }

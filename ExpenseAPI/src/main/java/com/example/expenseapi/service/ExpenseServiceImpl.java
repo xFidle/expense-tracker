@@ -151,8 +151,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
-    public Map<String, Double> getMonthlyExpensesForGroup(String year) {
-        return mapResult(expenseRepository.findTotalExpensesForMonthsGroup(year, getGroupName()));
+    public Map<String, Double> getMonthlyExpensesForGroup(String year, String currCode) {
+        List<Expense> groupExpenses = expenseRepository.findByUserGroupNameAndYear(getGroupName(), year);
+        return monthTotalExpensesMap(groupExpenses, currCode);
     }
 
     @Override
