@@ -1,5 +1,7 @@
 package pw.edu.pl.pap.screenComponents
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import com.arkivanov.decompose.ComponentContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +43,7 @@ class HomeScreenComponent(
     }
 
     fun getDataBasedOnState() {
+        fetchHomeInfo()
         when (_navigationState.value) {
             is NavigationState.InitialLoad -> {
                 fetchAllExpenses()
@@ -64,7 +67,6 @@ class HomeScreenComponent(
                 // Do nothing
             }
         }
-        fetchHomeInfo()
         updateNavigationState(NavigationState.Empty)
     }
 
@@ -78,7 +80,7 @@ class HomeScreenComponent(
     val homeInfo: StateFlow<TotalExpenses?> get() = _homeInfo
 
     private fun fetchHomeInfo() {
-        coroutineScope.launch {
+        runBlocking {
             try {
                 val homeData = apiService.expenseApiClient.getTotalExpenses()
                 _homeInfo.value = homeData
@@ -107,8 +109,10 @@ class HomeScreenComponent(
 
     private fun currentExpenseMethod(): () -> Flow<ExpenseMap> {
         return when (_currentGroupingKey.value) {
-            GroupKey.DATE -> apiService.expenseApiClient::getExpenseDateMap
-            GroupKey.CATEGORY -> apiService.expenseApiClient::getExpenseCatMap
+//            GroupKey.DATE -> apiService.expenseApiClient::getExpenseDateMap
+//            GroupKey.CATEGORY -> apiService.expenseApiClient::getExpenseCatMap
+            GroupKey.DATE -> { { apiService.expenseApiClient.getExpenseDateMapForGroup(_currentUserGroup.value?.name) } }
+            GroupKey.CATEGORY -> { { apiService.expenseApiClient.getExpenseCatMapForGroup(_currentUserGroup.value?.name) } }
         }
     }
 

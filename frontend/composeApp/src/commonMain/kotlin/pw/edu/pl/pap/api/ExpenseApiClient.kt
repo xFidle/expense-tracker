@@ -75,8 +75,8 @@ class ExpenseApiClient(baseUrl: String, httpClient: HttpClient, userToken: Strin
         return originalMap.toMap(ExpenseMap(initialGroupingOrder = Order.DESCENDING))
     }
 
-    fun getExpenseDateMapForGroup(group: String) = flow {
-        emit(getExpenseDateMapForGroupApi(group))
+    fun getExpenseDateMapForGroup(group: String?) = flow {
+        emit(getExpenseDateMapForGroupApi(group!!))
     }
 
     private suspend fun getExpenseCatMapForGroupApi(group: String): ExpenseMap {
@@ -84,7 +84,7 @@ class ExpenseApiClient(baseUrl: String, httpClient: HttpClient, userToken: Strin
         return originalMap.toMap(ExpenseMap(initialGroupingOrder = Order.ASCENDING))
     }
 
-    fun getExpenseCatMapForGroup(group: String) = flow {
-        emit(getExpenseCatMapForGroupApi(group))
+    fun getExpenseCatMapForGroup(group: String?) = flow {
+        emit(getExpenseCatMapForGroupApi(group!!))
     }
 }
