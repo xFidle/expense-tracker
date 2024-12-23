@@ -23,6 +23,7 @@ import pw.edu.pl.pap.screenComponents.loginSystem.SelectionLoginSignupScreenComp
 import pw.edu.pl.pap.screenComponents.loginSystem.SignupScreenComponent
 import pw.edu.pl.pap.screenComponents.singleExpense.ExpenseDetailsScreenComponent
 import pw.edu.pl.pap.screenComponents.singleExpense.NewExpenseScreenComponent
+import pw.edu.pl.pap.ui.navBar.NavBarItem
 
 class RootComponent(
     componentContext: ComponentContext,
@@ -74,6 +75,16 @@ class RootComponent(
         data class LogInSignUpSelectionScreen(val component: SelectionLoginSignupScreenComponent) : Child()
         data class LogInScreen(val component: LoginScreenComponent) : Child()
         data class SignUpScreen(val component: SignupScreenComponent) : Child()
+    }
+
+    // TODO add new screens when ready
+    fun navBarItemClicked(item: NavBarItem) {
+        when(item) {
+            NavBarItem.Home -> navigation.bringToFront(Configuration.HomeScreen)
+            NavBarItem.Data -> navigation.bringToFront(Configuration.HomeScreen)
+            NavBarItem.Groups -> navigation.bringToFront(Configuration.HomeScreen)
+            NavBarItem.Settings -> navigation.bringToFront(Configuration.HomeScreen)
+        }
     }
 
     @OptIn(ExperimentalDecomposeApi::class)

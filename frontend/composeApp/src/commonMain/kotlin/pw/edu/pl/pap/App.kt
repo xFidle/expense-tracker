@@ -39,8 +39,9 @@ fun App(rootComponent: RootComponent) {
                     BottomNavBar(
                         items = listOf(
                             NavBarItem.Home, NavBarItem.Data, NavBarItem.Groups, NavBarItem.Settings
-                        )
-                    ) { }
+                        ),
+                        onSelect = { rootComponent.navBarItemClicked(it) }
+                    )
                 }
             },
         ) { innerPadding ->
