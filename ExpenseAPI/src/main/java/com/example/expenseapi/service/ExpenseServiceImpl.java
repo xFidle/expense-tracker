@@ -4,14 +4,10 @@ import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.pojo.Currency;
 import com.example.expenseapi.repository.*;
 import com.example.expenseapi.utils.CurrencyRatesFetcher;
-import io.swagger.v3.oas.models.links.Link;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.*;
 import java.util.stream.*;
 
