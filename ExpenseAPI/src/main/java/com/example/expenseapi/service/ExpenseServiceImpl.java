@@ -20,15 +20,6 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     private final MembershipRepository membershipRepository;
     private final MethodOfPaymentRepository methodOfPaymentRepository;
 
-    private Map<String, Double> monthTotalExpensesMap(List<Expense> queryResult, String destCurr) {
-        Map<String, Double> map = new LinkedHashMap<>();
-        for (Expense expense : queryResult) {
-            String month = expense.getDate().getMonth().name();
-            double price = CurrencyRatesFetcher.convertFromCurrencyToAnother(expense.getPrice(), expense.getCurrency().getSymbol(), destCurr);
-            map.put(month, map.getOrDefault(month, 0.0) + price);
-        }
-        return map;
-    }
     public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository, UserRepository userRepository, MembershipRepository membershipRepository, MethodOfPaymentRepository methodOfPaymentRepository) {
         super(repository);
         this.expenseRepository = repository;
@@ -138,18 +129,17 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public Map<String, Double> getMonthlyExpensesForUser(String year, String currCode) {
-        List<Expense> userExpenses = expenseRepository.findByUserEmailAndYear(year, SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName());
-        return monthTotalExpensesMap(userExpenses, currCode);
+        Currency currency = currencyRepository.findBySymbol(currCode);
+        List<Expense> userExpenses = expenseRepository.findByUserEmailAndYear(getUserEmail(), year);
+        return monthTotalExpensesMap(userExpenses, currency);
 
     }
 
     @Override
     public Map<String, Double> getMonthlyExpensesForGroup(String year, String currCode) {
+        Currency currency = currencyRepository.findBySymbol(currCode);
         List<Expense> groupExpenses = expenseRepository.findByUserGroupNameAndYear(getGroupName(), year);
-        return monthTotalExpensesMap(groupExpenses, currCode);
+        return monthTotalExpensesMap(groupExpenses, currency);
     }
 
     @Override
@@ -188,5 +178,10 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             name = membershipRepository.findBaseGroupsByUser_Id(user.get().getId()).getFirst().getName();
         }
         return name;
+    }
+
+    private String getUserEmail() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getName();
     }
 }
