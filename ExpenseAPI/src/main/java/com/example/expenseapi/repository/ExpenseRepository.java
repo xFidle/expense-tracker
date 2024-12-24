@@ -1,13 +1,14 @@
 package com.example.expenseapi.repository;
 
 import com.example.expenseapi.pojo.Expense;
-import com.example.expenseapi.service.ExpenseService;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByUserEmail(String email);
@@ -53,13 +54,14 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     @Query("SELECT e FROM Expense e WHERE e.user IN (SELECT m.user FROM Membership m WHERE m.name = :name)")
     List<Expense> findByUserGroupName(String name);
 
-    @Query("SELECT e FROM Expense e " +
-            "WHERE e.user.email = :email " +
-            "AND EXTRACT(YEAR FROM e.date) = :year")
-    List<Expense> findByUserEmailAndYear(String email, String year);
+    @Query("Select e FROM Expense e WHERE e.user.email = :userEmail AND EXTRACT(YEAR FROM e.date) = :year")
+    List<Expense> findByUserEmailAndDateYear(String userEmail, String year);
 
     @Query("SELECT e FROM Expense e " +
             "WHERE e.user IN (SELECT m.user FROM Membership m WHERE m.name = :name) " +
             "AND EXTRACT(YEAR FROM e.date) = :year")
     List<Expense> findByUserGroupNameAndYear(String groupName, String year);
+
+    @Query("SELECT e FROM Expense e WHERE e.user.email = :userEmail and e.date between :begin and :end")
+    List<Expense> findByUserEmailAndDateBetween(String userEmail, LocalDate begin, LocalDate end);
 }
