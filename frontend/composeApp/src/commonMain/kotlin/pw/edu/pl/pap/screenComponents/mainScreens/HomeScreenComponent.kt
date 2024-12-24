@@ -1,13 +1,10 @@
-package pw.edu.pl.pap.screenComponents
+package pw.edu.pl.pap.screenComponents.mainScreens
 
-import com.arkivanov.decompose.ComponentContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import pw.edu.pl.pap.api.ApiService
 import pw.edu.pl.pap.data.databaseAssociatedData.Expense
 import pw.edu.pl.pap.data.databaseAssociatedData.TotalExpenses
 import pw.edu.pl.pap.util.sortingSystem.ExpenseMap
@@ -16,12 +13,10 @@ import pw.edu.pl.pap.util.sortingSystem.GroupMapKey
 import pw.edu.pl.pap.util.sortingSystem.Order
 
 class HomeScreenComponent(
-    componentContext: ComponentContext,
-    private val apiService: ApiService,
-    private val coroutineScope: CoroutineScope,
+    baseScreenComponent: BaseScreenComponent,
     val onAddExpenseButtonClicked: () -> Unit,
     val onExpenseClick: (Expense) -> Unit
-) : ComponentContext by componentContext {
+) : BaseScreenComponent by baseScreenComponent {
 
     sealed class NavigationState {
         data object InitialLoad : NavigationState()
