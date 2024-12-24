@@ -184,4 +184,23 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth.getName();
     }
+
+    private double convertFromCurrencyToAnother(double value, Currency srcCurr, Currency dstCurr) {
+        if (!srcCurr.getSymbol().equals("PLN")) {
+            value *= srcCurr.getExchangeRate();
+        }
+        if (!dstCurr.getSymbol().equals("PLN")) {
+            value /= dstCurr.getExchangeRate();
+        }
+        return value;
+    }
+    private Map<String, Double> monthTotalExpensesMap(List<Expense> queryResult, Currency dstCurr) {
+        Map<String, Double> map = new LinkedHashMap<>();
+        for (Expense expense : queryResult) {
+            String month = expense.getDate().getMonth().name();
+            double price = convertFromCurrencyToAnother(expense.getPrice(), expense.getCurrency(), dstCurr);
+            map.put(month, map.getOrDefault(month, 0.0) + price);
+        }
+        return map;
+    }
 }
