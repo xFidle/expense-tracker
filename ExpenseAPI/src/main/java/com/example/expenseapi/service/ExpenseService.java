@@ -23,7 +23,7 @@ public interface ExpenseService extends GenericService<Expense, Long> {
     Map<Category, List<Expense>> getCategoryExpenseAsMap();
     Map<String, Double> getMonthlyExpensesForUser(String year, String currCode);
     Map<String, Double> getMonthlyExpensesForGroup(String year, String currCode);
-    Map<String, Double> getSumOfCategoryExpansesForGroup(String begin, String end);
-    Map<String, Double> getSumOfCategoryExpansesForUser(String begin, String end);
+    Map<String, Double> getSumOfCategoryExpansesForGroup(String begin, String end, String currCode);
+    Map<String, Double> getSumOfCategoryExpansesForUser(String begin, String end, String currCode);
     Optional<Expense> getRecentExpense();
 }

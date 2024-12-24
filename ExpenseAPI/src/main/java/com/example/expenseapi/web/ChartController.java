@@ -30,9 +30,14 @@ public class ChartController {
     }
 
     @GetMapping("/my/group/categories/{begin}/{end}")
-    @Operation(summary = "Retrieves map <CategoryName, ExpensesSum> for given time period")
-    public ResponseEntity<Map<String, Double>> getGroupCategoryExpensesMap(@PathVariable String begin, @PathVariable String end) {
-        return new ResponseEntity<>(service.getSumOfCategoryExpansesForGroup(begin, end), HttpStatus.OK);
+    @Operation(summary = "Retrieves map <CategoryName, ExpensesSum> for given time period, currCode (currency code ISO4217) - param")
+    public ResponseEntity<Map<String, Double>> getGroupCategoryExpensesMap(@PathVariable String begin, @PathVariable String end, @RequestParam(defaultValue = "PLN") String currCode) {
+        return new ResponseEntity<>(service.getSumOfCategoryExpansesForGroup(begin, end, currCode), HttpStatus.OK);
     }
 
+    @GetMapping("/my/expenses/categories/{begin}/{end}")
+    @Operation(summary = "Retrieves map <CategoryName, ExpensesSum> for given time period, currCode (currency code ISO4217) - param")
+    public ResponseEntity<Map<String, Double>> getUserCategoryExpensesMap(@PathVariable String begin, @PathVariable String end, @RequestParam(defaultValue = "PLN") String currCode) {
+        return new ResponseEntity<>(service.getSumOfCategoryExpansesForUser(begin, end, currCode), HttpStatus.OK);
+    }
 }

@@ -3,12 +3,12 @@ package com.example.expenseapi.service;
 import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.pojo.Currency;
 import com.example.expenseapi.repository.*;
-import com.example.expenseapi.utils.CurrencyRatesFetcher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.*;
 
 @Service
@@ -130,8 +130,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     @Override
     public Map<String, Double> getMonthlyExpensesForUser(String year, String currCode) {
         Currency currency = currencyRepository.findBySymbol(currCode);
-        List<Expense> userExpenses = expenseRepository.findByUserEmailAndYear(getUserEmail(), year);
-        return monthTotalExpensesMap(userExpenses, currency);
+        List<Expense> userExpenses = expenseRepository.findByUserEmailAndDateYear(getUserEmail(), year);
+        return totalExpensesMap(userExpenses, e -> e.getDate().getMonth().name(), currency);
 
     }
 
@@ -139,25 +139,25 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     public Map<String, Double> getMonthlyExpensesForGroup(String year, String currCode) {
         Currency currency = currencyRepository.findBySymbol(currCode);
         List<Expense> groupExpenses = expenseRepository.findByUserGroupNameAndYear(getGroupName(), year);
-        return monthTotalExpensesMap(groupExpenses, currency);
+        return totalExpensesMap(groupExpenses, e-> e.getDate().getMonth().name(), currency);
     }
 
     @Override
-    public Map<String, Double> getSumOfCategoryExpansesForGroup(String begin, String end) {
+    public Map<String, Double> getSumOfCategoryExpansesForGroup(String begin, String end, String currCode) {
         LocalDate beginDate = LocalDate.parse(begin);
         LocalDate endDate = LocalDate.parse(end);
-        List<Expense> result = expenseRepository.findByDateBetween(beginDate, endDate, getGroupName());
-        Map<String, Double> categoryExpenses = new LinkedHashMap<>();
-        for (Expense expense : result) {
-            String catName = expense.getCategory().getName();
-            categoryExpenses.put(catName, categoryExpenses.getOrDefault(catName, 0.0) + expense.getPrice());
-        }
-        return categoryExpenses;
+        Currency currency = currencyRepository.findBySymbol(currCode);
+        List<Expense> categoryExpenses = expenseRepository.findByDateBetween(beginDate, endDate, getGroupName());
+        return totalExpensesMap(categoryExpenses, e->e.getCategory().getName(), currency);
     }
 
     @Override
-    public Map<String, Double> getSumOfCategoryExpansesForUser(String begin, String end) {
-        return null;
+    public Map<String, Double> getSumOfCategoryExpansesForUser(String begin, String end, String currCode) {
+        LocalDate beginDate = LocalDate.parse(begin);
+        LocalDate endDate = LocalDate.parse(end);
+        Currency currency = currencyRepository.findBySymbol(currCode);
+        List<Expense> categoryExpenses = expenseRepository.findByUserEmailAndDateBetween(getUserEmail(), beginDate, endDate);
+        return totalExpensesMap(categoryExpenses, e->e.getCategory().getName(), currency);
     }
 
     @Override
@@ -194,12 +194,12 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         }
         return value;
     }
-    private Map<String, Double> monthTotalExpensesMap(List<Expense> queryResult, Currency dstCurr) {
+    private Map<String, Double> totalExpensesMap(List<Expense> queryResult, Function<Expense, String> keyExtractor, Currency dstCurr) {
         Map<String, Double> map = new LinkedHashMap<>();
         for (Expense expense : queryResult) {
-            String month = expense.getDate().getMonth().name();
+            String key = keyExtractor.apply(expense);
             double price = convertFromCurrencyToAnother(expense.getPrice(), expense.getCurrency(), dstCurr);
-            map.put(month, map.getOrDefault(month, 0.0) + price);
+            map.put(key, map.getOrDefault(key, 0.0) + price);
         }
         return map;
     }
