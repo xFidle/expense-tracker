@@ -1,6 +1,7 @@
 package com.example.expenseapi.service;
 
 import com.example.expenseapi.pojo.BaseGroup;
+import com.example.expenseapi.pojo.BaseMembership;
 import com.example.expenseapi.pojo.Membership;
 import com.example.expenseapi.pojo.User;
 import com.example.expenseapi.repository.MembershipRepository;
@@ -31,7 +32,7 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     }
 
     @Override
-    public String getRole(User user, Membership entity) {
+    public String getRole(User user, BaseMembership entity) {
         return getMembershipsByUserId(user.getId())
                 .stream()
                 .filter(membership -> membership.getGroup().getId().equals(entity.getGroup().getId()))
