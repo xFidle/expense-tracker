@@ -4,43 +4,42 @@ import com.example.expenseapi.pojo.Membership;
 import com.example.expenseapi.pojo.User;
 import com.example.expenseapi.service.MembershipService;
 import com.example.expenseapi.service.UserService;
-import jakarta.persistence.Inheritance;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/membership")
 public class MembershipController extends GenericController<Membership, Long> {
-    private final UserService userService ;
     private final MembershipService membershipService ;
-    public MembershipController(MembershipService service, UserService userService, MembershipService membershipService) {
+    private final UserService userService ;
+    public MembershipController(MembershipService service, MembershipService membershipService, UserService userService) {
         super(service);
-        this.userService = userService;
         this.membershipService = membershipService;
+        this.userService = userService;
     }
 
     @PostMapping("/add")
     public ResponseEntity<HttpStatus> save(@RequestBody Membership entity, @AuthenticationPrincipal org.springframework.security.core.userdetails.User user) {
         String email = user.getUsername();
-        Optional<User> mUser = userService.findByEmail(email);
-        if (Objects.equals(((MembershipService) service)
-                .getMembershipsByUserId(mUser.get().getId())
-                .stream()
-                .filter(membership -> membership.getGroup().equals(entity.getGroup()))
-                .findFirst()
-                .get().getRole().getName(), "admin"))
-        {
+        User mUser = userService.findByEmail(email).get();
+        if (((MembershipService) service).getRole(mUser, entity).equals("admin")) {
             membershipService.save(entity);
             return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<HttpStatus> delete(@RequestBody Membership entity, @AuthenticationPrincipal org.springframework.security.core.userdetails.User user) {
+        String email = user.getUsername();
+        User mUser = userService.findByEmail(email).get();
+        if (((MembershipService) service).getRole(mUser, entity).equals("admin")) {
+            membershipService.delete(entity.getId());
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
