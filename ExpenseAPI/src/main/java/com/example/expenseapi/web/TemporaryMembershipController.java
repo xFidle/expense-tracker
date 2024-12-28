@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/tempMembership")
@@ -36,6 +33,18 @@ public class TemporaryMembershipController extends GenericController<TemporaryMe
             Membership newMembership = new Membership(temporaryMembership);
             temporaryMembershipService.delete(id);
             membershipService.save(newMembership);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @DeleteMapping("/decline/{id}")
+    public ResponseEntity<HttpStatus> declineInvitation(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        com.example.expenseapi.pojo.User mUser = userService.findByEmail(user.getUsername()).get();
+        TemporaryMembership temporaryMembership = temporaryMembershipService.get(id);
+
+        if (temporaryMembership.getUser().getId().equals(mUser.getId())) {
+            temporaryMembershipService.delete(id);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
