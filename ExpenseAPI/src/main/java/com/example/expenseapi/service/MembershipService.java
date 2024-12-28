@@ -5,9 +5,11 @@ import com.example.expenseapi.pojo.Membership;
 import com.example.expenseapi.pojo.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MembershipService extends GenericService<Membership, Long> {
     List<BaseGroup> getBaseGroupsByUserId(Long userId);
     List<Membership> getMembershipsByUserId(Long userId);
     List<User> findAdmins(String group);
+    String getRole(User user, Membership entity);
 }

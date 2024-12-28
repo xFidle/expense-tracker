@@ -7,10 +7,13 @@ import com.example.expenseapi.repository.MembershipRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> implements MembershipService {
     MembershipRepository membershipRepository;
+    UserService userService;
     public MembershipServiceImpl(MembershipRepository repository) {
         super(repository);
         this.membershipRepository = repository;
@@ -29,4 +32,16 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     public List<User> findAdmins(String group) {
         return membershipRepository.findAdmins(group);
     }
+
+    @Override
+    public String getRole(User user, Membership entity) {
+        return getMembershipsByUserId(user.getId())
+                .stream()
+                .filter(membership -> membership.getGroup().getId().equals(entity.getGroup().getId()))
+                .findFirst()
+                .get()
+                .getRole()
+                .getName();
+    }
+
 }
