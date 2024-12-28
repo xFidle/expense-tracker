@@ -42,4 +42,15 @@ public class MembershipController extends GenericController<Membership, Long> {
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
+
+    @PutMapping("/update")
+    public ResponseEntity<HttpStatus> update(@RequestBody Membership entity, @AuthenticationPrincipal org.springframework.security.core.userdetails.User user) {
+        String email = user.getUsername();
+        User mUser = userService.findByEmail(email).get();
+        if (((MembershipService) service).getRole(mUser, entity).equals("admin")) {
+            membershipService.update(entity.getId(), entity);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
 }
