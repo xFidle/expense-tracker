@@ -140,6 +140,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         if (filter.getGroupName() == null || filter.getGroupName().isEmpty()) {
             filter.setGroupName(getGroupName());
         }
+        if (!isGroupNameValid(filter.getGroupName())) {
+            return Collections.emptyList();
+        }
         Specification<Expense> spec = Specification.where(null);
         spec = spec.and(ExpenseSpecification.hasCategory(filter.getCategoryName()));
         spec = spec.and(ExpenseSpecification.dateIs(filter.getDate()));
@@ -148,5 +151,10 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         spec = spec.and(ExpenseSpecification.hasGroup(filter.getGroupName()));
         spec = spec.and(ExpenseSpecification.isUser(filter.getEmail()));
         return expenseRepository.findAll(spec);
+    }
+
+    private boolean isGroupNameValid(String name){
+        return getAllGroups().stream()
+                .anyMatch(group -> group.getName().equals(name));
     }
 }
