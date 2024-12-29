@@ -11,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/tempMembership")
 public class TemporaryMembershipController extends GenericController<TemporaryMembership, Long> {
@@ -48,6 +50,12 @@ public class TemporaryMembershipController extends GenericController<TemporaryMe
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/invitations")
+    public ResponseEntity<List<TemporaryMembership>> getInvitations(@AuthenticationPrincipal User user) {
+        com.example.expenseapi.pojo.User mUser = userService.findByEmail(user.getUsername()).get();
+        return new ResponseEntity<>(temporaryMembershipService.getByUserId(mUser.getId()), HttpStatus.OK);
     }
 
 }
