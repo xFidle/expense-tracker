@@ -55,41 +55,10 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
-    public List<Expense> getExpensesByCategory(String category) {
-        return expenseRepository.findByCategoryName(category, getGroupName());
-    }
-
-    @Override
-    public List<Expense> getExpensesByDate(String date) {
-        LocalDate dateObject = LocalDate.parse(date);
-        return expenseRepository.findByDate(dateObject, getGroupName());
-    }
-
-    @Override
-    public List<Expense> getExpensesByPeriod(String begin, String end) {
-        LocalDate beginDate = LocalDate.parse(begin);
-        LocalDate endDate = LocalDate.parse(end);
-        return expenseRepository.findByDateBetween(beginDate, endDate, getGroupName());
-    }
-
-    @Override
-    public List<Expense> getExpensesWherePriceInRange(double left_end, double right_end) {
-        return expenseRepository.findByPriceBetween(left_end, right_end, getGroupName());
-    }
-
-    @Override
-    public List<Expense> getExpensesWherePriceIsLower(double price) {
-        return expenseRepository.findByPriceLessThan(price, getGroupName());
-    }
-
-    @Override
-    public List<Expense> getExpensesWherePriceIsGreater(double price) {
-        return expenseRepository.findByPriceGreaterThan(price, getGroupName());
-    }
-
-    @Override
     public List<Expense> getExpensesForGroup(String name) {
-        return expenseRepository.findByUserGroupName(name);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setGroupName(name);
+        return searchExpenses(filter);
     }
 
     @Override
@@ -132,7 +101,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         return expenseRepository.findTopByOrderByIdDesc();
     }
 
-    private List<Expense> getExpensesForGroup() {
+    @Override
+    public List<Expense> getExpensesForGroup() {
         return getExpensesForGroup(getGroupName());
     }
 
@@ -167,6 +137,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public List<Expense> searchExpenses(ExpenseFilter filter) {
+        if (filter.getGroupName() == null || filter.getGroupName().isEmpty()) {
+            filter.setGroupName(getGroupName());
+        }
         Specification<Expense> spec = Specification.where(null);
         spec = spec.and(ExpenseSpecification.hasCategory(filter.getCategoryName()));
         spec = spec.and(ExpenseSpecification.dateIs(filter.getDate()));

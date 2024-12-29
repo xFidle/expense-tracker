@@ -1,4 +1,5 @@
 package com.example.expenseapi.web;
+import com.example.expenseapi.dto.ExpenseFilter;
 import com.example.expenseapi.pojo.Category;
 import com.example.expenseapi.pojo.ExpInfo;
 import com.example.expenseapi.pojo.Expense;
@@ -15,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,34 +30,25 @@ import java.util.Optional;
 @RequestMapping("/expense")
 @Tag(name="Expense Controller", description = "Controller to manage expense objects")
 public class ExpenseController extends GenericController<Expense, Long> {
-    private final MembershipService membershipService;
-    private final UserService userService;
-    public ExpenseController(ExpenseService service, MembershipService membershipService, UserService userService) {
+    public ExpenseController(ExpenseService service) {
         super(service);
-        this.membershipService = membershipService;
-        this.userService = userService;
     }
 
     @GetMapping("/my/expenses")
     @Operation(summary = "Retrieves expenses from logged-in user")
     @ApiResponse(responseCode = "200", description = "List of expense objects from logged user", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
     public ResponseEntity<List<Expense>> getMyExpenses(@AuthenticationPrincipal UserDetails user) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesByEmail(user.getUsername()), HttpStatus.OK);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setEmail(user.getUsername());
+        return new ResponseEntity<>(((ExpenseService) service).searchExpenses(filter), HttpStatus.OK);
     }
 
 
     @GetMapping("/my/group")
     @Operation(summary = "Retrieves expenses for group of logged-in user")
     @ApiResponse(responseCode = "200", description = "List of expense object for group of logged-in user", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
-    public ResponseEntity<List<Expense>> getByGroup(@AuthenticationPrincipal UserDetails user) {
-        var currentUser = userService
-                .findByEmail(user.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
-        String groupName = membershipService
-                .getBaseGroupsByUserId(currentUser.getId())
-                .getFirst()
-                .getName();
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesForGroup(groupName), HttpStatus.OK);
+    public ResponseEntity<List<Expense>> getByGroup() {
+        return new ResponseEntity<>(((ExpenseService) service).getExpensesForGroup(), HttpStatus.OK);
     }
 
     @GetMapping("/state")
@@ -102,5 +93,4 @@ public class ExpenseController extends GenericController<Expense, Long> {
     public ResponseEntity<Optional<Expense>> getRecent() {
         return new ResponseEntity<>(((ExpenseService) service).getRecentExpense(), HttpStatus.OK);
     }
-
 }

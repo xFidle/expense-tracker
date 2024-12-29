@@ -26,7 +26,7 @@ public class FilterController {
     }
 
     @GetMapping("/search")
-    public List<Expense> search(
+    public ResponseEntity<List<Expense>> search(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String groupName,
             @RequestParam(required = false) Double minPrice,
@@ -44,47 +44,61 @@ public class FilterController {
         if (beginDate != null) filter.setBeginDate(LocalDate.parse(beginDate));
         if (endDate != null) filter.setEndDate(LocalDate.parse(endDate));
 
-        return service.searchExpenses(filter);
+        return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
     @GetMapping("/category/{name}")
     @Operation(summary = "Retrieves expenses with given category")
     @ApiResponse(responseCode = "200", description = "List of expense objects with given category", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
     public ResponseEntity<List<Expense>> getByCategory(@PathVariable String name) {
-        return new ResponseEntity<>(((service).getExpensesByCategory(name)), HttpStatus.OK);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setCategoryName(name);
+        return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 
     @GetMapping("/date/{date}")
     @Operation(summary = "Retrieves expenses with given date")
     @ApiResponse(responseCode = "200", description = "List of expense objects with given date", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
     public ResponseEntity<List<Expense>> getByDate(@PathVariable String date) {
-        return new ResponseEntity<>((service).getExpensesByDate(date), HttpStatus.OK);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setBeginDate(LocalDate.parse(date));
+        return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 
     @GetMapping("/date/{begin}/{end}")
     @Operation(summary = "Retrieves expenses between given dates")
     @ApiResponse(responseCode = "200", description = "List of expense objects between given dates", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
     public ResponseEntity<List<Expense>> getByPeriod(@PathVariable String begin, @PathVariable String end) {
-        return new ResponseEntity<>((service).getExpensesByPeriod(begin, end), HttpStatus.OK);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setBeginDate(LocalDate.parse(begin));
+        filter.setEndDate(LocalDate.parse(end));
+        return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 
     @GetMapping("/price/{begin}/{end}")
     @Operation(summary = "Retrieves expenses between given prices")
     @ApiResponse(responseCode = "200", description = "List of expense object between given prices", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
     public ResponseEntity<List<Expense>> getByPriceRange(@PathVariable double begin, @PathVariable double end) {
-        return new ResponseEntity<>((service).getExpensesWherePriceInRange(begin, end), HttpStatus.OK);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setPriceMin(begin);
+        filter.setPriceMax(end);
+        return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 
     @GetMapping("/price/lower/{price}")
     @Operation(summary = "Retrieves expenses lower than given price")
     @ApiResponse(responseCode = "200", description = "List of expense object which price is lower than given", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
     public ResponseEntity<List<Expense>> getByPriceLowerThan(@PathVariable double price) {
-        return new ResponseEntity<>((service).getExpensesWherePriceIsLower(price), HttpStatus.OK);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setPriceMax(price);
+        return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 
     @GetMapping("/price/greater/{price}")
     @Operation(summary = "Retrieves expenses greater than given price")
     @ApiResponse(responseCode = "200", description = "List of expense object which price is greater than given", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
     public ResponseEntity<List<Expense>> getByPriceGreaterThan(@PathVariable double price) {
-        return new ResponseEntity<>((service).getExpensesWherePriceIsGreater(price), HttpStatus.OK);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setPriceMin(price);
+        return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 }
