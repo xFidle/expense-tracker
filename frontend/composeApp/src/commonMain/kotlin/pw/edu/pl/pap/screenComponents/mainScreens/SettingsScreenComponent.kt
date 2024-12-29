@@ -26,7 +26,7 @@ class SettingsScreenComponent(
         _inputFieldsData.addAll(
             listOf(
                 InputFieldData(
-                    title = "Server: ",
+                    title = "Server address: ",
                     textFieldData = TextFieldData(
                         parameter = serverAddress,
                         onChange = {
