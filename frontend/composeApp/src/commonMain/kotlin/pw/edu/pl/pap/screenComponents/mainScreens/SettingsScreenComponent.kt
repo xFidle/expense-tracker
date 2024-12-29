@@ -1,14 +1,15 @@
 package pw.edu.pl.pap.screenComponents.mainScreens
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import pw.edu.pl.pap.data.uiSetup.inputFields.ButtonData
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
 import pw.edu.pl.pap.data.uiSetup.inputFields.TextFieldData
+import androidx.compose.runtime.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 class SettingsScreenComponent(
     baseComponent: BaseScreenComponent
@@ -18,11 +19,23 @@ class SettingsScreenComponent(
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
 
     private var serverAddress: MutableState<String> = mutableStateOf(apiService.getCurrentUrl())
+    private var debounceJob by mutableStateOf<Job?>(null)
 
-//    @Composable
-//    suspend fun updateUrl() {
-//
-//    }
+    fun onServerAddressChange(newAddress: String) {
+        serverAddress.value = newAddress
+        debounceJob?.cancel()
+        debounceJob = coroutineScope.launch {
+            delay(500)
+//            println(apiService.getCurrentUrl())
+//            println(serverAddress.value)
+            updateUrl()
+            println("URL CHANGED")
+        }
+    }
+
+    private suspend fun updateUrl() {
+        apiService.updateBaseUrl(serverAddress.value)
+    }
 
 
     fun setupInputFields() {
@@ -34,7 +47,7 @@ class SettingsScreenComponent(
                     textFieldData = TextFieldData(
                         parameter = serverAddress,
                         onChange = {
-                            coroutineScope.launch { serverAddress.value = it }
+                            onServerAddressChange(it)
                         }
                     )
                 ),

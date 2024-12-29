@@ -17,6 +17,6 @@ class ApiService(
     }
 
     fun getCurrentUrl(): String {
-        return expenseApiClient.getUrl()
+        return expenseApiClient.getUrl().removeSuffix("/expense/")
     }
 }
