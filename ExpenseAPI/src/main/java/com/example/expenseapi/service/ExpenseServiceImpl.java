@@ -1,8 +1,11 @@
 package com.example.expenseapi.service;
 
+import com.example.expenseapi.dto.ExpenseFilter;
 import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.pojo.Currency;
 import com.example.expenseapi.repository.*;
+import com.example.expenseapi.utils.ExpenseSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -160,5 +163,17 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         List<Expense> expenses = getExpensesForGroup(name);
         return expenses.stream()
                 .collect(Collectors.groupingBy(Expense::getCategory));
+    }
+
+    @Override
+    public List<Expense> searchExpenses(ExpenseFilter filter) {
+        Specification<Expense> spec = Specification.where(null);
+        spec = spec.and(ExpenseSpecification.hasCategory(filter.getCategoryName()));
+        spec = spec.and(ExpenseSpecification.dateIs(filter.getDate()));
+        spec = spec.and(ExpenseSpecification.dateBetween(filter.getBeginDate(), filter.getEndDate()));
+        spec = spec.and(ExpenseSpecification.priceBetween(filter.getPriceMin(), filter.getPriceMax()));
+        spec = spec.and(ExpenseSpecification.hasGroup(filter.getGroupName()));
+        spec = spec.and(ExpenseSpecification.isUser(filter.getEmail()));
+        return expenseRepository.findAll(spec);
     }
 }
