@@ -107,15 +107,31 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     @Override
     public Map<String, Double> getMonthlyExpensesForUser(String year, String currCode) {
         Currency currency = currencyRepository.findBySymbol(currCode);
-        List<Expense> userExpenses = expenseRepository.findByUserEmailAndDateYear(getUserEmail(), year);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setBeginDate(LocalDate.ofYearDay(Integer.parseInt(year), 1));
+        filter.setEndDate(LocalDate.ofYearDay(Integer.parseInt(year), endOfTheYear(year)));
+        filter.setEmail(getUserEmail());
+        List<Expense> userExpenses = searchExpenses(filter);
         return totalExpensesMap(userExpenses, e -> e.getDate().getMonth().name(), currency);
 
+    }
+
+    private int endOfTheYear (String year) {
+        if (LocalDate.parse(year).isLeapYear()) {
+            return 366;
+        } else {
+            return 365;
+        }
     }
 
     @Override
     public Map<String, Double> getMonthlyExpensesForGroup(String year, String currCode) {
         Currency currency = currencyRepository.findBySymbol(currCode);
-        List<Expense> groupExpenses = expenseRepository.findByUserGroupNameAndYear(getGroupName(), year);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setBeginDate(LocalDate.ofYearDay(Integer.parseInt(year), 1));
+        filter.setEndDate(LocalDate.ofYearDay(Integer.parseInt(year), endOfTheYear(year)));
+        filter.setGroupName(getGroupName());
+        List<Expense> groupExpenses = searchExpenses(filter);
         return totalExpensesMap(groupExpenses, e-> e.getDate().getMonth().name(), currency);
     }
 
@@ -124,7 +140,10 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         LocalDate beginDate = LocalDate.parse(begin);
         LocalDate endDate = LocalDate.parse(end);
         Currency currency = currencyRepository.findBySymbol(currCode);
-        List<Expense> categoryExpenses = expenseRepository.findByDateBetween(beginDate, endDate, getGroupName());
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setBeginDate(beginDate);
+        filter.setEndDate(endDate);
+        List<Expense> categoryExpenses = searchExpenses(filter);
         return totalExpensesMap(categoryExpenses, e->e.getCategory().getName(), currency);
     }
 
@@ -133,7 +152,11 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         LocalDate beginDate = LocalDate.parse(begin);
         LocalDate endDate = LocalDate.parse(end);
         Currency currency = currencyRepository.findBySymbol(currCode);
-        List<Expense> categoryExpenses = expenseRepository.findByUserEmailAndDateBetween(getUserEmail(), beginDate, endDate);
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setBeginDate(beginDate);
+        filter.setEndDate(endDate);
+        filter.setEmail(getUserEmail());
+        List<Expense> categoryExpenses = searchExpenses(filter);
         return totalExpensesMap(categoryExpenses, e->e.getCategory().getName(), currency);
     }
 
