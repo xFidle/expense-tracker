@@ -10,4 +10,9 @@ class ApiService(
 
     val expenseApiClient = ExpenseApiClient("$baseUrl/expense/", httpClient, userToken)
     val groupApiClient = GroupApiClient("$baseUrl/group/", httpClient, userToken)
+
+    fun updateBaseUrl(newUrl: String): Unit {
+        expenseApiClient.updateUrl(newUrl)
+        groupApiClient.updateUrl(newUrl)
+    }
 }

@@ -6,10 +6,14 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 
 open class BaseApiClient(
-    private val baseUrl: String,
+    private var baseUrl: String,
     private val httpClient: HttpClient,
     private val userToken: String
 ) {
+    fun updateUrl(newUrl: String): Unit{
+        baseUrl = newUrl
+    }
+
     protected suspend fun get(endpoint: String): HttpResponse {
         return httpClient.get("$baseUrl$endpoint") {
             contentType(ContentType.Application.Json)

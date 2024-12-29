@@ -21,11 +21,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.window.Popup
 import kotlinx.datetime.LocalDate
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import pw.edu.pl.pap.data.uiSetup.inputFields.*
-import java.awt.Button
 
 
 @Composable
