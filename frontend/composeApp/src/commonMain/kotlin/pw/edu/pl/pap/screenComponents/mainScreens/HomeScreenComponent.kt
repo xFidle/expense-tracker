@@ -58,21 +58,34 @@ class HomeScreenComponent(
                 // Do nothing
             }
         }
-        fetchHomeInfo()
         updateNavigationState(NavigationState.Empty)
+    }
+
+    private val _userGroupInfo = MutableStateFlow<List<UserGroup>?>(emptyList())
+    val userGroupInfo: StateFlow<List<UserGroup>?> get() = _userGroupInfo
+
+    private val _currentUserGroup = MutableStateFlow<UserGroup?>(null)
+    val currentUserGroup: StateFlow<UserGroup?> get() = _currentUserGroup
+
+    fun updateUserGroup(key: UserGroup) {
+        _currentUserGroup.value = key
     }
 
     private val _homeInfo = MutableStateFlow<TotalExpenses?>(null)
     val homeInfo: StateFlow<TotalExpenses?> get() = _homeInfo
 
-    private fun fetchHomeInfo() {
-        coroutineScope.launch {
+    fun fetchHomeInfo() {
+        runBlocking {
             try {
                 val homeData = apiService.expenseApiClient.getTotalExpenses()
                 _homeInfo.value = homeData
+                val userGroupInfo = apiService.groupApiClient.getUserGroups()
+//                println(userGroupInfo)
+                _userGroupInfo.value = userGroupInfo
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+            _currentUserGroup.value = _userGroupInfo.value?.first()
         }
     }
 
@@ -91,8 +104,10 @@ class HomeScreenComponent(
 
     private fun currentExpenseMethod(): () -> Flow<ExpenseMap> {
         return when (_currentGroupingKey.value) {
-            GroupKey.DATE -> apiService.expenseApiClient::getExpenseDateMap
-            GroupKey.CATEGORY -> apiService.expenseApiClient::getExpenseCatMap
+//            GroupKey.DATE -> apiService.expenseApiClient::getExpenseDateMap
+//            GroupKey.CATEGORY -> apiService.expenseApiClient::getExpenseCatMap
+            GroupKey.DATE -> { { apiService.expenseApiClient.getExpenseDateMapForGroup(_currentUserGroup.value?.name) } }
+            GroupKey.CATEGORY -> { { apiService.expenseApiClient.getExpenseCatMapForGroup(_currentUserGroup.value?.name) } }
         }
     }
 
