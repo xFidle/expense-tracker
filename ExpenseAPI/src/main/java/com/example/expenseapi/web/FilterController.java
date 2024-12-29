@@ -46,6 +46,7 @@ public class FilterController {
 
         return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
+    @Deprecated
     @GetMapping("/category/{name}")
     @Operation(summary = "Retrieves expenses with given category")
     @ApiResponse(responseCode = "200", description = "List of expense objects with given category", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
@@ -55,6 +56,7 @@ public class FilterController {
         return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 
+    @Deprecated
     @GetMapping("/date/{date}")
     @Operation(summary = "Retrieves expenses with given date")
     @ApiResponse(responseCode = "200", description = "List of expense objects with given date", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
@@ -64,6 +66,7 @@ public class FilterController {
         return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 
+    @Deprecated
     @GetMapping("/date/{begin}/{end}")
     @Operation(summary = "Retrieves expenses between given dates")
     @ApiResponse(responseCode = "200", description = "List of expense objects between given dates", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
@@ -74,6 +77,7 @@ public class FilterController {
         return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 
+    @Deprecated
     @GetMapping("/price/{begin}/{end}")
     @Operation(summary = "Retrieves expenses between given prices")
     @ApiResponse(responseCode = "200", description = "List of expense object between given prices", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
@@ -84,6 +88,7 @@ public class FilterController {
         return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 
+    @Deprecated
     @GetMapping("/price/lower/{price}")
     @Operation(summary = "Retrieves expenses lower than given price")
     @ApiResponse(responseCode = "200", description = "List of expense object which price is lower than given", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
@@ -93,6 +98,7 @@ public class FilterController {
         return new ResponseEntity<>(service.searchExpenses(filter), HttpStatus.OK);
     }
 
+    @Deprecated
     @GetMapping("/price/greater/{price}")
     @Operation(summary = "Retrieves expenses greater than given price")
     @ApiResponse(responseCode = "200", description = "List of expense object which price is greater than given", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
