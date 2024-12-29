@@ -19,7 +19,6 @@ class HomeScreenComponent(
     val onExpenseClick: (Expense) -> Unit
 ) : BaseScreenComponent by baseScreenComponent {
 
-
     sealed class NavigationState {
         data object InitialLoad : NavigationState()
         data object FromNewExpenseScreen : NavigationState()
