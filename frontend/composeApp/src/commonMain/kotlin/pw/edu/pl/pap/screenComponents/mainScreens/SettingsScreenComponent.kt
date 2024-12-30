@@ -53,7 +53,6 @@ class SettingsScreenComponent(
         apiService.updateBaseUrl(serverAddress.value)
     }
 
-
     fun setupInputFields() {
         _inputFieldsData.clear()
         _inputFieldsData.addAll(

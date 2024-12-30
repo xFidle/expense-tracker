@@ -225,7 +225,8 @@ class RootComponent(
 
             is Configuration.UserPersonalDataScreen -> Child.UserPersonalDataScreen(
                 UserPersonalDataScreenComponent(
-                    baseComponent = createMainScreenComponent(componentContext)
+                    baseComponent = createMainScreenComponent(componentContext),
+                    onBack = { navigation.pop() }
                 )
             )
 
