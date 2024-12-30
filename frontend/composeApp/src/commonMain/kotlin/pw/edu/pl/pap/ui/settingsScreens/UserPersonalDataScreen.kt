@@ -19,7 +19,7 @@ fun UserPersonalDataScreen(component: UserPersonalDataScreenComponent) {
     ConfirmOrBackButtonRow(
         text = "CONFIRM",
         onBack = { component.coroutineScope.launch { component.onBack() } },
-        onConfirm = { component.showConfirmationDialog.value = true }
+        onConfirm = { component.onConfirmClicked() }
     )
 
     if (component.showConfirmationDialog.value) {

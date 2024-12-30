@@ -256,11 +256,13 @@ class RootComponent(
                 )
             }
 
-            is Configuration.PreferencesScreen -> Child.PreferencesScreen(
-                PreferencesScreenComponent(
-                    baseComponent = createMainScreenComponent(componentContext)
+            is Configuration.PreferencesScreen -> {
+                Child.PreferencesScreen(
+                    component = PreferencesScreenComponent(
+                        baseSettingsScreenComponent = createSettingsScreenComponent(componentContext)
+                    )
                 )
-            )
+            }
         }
     }
 

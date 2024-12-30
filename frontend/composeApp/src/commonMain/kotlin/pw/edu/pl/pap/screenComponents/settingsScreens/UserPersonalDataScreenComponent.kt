@@ -30,10 +30,6 @@ class UserPersonalDataScreenComponent (
         }
     )
 
-    override fun onConfirmClicked() {
-        showConfirmationDialog.value = true
-    }
-
     override fun postChanges() {
         //TODO
     }

@@ -34,7 +34,7 @@ class ChangePasswordScreenComponent (
             showPasswordsWarning.value = true
             return
         } else {
-            showConfirmationDialog.value = true
+            super.onConfirmClicked()
         }
 
     }
