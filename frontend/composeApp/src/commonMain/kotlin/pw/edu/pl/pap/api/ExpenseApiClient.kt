@@ -90,7 +90,7 @@ class ExpenseApiClient(baseUrl: String, httpClient: HttpClient, userToken: Strin
     }
 
     private suspend fun getExpenseCatMapForGroupApi(group: String): ExpenseMap {
-        val originalMap: Map<GroupMapKey.DateKey, List<Expense>> = get("categoryMap/group/$group").body()
+        val originalMap: Map<GroupMapKey.StringKey, List<Expense>> = get("categoryMap/group/$group").body()
         return originalMap.toMap(ExpenseMap(initialGroupingOrder = Order.ASCENDING))
     }
 
