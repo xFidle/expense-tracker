@@ -1,13 +1,6 @@
 package pw.edu.pl.pap.api.endpoints
 
-sealed class ExpenseEndpoint(private val relativePath: String) : ApiEndpoint {
-    companion object {
-        private const val BASE_PATH = "/expense"
-    }
-
-    override val path: String
-        get() = "$BASE_PATH$relativePath"
-
+sealed class ExpenseEndpoint(relativePath: String) : BaseEndpoint("/expense", relativePath) {
     data object RecentExpense : ExpenseEndpoint("/recent")
     data object NewExpense : ExpenseEndpoint("/insert")
     data class DeleteExpense(val id: Number) : ExpenseEndpoint("/delete/$id")
