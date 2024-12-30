@@ -23,7 +23,7 @@ class UserPersonalDataScreenComponent (
     private var surname: MutableState<String> = mutableStateOf("")
 
     var showConfirmationDialog: MutableState<Boolean> = mutableStateOf(false)
-    val logOutConfirmationData = ConfirmationDialogConfig(
+    val confirmationData = ConfirmationDialogConfig(
         mainText = "Change Personal Data",
         subText = "Are you sure you want to change your personals?",
         onNo = { showConfirmationDialog.value = false },
