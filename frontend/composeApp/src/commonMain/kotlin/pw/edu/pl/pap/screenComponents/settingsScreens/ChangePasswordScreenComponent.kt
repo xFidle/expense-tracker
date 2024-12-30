@@ -4,39 +4,33 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import pw.edu.pl.pap.data.uiSetup.ConfirmationDialogConfig
-import pw.edu.pl.pap.data.uiSetup.inputFields.ButtonData
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
 import pw.edu.pl.pap.data.uiSetup.inputFields.TextFieldData
 import pw.edu.pl.pap.screenComponents.mainScreens.BaseScreenComponent
 
 class ChangePasswordScreenComponent (
-    val onBack: () -> Unit,
-    baseComponent: BaseScreenComponent
-) : BaseScreenComponent by baseComponent {
+    baseSettingsScreenComponent: BaseSettingsScreenComponent
+) : BaseSettingsScreenComponentImpl(baseSettingsScreenComponent) {
 
-    private val _inputFieldsData = mutableStateListOf<InputFieldData>()
-    val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
 
     private var password: MutableState<String> = mutableStateOf("")
     private var repeatedPassword: MutableState<String> = mutableStateOf("")
 
     var showPasswordsWarning: MutableState<Boolean> = mutableStateOf(false)
 
-    var showConfirmationDialog: MutableState<Boolean> = mutableStateOf(false)
-    val confirmationData = ConfirmationDialogConfig(
+    override var confirmationData = ConfirmationDialogConfig(
         mainText = "Change Password",
         subText = "Are you sure you want to change your password?",
         onNo = { showConfirmationDialog.value = false },
         onYes = {
             showConfirmationDialog.value = false
-            coroutineScope.launch { saveNewPassword() }
+            coroutineScope.launch { postChanges() }
             onBack()
         }
     )
 
-    fun onConfirmClicked() {
+    override fun onConfirmClicked() {
         if (password.value != repeatedPassword.value || password.value == "") {
             showPasswordsWarning.value = true
             return
@@ -46,7 +40,7 @@ class ChangePasswordScreenComponent (
 
     }
 
-    private fun saveNewPassword() {
+    override fun postChanges() {
         //TODO
     }
 
