@@ -59,7 +59,7 @@ class UserPersonalDataScreenComponent (
                     )
                 ),
                 InputFieldData(
-                    title = "Name",
+                    title = "Name: ",
                     textFieldData = TextFieldData(
                         parameter = name,
                         onChange = {
@@ -68,7 +68,7 @@ class UserPersonalDataScreenComponent (
                     )
                 ),
                 InputFieldData(
-                    title = "Surname",
+                    title = "Surname: ",
                     textFieldData = TextFieldData(
                         parameter = surname,
                         onChange = {
@@ -79,6 +79,4 @@ class UserPersonalDataScreenComponent (
             )
         )
     }
-
-
 }
