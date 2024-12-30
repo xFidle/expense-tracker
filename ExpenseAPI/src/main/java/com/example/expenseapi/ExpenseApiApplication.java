@@ -62,6 +62,7 @@ public class ExpenseApiApplication implements CommandLineRunner {
             groups = new Group[]{
                     new Group("family"),
                     new Group("workers"),
+                    new Group("empty")
             };
             groupRepository.saveAll(Arrays.asList(groups));
         }
@@ -77,6 +78,7 @@ public class ExpenseApiApplication implements CommandLineRunner {
                     new User("Herkules1", "Herkules1", "herkules1@gmail.com", passwordEncoder.encode("123")),
                     new User("Herkules2", "Herkules2", "herkules2@gmail.com", passwordEncoder.encode("234")),
                     new User("Herkules3", "Herkules3", "herkules3@gmail.com", passwordEncoder.encode("345")),
+                    new User("Herkules4", "Herkules4", "herkules4@gmail.com", passwordEncoder.encode("456"))
             };
             userRepository.saveAll(Arrays.asList(users));
         }
@@ -94,6 +96,7 @@ public class ExpenseApiApplication implements CommandLineRunner {
                     new Membership(users[2], groups[1], "workers", roles[0]),
                     new Membership(users[0], archivedGroups[0], "family2", roles[0]),
                     new Membership(users[1], archivedGroups[1], "workers2", roles[1]),
+                    new Membership(users[3], groups[2], "empty", roles[0])
             };
             membershipRepository.saveAll(Arrays.asList(memberships));
         }
