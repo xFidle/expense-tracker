@@ -81,6 +81,7 @@ class SettingsScreenComponent(
                     isButton = true,
                     buttonData = ButtonData(
                         title = "LOG OUT",
+                        isColored = true,
                         onClick = onLogOut,
                     )
                 ),

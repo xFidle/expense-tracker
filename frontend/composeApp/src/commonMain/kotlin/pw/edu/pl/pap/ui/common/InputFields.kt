@@ -24,6 +24,7 @@ import kotlinx.datetime.LocalDate
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import pw.edu.pl.pap.data.uiSetup.inputFields.*
+import androidx.compose.runtime.*
 
 
 @Composable
@@ -223,12 +224,17 @@ private fun createPasswordField(
 private fun createClickableCard(data: ButtonData) {
     Card(
         shape = RoundedCornerShape(8.dp),
-        modifier = data.modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .height(50.dp)
             .clickable { data.onClick() },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = if (data.isColored) {
+            CardDefaults.cardColors(containerColor = data.customColor)
+        } else {
+            CardDefaults.cardColors()
+        }
     ){
         Box(
             modifier = Modifier.fillMaxSize(),
