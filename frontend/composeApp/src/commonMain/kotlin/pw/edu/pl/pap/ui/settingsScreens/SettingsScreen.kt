@@ -5,6 +5,7 @@ import pw.edu.pl.pap.screenComponents.mainScreens.SettingsScreenComponent
 import pw.edu.pl.pap.ui.common.Header
 import pw.edu.pl.pap.ui.common.InputFields
 import pw.edu.pl.pap.ui.common.ConfirmationPopup
+import pw.edu.pl.pap.ui.common.showConfirmationPopup
 
 @Composable
 fun SettingsScreen(component: SettingsScreenComponent) {
@@ -15,16 +16,7 @@ fun SettingsScreen(component: SettingsScreenComponent) {
     InputFields(component.inputFieldsData)
 
     if (component.showLogOutDialog.value) {
-        ConfirmationPopup(
-            mainText = component.logOutConfirmationData.mainText,
-            subText = component.logOutConfirmationData.subText,
-            onNo = {
-                component.logOutConfirmationData.onNo()
-            },
-            onYes = {
-                component.logOutConfirmationData.onYes()
-            }
-        )
+        showConfirmationPopup(component.logOutConfirmationData)
     }
 }
 
