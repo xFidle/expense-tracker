@@ -26,6 +26,9 @@ import pw.edu.pl.pap.ui.loginSystem.LogInSignUpSelectionScreen
 import pw.edu.pl.pap.ui.loginSystem.SignUpScreen
 import pw.edu.pl.pap.ui.navBar.BottomNavBar
 import pw.edu.pl.pap.ui.navBar.NavBarItem
+import pw.edu.pl.pap.ui.settingsScreens.ChangePasswordScreen
+import pw.edu.pl.pap.ui.settingsScreens.PreferencesScreen
+import pw.edu.pl.pap.ui.settingsScreens.UserPersonalDataScreen
 
 // Todo refactor function, tweak animations
 @Composable
@@ -73,6 +76,10 @@ fun App(rootComponent: RootComponent) {
 
                             is RootComponent.Child.DataScreen -> DataScreen(instance.component)
                             is RootComponent.Child.SettingsScreen -> SettingsScreen(instance.component)
+
+                            is RootComponent.Child.UserPersonalDataScreen -> UserPersonalDataScreen(instance.component)
+                            is RootComponent.Child.ChangePasswordScreen -> ChangePasswordScreen(instance.component)
+                            is RootComponent.Child.PreferencesScreen -> PreferencesScreen(instance.component)
                         }
                     }
                 }

@@ -17,8 +17,12 @@ import kotlinx.serialization.json.Json
 import pw.edu.pl.pap.api.ApiService
 import pw.edu.pl.pap.api.authApi.LoginApi
 import pw.edu.pl.pap.data.databaseAssociatedData.Expense
+import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.screenComponents.loginSystem.*
 import pw.edu.pl.pap.screenComponents.mainScreens.*
+import pw.edu.pl.pap.screenComponents.settingsScreens.ChangePasswordScreenComponent
+import pw.edu.pl.pap.screenComponents.settingsScreens.PreferencesScreenComponent
+import pw.edu.pl.pap.screenComponents.settingsScreens.UserPersonalDataScreenComponent
 import pw.edu.pl.pap.screenComponents.singleExpense.ExpenseDetailsScreenComponent
 import pw.edu.pl.pap.screenComponents.singleExpense.NewExpenseScreenComponent
 import pw.edu.pl.pap.ui.navBar.NavBarItem
@@ -69,6 +73,15 @@ class RootComponent(
 
         @Serializable
         data object SettingsScreen : Configuration()
+
+        @Serializable
+        data object UserPersonalDataScreen : Configuration()
+
+        @Serializable
+        data object ChangePasswordScreen : Configuration()
+
+        @Serializable
+        data object PreferencesScreen : Configuration()
     }
 
     private fun createLoginScreenComponent(
@@ -101,6 +114,10 @@ class RootComponent(
 
         data class DataScreen(val component: DataScreenComponent) : Child()
         data class SettingsScreen(val component: SettingsScreenComponent) : Child()
+
+        data class UserPersonalDataScreen(val component: UserPersonalDataScreenComponent) : Child()
+        data class ChangePasswordScreen(val component: ChangePasswordScreenComponent) : Child()
+        data class PreferencesScreen(val component: PreferencesScreenComponent) : Child()
     }
 
     // TODO add new screens when ready
@@ -199,6 +216,24 @@ class RootComponent(
             is Configuration.SettingsScreen -> Child.SettingsScreen(
                 SettingsScreenComponent(
                     onLogOut = {navigation.replaceAll(Configuration.LogInSignUpSelectionScreen)},
+                    baseComponent = createMainScreenComponent(componentContext)
+                )
+            )
+
+            is Configuration.UserPersonalDataScreen -> Child.UserPersonalDataScreen(
+                UserPersonalDataScreenComponent(
+                    baseComponent = createMainScreenComponent(componentContext)
+                )
+            )
+
+            is Configuration.ChangePasswordScreen -> Child.ChangePasswordScreen(
+                ChangePasswordScreenComponent(
+                    baseComponent = createMainScreenComponent(componentContext)
+                )
+            )
+
+            is Configuration.PreferencesScreen -> Child.PreferencesScreen(
+                PreferencesScreenComponent(
                     baseComponent = createMainScreenComponent(componentContext)
                 )
             )
