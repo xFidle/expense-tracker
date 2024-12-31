@@ -120,9 +120,9 @@ public class ExpenseApiApplication implements CommandLineRunner {
         if (expenseRepository.count() == 0) {
             Expense[] expenses = new Expense[] {
                     new Expense("dinner", 100, memberships[0], categories[0], LocalDate.of(2024, 11, 30), currencies[0], methods[0]),
-                    new Expense("train-ticket", 200, memberships[2], categories[1], LocalDate.of(2024, 12, 22), currencies[1], methods[1]),
-                    new Expense("groceries", 300, memberships[3], categories[0], currencies[0], methods[0]),
-                    new Expense("fast-food", 300, memberships[4], categories[0], currencies[2], methods[1]),
+                    new Expense("train-ticket", 200, memberships[1], categories[1], LocalDate.of(2024, 12, 22), currencies[1], methods[1]),
+                    new Expense("groceries", 300, memberships[2], categories[0], currencies[0], methods[0]),
+                    new Expense("fast-food", 300, memberships[2], categories[0], currencies[2], methods[1]),
             };
             expenseRepository.saveAll(Arrays.asList(expenses));
         }
