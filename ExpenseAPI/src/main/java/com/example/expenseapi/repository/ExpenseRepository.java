@@ -8,6 +8,6 @@ import java.util.Optional;
 
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long>, JpaSpecificationExecutor<Expense> {
-    List<Expense> findByUserEmail(String email);
+    List<Expense> findByMembership_User_Email(String email);
     Optional<Expense> findTopByOrderByIdDesc();
 }
