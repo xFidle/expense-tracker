@@ -1,5 +1,6 @@
 package com.example.expenseapi.service;
 
+import com.example.expenseapi.ExpenseApiApplication;
 import com.example.expenseapi.dto.ExpenseFilter;
 import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.pojo.Currency;
@@ -34,16 +35,11 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
-    public List<Expense> getExpensesByEmail(String mail) {
-        return expenseRepository.findByMembershipUserEmail(mail);
-    }
-
-    @Override
     public Expense save(Expense entity) {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        String email = auth.getName();
-//        Optional<User> user = userRepository.findByEmail(email);
-//        user.ifPresent(entity::setUser);
+        // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // String email = auth.getName();
+        // Optional<User> user = userRepository.findByEmail(email);
+        // user.ifPresent(entity::setUser);
         if (entity.getCategory() == null) {
             Category defaultCategory = categoryRepository.findById(1L)
                     .orElseGet(() -> categoryRepository.save(new Category()));
@@ -70,9 +66,18 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
+    public List<Expense> getExpensesForUser() {
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setEmail(getUserEmail());
+        return searchExpenses(filter);
+    }
+
+    @Override
     public ExpInfo getExpInfo(String group) {
         List<Expense> groupExpenses = getExpensesForGroup(group);
-        List<Expense> userExpenses = expenseRepository.findByMembershipUserEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        List<Expense> userExpenses = groupExpenses.stream()
+                .filter(expense -> expense.getMembership().getUser().getEmail().equals(getUserEmail()))
+                .toList(); // Returns only user's expenses in provided group, not in all groups
         double groupSum = groupExpenses.stream().mapToDouble(Expense::getPrice).sum();
         double userSum = userExpenses.stream().mapToDouble(Expense::getPrice).sum();
         return new ExpInfo(userSum, groupSum);
@@ -80,28 +85,12 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public ExpInfo getExpInfo() {
-        return getExpInfo(getGroupName());
-    }
-
-    @Override
-    public Map<LocalDate, List<Expense>> getDateExpenseAsMap() {
-        List<Expense> groupExpenses = getExpensesForGroup();
-        return groupExpenses.stream()
-                .sorted(Comparator.comparing(Expense::getDate).reversed())
-                .collect(Collectors.groupingBy(
-                        Expense::getDate,
-                        LinkedHashMap::new,
-                        Collectors.toList()
-                ));
-    }
-
-    @Override
-    public Map<Category, List<Expense>> getCategoryExpenseAsMap() {
-        List<Expense> groupExpenses = getExpensesForGroup();
-        return groupExpenses.stream()
-                .collect(Collectors.groupingBy(
-                        Expense::getCategory
-                ));
+        List<BaseGroup> groups = getAllGroups();
+        Set<Expense> groupExpenses = groups.stream().flatMap(group -> getExpensesForGroup(group.getName()).stream()).collect(Collectors.toSet());
+        List<Expense> userExpenses = expenseRepository.findByMembershipUserEmail(getUserEmail());
+        double groupSum = groupExpenses.stream().mapToDouble(Expense::getPrice).sum();
+        double userSum = userExpenses.stream().mapToDouble(Expense::getPrice).sum();
+        return new ExpInfo(userSum, groupSum);
     }
 
     @Override
@@ -162,13 +151,12 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public Optional<Expense> getRecentExpense() {
-        return expenseRepository.findTopByOrderByIdDesc();
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setEmail(getUserEmail());
+        List<Expense> expenses = searchExpenses(filter);
+        return expenses.stream().max(Comparator.comparing(Expense::getDate));
     }
 
-    @Override
-    public List<Expense> getExpensesForGroup() {
-        return getExpensesForGroup(getGroupName());
-    }
 
     private String getGroupName() {
         return getAllGroups().getFirst().getName();
