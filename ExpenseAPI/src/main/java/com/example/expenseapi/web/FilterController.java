@@ -22,7 +22,7 @@ public class FilterController {
 
     @GetMapping("/search")
     public ResponseEntity<List<Expense>> search(
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) List<String> categories,
             @RequestParam(required = false) String groupName,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
@@ -32,7 +32,7 @@ public class FilterController {
             @RequestParam(required = false) List<String> emails
     ) {
         ExpenseFilter filter = new ExpenseFilter();
-        filter.setCategoryName(category);
+        filter.setCategoryNames(categories);
         filter.setGroupName(groupName);
         filter.setPriceMin(minPrice);
         filter.setPriceMax(maxPrice);

@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExpenseFilter {
-    private String categoryName;
+    private List<String> categoryNames;
     private LocalDate date;
     private LocalDate beginDate;
     private LocalDate endDate;

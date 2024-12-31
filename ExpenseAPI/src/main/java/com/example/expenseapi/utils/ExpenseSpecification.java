@@ -1,20 +1,18 @@
 package com.example.expenseapi.utils;
 
 import com.example.expenseapi.pojo.Expense;
-import com.example.expenseapi.pojo.Membership;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class ExpenseSpecification {
-    public static Specification<Expense> hasCategory(String categoryName) {
+    public static Specification<Expense> hasCategory(List<String> categoryNames) {
         return (root, query, criteriaBuilder) -> {
-            if (categoryName == null || categoryName.isBlank()) {
+            if (categoryNames == null || categoryNames.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("category").get("name"), categoryName);
+            return root.get("category").get("name").in(categoryNames);
         };
     }
 
@@ -90,6 +88,15 @@ public class ExpenseSpecification {
                 return cb.conjunction();
             }
             return cb.equal(root.get("membership").get("user").get("email"), email);
+        };
+    }
+
+    public static Specification<Expense> isUserInList(List<String> emails) {
+        return (root, query, cb) -> {
+            if (emails == null || emails.isEmpty()) {
+                return cb.conjunction();
+            }
+            return root.get("membership").get("user").get("email").in(emails);
         };
     }
 
