@@ -60,10 +60,11 @@ class HomeScreenComponent(
                 // Do nothing
             }
         }
+        fetchHomeInfo()
         updateNavigationState(NavigationState.Empty)
     }
 
-    private val _userGroupInfo = MutableStateFlow<List<UserGroup>?>(emptyList())
+    private val _userGroupInfo = MutableStateFlow<List<UserGroup>?>(null)
     val userGroupInfo: StateFlow<List<UserGroup>?> get() = _userGroupInfo
 
     private val _currentUserGroup = MutableStateFlow<UserGroup?>(null)
@@ -76,12 +77,21 @@ class HomeScreenComponent(
     private val _homeInfo = MutableStateFlow<TotalExpenses?>(null)
     val homeInfo: StateFlow<TotalExpenses?> get() = _homeInfo
 
-    fun fetchHomeInfo() {
-        runBlocking {
-            try {
+    private suspend fun populateGroupList() {
+        when (_userGroupInfo.value) {
+            null -> {
                 val userGroupInfo = apiService.groupApiClient.getUserGroups()
                 _userGroupInfo.value = userGroupInfo
                 _currentUserGroup.value = _userGroupInfo.value?.first()
+            }
+            else -> return
+        }
+    }
+
+    fun fetchHomeInfo() {
+        runBlocking {
+            try {
+                populateGroupList()
                 val homeData = apiService.expenseApiClient.getTotalExpensesForGroup(currentUserGroup.value?.name)
                 _homeInfo.value = homeData.first()
             } catch (e: Exception) {
@@ -121,8 +131,6 @@ class HomeScreenComponent(
                     println(_groupedExpenses.value.groupingOrder.value)
                     println(currentGroupingOrder.value)
                 }
-                val homeData = apiService.expenseApiClient.getTotalExpensesForGroup(currentUserGroup.value?.name)
-                _homeInfo.value = homeData.first()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
