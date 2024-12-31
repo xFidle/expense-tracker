@@ -5,7 +5,6 @@ import com.example.expenseapi.dto.ExpenseDTO;
 import com.example.expenseapi.pojo.Expense;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface ExpenseMapper {
