@@ -34,16 +34,11 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
-    public List<Expense> getExpensesByEmail(String mail) {
-        return expenseRepository.findByUserEmail(mail);
-    }
-
-    @Override
     public Expense save(Expense entity) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        Optional<User> user = userRepository.findByEmail(email);
-        user.ifPresent(entity::setUser);
+        // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // String email = auth.getName();
+        // Optional<User> user = userRepository.findByEmail(email);
+        // user.ifPresent(entity::setUser);
         if (entity.getCategory() == null) {
             Category defaultCategory = categoryRepository.findById(1L)
                     .orElseGet(() -> categoryRepository.save(new Category()));
@@ -82,7 +77,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     public ExpInfo getExpInfo() {
         List<BaseGroup> groups = getAllGroups();
         Set<Expense> groupExpenses = groups.stream().flatMap(group -> getExpensesForGroup(group.getName()).stream()).collect(Collectors.toSet());
-        List<Expense> userExpenses = expenseRepository.findByMembership_User_Email(getUserEmail());
+        List<Expense> userExpenses = expenseRepository.findByMembershipUserEmail(getUserEmail());
         double groupSum = groupExpenses.stream().mapToDouble(Expense::getPrice).sum();
         double userSum = userExpenses.stream().mapToDouble(Expense::getPrice).sum();
         return new ExpInfo(userSum, groupSum);
@@ -149,10 +144,6 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         return expenseRepository.findTopByOrderByIdDesc();
     }
 
-    @Override
-    public List<Expense> getExpensesForGroup() {
-        return getExpensesForGroup(getGroupName());
-    }
 
     private String getGroupName() {
         return getAllGroups().getFirst().getName();

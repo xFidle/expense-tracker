@@ -11,7 +11,6 @@ import com.example.expenseapi.pojo.ExpInfo;
 import com.example.expenseapi.pojo.Expense;
 
 public interface ExpenseService extends GenericService<Expense, Long> {
-    List<Expense> getExpensesByEmail(String email);
     List<Expense> getExpensesForGroup(String name);
     ExpInfo getExpInfo(String group);
     ExpInfo getExpInfo();
