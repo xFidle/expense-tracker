@@ -35,10 +35,8 @@ public class ExpenseController extends GenericController<Expense, Long> {
     @GetMapping("/my/expenses")
     @Operation(summary = "Retrieves expenses from logged-in user")
     @ApiResponse(responseCode = "200", description = "List of expense objects from logged user", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
-    public ResponseEntity<List<Expense>> getMyExpenses(@AuthenticationPrincipal UserDetails user) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setEmail(user.getUsername());
-        return new ResponseEntity<>(((ExpenseService) service).searchExpenses(filter), HttpStatus.OK);
+    public ResponseEntity<List<Expense>> getMyExpenses() {
+        return new ResponseEntity<>(((ExpenseService) service).getExpensesForUser(), HttpStatus.OK);
     }
 
     @GetMapping("/my/group/{name}")

@@ -66,6 +66,13 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
+    public List<Expense> getExpensesForUser() {
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setEmail(getUserEmail());
+        return searchExpenses(filter);
+    }
+
+    @Override
     public ExpInfo getExpInfo(String group) {
         List<Expense> groupExpenses = getExpensesForGroup(group);
         List<Expense> userExpenses = groupExpenses.stream()

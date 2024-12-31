@@ -12,6 +12,7 @@ import com.example.expenseapi.pojo.Expense;
 
 public interface ExpenseService extends GenericService<Expense, Long> {
     List<Expense> getExpensesForGroup(String name);
+    List<Expense> getExpensesForUser();
     ExpInfo getExpInfo(String group);
     ExpInfo getExpInfo();
     Map<String, Double> getMonthlyExpensesForUser(String year, String currCode);
