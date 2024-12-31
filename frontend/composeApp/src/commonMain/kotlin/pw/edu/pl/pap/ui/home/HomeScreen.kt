@@ -14,7 +14,7 @@ import pw.edu.pl.pap.screenComponents.mainScreens.HomeScreenComponent
 import pw.edu.pl.pap.ui.common.LoadingScreen
 import pw.edu.pl.pap.ui.home.sortingSystem.ButtonRow
 import pw.edu.pl.pap.ui.home.sortingSystem.GroupKeyPopup
-import pw.edu.pl.pap.ui.home.sortingSystem.UserGroupPopup
+import pw.edu.pl.pap.ui.common.UserGroupPopup
 
 @Composable
 fun HomeScreen(component: HomeScreenComponent) {
