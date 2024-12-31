@@ -103,10 +103,10 @@ class HomeScreenComponent(
         _currentGroupingKey.value = key
     }
 
-    private fun currentExpenseMethod(): () -> Flow<ExpenseMap> {
+    private fun currentExpenseMethod(): (String?) -> Flow<ExpenseMap> {
         return when (_currentGroupingKey.value) {
-            GroupKey.DATE -> { { apiService.expenseApiClient.getExpenseDateMapForGroup(_currentUserGroup.value?.name) } }
-            GroupKey.CATEGORY -> { { apiService.expenseApiClient.getExpenseCatMapForGroup(_currentUserGroup.value?.name) } }
+            GroupKey.DATE -> apiService.expenseApiClient::getExpenseDateMapForGroup
+            GroupKey.CATEGORY -> apiService.expenseApiClient::getExpenseCatMapForGroup
         }
     }
 
@@ -115,7 +115,7 @@ class HomeScreenComponent(
         runBlocking {
             try {
                 val getExpenseMap = currentExpenseMethod()
-                getExpenseMap().collect { expenses ->
+                getExpenseMap(_currentUserGroup.value?.name).collect { expenses ->
                     _groupedExpenses.value = expenses
                     println(expenses.groupingOrder.value)
                     println(_groupedExpenses.value.groupingOrder.value)
