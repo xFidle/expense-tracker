@@ -49,7 +49,7 @@ public class Expense {
     public Expense(String title, double price, @NonNull Membership membership, Category category, Currency currency, MethodOfPayment method) {
         this.title = title;
         this.price = price;
-        this.membership= membership;
+        this.membership = membership;
         this.category = category;
         this.currency = currency;
         this.method = method;
