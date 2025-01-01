@@ -28,6 +28,7 @@ import pw.edu.pl.pap.ui.loginSystem.SignUpScreen
 import pw.edu.pl.pap.ui.navBar.BottomNavBar
 import pw.edu.pl.pap.ui.navBar.NavBarItem
 import androidx.compose.runtime.getValue
+import pw.edu.pl.pap.ui.settingsScreens.*
 
 // Todo refactor function, tweak animations
 @Composable
