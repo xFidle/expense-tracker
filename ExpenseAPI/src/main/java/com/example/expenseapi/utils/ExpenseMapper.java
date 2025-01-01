@@ -16,6 +16,7 @@ public interface ExpenseMapper {
     @Mapping(source = "date", target = "expenseDate")
     @Mapping(source = "membership.user.name", target = "user.name")
     @Mapping(source = "membership.user.surname", target = "user.surname")
+    @Mapping(source = "membership.user.id", target = "user.id")
     ExpenseDTO expenseToExpenseDTO(Expense expense);
 
     @Mapping(source = "categoryName", target = "category.name")
