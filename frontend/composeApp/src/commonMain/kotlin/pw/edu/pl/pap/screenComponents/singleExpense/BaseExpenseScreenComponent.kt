@@ -8,6 +8,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.uiSetup.inputFields.DatePickerData
 import pw.edu.pl.pap.data.uiSetup.inputFields.DropdownListData
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
@@ -27,7 +28,7 @@ open class BaseExpenseScreenComponent(
 
     protected open var title: MutableState<String> = mutableStateOf("")
 
-    private val categories = listOf("Food", "Transport", "Bills")
+    protected val categories = listOf("food", "transport", "bills")
     //TODO fetch categories
     protected open var categoryIndex: MutableState<Int> = mutableStateOf(0)
 
@@ -37,15 +38,21 @@ open class BaseExpenseScreenComponent(
 
     protected open var newPrice: MutableState<String> = mutableStateOf("")
 
-    private val currencies = listOf("PLN", "EUR", "USD")
+    protected val currencies = listOf("PLN", "EUR", "USD")
     //TODO fetch currencies
     protected open var currencyIndex: MutableState<Int> = mutableStateOf(0)
 
-    private val methodsOfPayment = listOf("Cash", "Card", "W naturze")
+    protected val methodsOfPayment = listOf("cash", "Card", "W naturze")
     //TODO fetch methods of payment
     protected open var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(0)
 
-    private val users = listOf("Herkules", "Zeus", "Posejdon", "Hefajstos", "Atena", "Hermes")
+    //temp
+    protected val users = listOf(
+        User(1, "Herkules", "1", "Kaczka2137@gmail.com"),
+        User(2, "Zeus", "2", "Kaczka2137@gmail.com"),
+        User(3, "Posejdon", "3", "Kaczka2137@gmail.com"),
+    )
+    private val userNames = users.map { "${it.name} ${it.surname}" }
     //TODO fetch available users
     protected open var userIndex: MutableState<Int> = mutableStateOf(0)
 
@@ -126,7 +133,7 @@ open class BaseExpenseScreenComponent(
                     title = "User: ",
                     isDropdownList = true,
                     dropdownListData = DropdownListData(
-                        itemList = users,
+                        itemList = userNames,
                         selectedIndex = userIndex,
                         onItemClick = {
                             coroutineScope.launch { userIndex.value = it }

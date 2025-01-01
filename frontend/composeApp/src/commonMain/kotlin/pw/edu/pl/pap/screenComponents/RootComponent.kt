@@ -19,6 +19,7 @@ import kotlinx.serialization.json.Json
 import pw.edu.pl.pap.api.ApiService
 import pw.edu.pl.pap.api.authApi.LoginApi
 import pw.edu.pl.pap.data.databaseAssociatedData.Expense
+import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.screenComponents.loginSystem.*
 import pw.edu.pl.pap.screenComponents.mainScreens.*
 import pw.edu.pl.pap.screenComponents.settingsScreens.*
@@ -62,7 +63,7 @@ class RootComponent(
         data object HomeScreen : Configuration()
 
         @Serializable
-        data object NewExpenseScreen : Configuration()
+        data class NewExpenseScreen(val userGroup: UserGroup) : Configuration()
 
         @Serializable
         data class ExpenseDetailsScreen(val expense: Expense) : Configuration()
@@ -186,8 +187,8 @@ class RootComponent(
                 Child.HomeScreen(
                     component = HomeScreenComponent(
                         baseScreenComponent = createMainScreenComponent(componentContext),
-                        onAddExpenseButtonClicked = {
-                            navigation.pushNew(Configuration.NewExpenseScreen)
+                        onAddExpenseButtonClicked = { userGroup ->
+                            navigation.pushNew(Configuration.NewExpenseScreen(userGroup))
                         },
                         onExpenseClick = { expense ->
                             navigation.pushNew(Configuration.ExpenseDetailsScreen(expense))
@@ -204,7 +205,9 @@ class RootComponent(
                         (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
                             HomeScreenComponent.NavigationState.FromNewExpenseScreen
                         )
-                    })
+                    },
+                    currentUserGroup = configuration.userGroup
+                )
             )
 
             is Configuration.ExpenseDetailsScreen -> Child.ExpenseDetailsScreen(

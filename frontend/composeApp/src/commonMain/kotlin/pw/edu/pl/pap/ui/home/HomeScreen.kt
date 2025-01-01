@@ -58,7 +58,13 @@ fun HomeScreen(component: HomeScreenComponent) {
                             })
                     }
                 }
-                PlusButton(onUpdate = { component.onAddExpenseButtonClicked() })
+                PlusButton(onUpdate = {
+                    component.currentUserGroup.value?.let { userGroup ->
+                        component.onAddExpenseButtonClicked(userGroup)
+                    } ?: run {
+                        println("No UserGroup is set!")
+                    }
+                })
             }
 
 //            else -> Text(
