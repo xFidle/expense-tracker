@@ -1,6 +1,5 @@
 package com.example.expenseapi.service;
 
-import com.example.expenseapi.ExpenseApiApplication;
 import com.example.expenseapi.dto.ExpenseFilter;
 import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.pojo.Currency;
@@ -114,6 +113,15 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
+    public Map<String, Double> getMapResult(ExpenseFilter filter, String currCode, String keyType) {
+        List<Expense> result = searchExpenses(filter);
+        Currency currency = currencyRepository.findBySymbol(currCode);
+        Function<Expense, String> keyExtractor = findKeyExtractor(keyType);
+        if (keyExtractor == null) throw new IllegalArgumentException("Invalid key type");
+        return totalExpensesMap(result, keyExtractor, currency);
+    }
+
+    @Override
     public Map<String, Double> getMonthlyExpensesForGroup(String year, String currCode) {
         Currency currency = currencyRepository.findBySymbol(currCode);
         ExpenseFilter filter = new ExpenseFilter();
@@ -196,12 +204,14 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             return Collections.emptyList();
         }
         Specification<Expense> spec = Specification.where(null);
-        spec = spec.and(ExpenseSpecification.hasCategory(filter.getCategoryName()));
+        spec = spec.and(ExpenseSpecification.hasCategory(filter.getCategoryNames()));
         spec = spec.and(ExpenseSpecification.dateIs(filter.getDate()));
         spec = spec.and(ExpenseSpecification.dateBetween(filter.getBeginDate(), filter.getEndDate()));
         spec = spec.and(ExpenseSpecification.priceBetween(filter.getPriceMin(), filter.getPriceMax()));
         spec = spec.and(ExpenseSpecification.hasGroup(filter.getGroupName()));
         spec = spec.and(ExpenseSpecification.isUser(filter.getEmail()));
+        spec = spec.and(ExpenseSpecification.isUserInList(filter.getEmails()));
+        spec = spec.and(ExpenseSpecification.hasMethod(filter.getMethodsOfPayment()));
         return expenseRepository.findAll(spec);
     }
 
@@ -224,6 +234,18 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         }
         return value;
     }
+
+    private Function<Expense, String> findKeyExtractor(String keyType) {
+        return switch (keyType) {
+            case "category" -> e -> e.getCategory().getName();
+            case "method" -> e -> e.getMethod().getName();
+            case "user" -> e -> e.getMembership().getUser().getEmail();
+            case "month" -> e -> e.getDate().getMonth().name();
+            case "year" -> e -> String.valueOf(e.getDate().getYear());
+            default -> null;
+        };
+    }
+
     private Map<String, Double> totalExpensesMap(List<Expense> queryResult, Function<Expense, String> keyExtractor, Currency dstCurr) {
         Map<String, Double> map = new LinkedHashMap<>();
         for (Expense expense : queryResult) {
