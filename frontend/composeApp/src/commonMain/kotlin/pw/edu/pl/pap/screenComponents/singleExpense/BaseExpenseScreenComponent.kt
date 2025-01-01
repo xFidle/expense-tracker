@@ -28,7 +28,7 @@ open class BaseExpenseScreenComponent(
 
     protected open var title: MutableState<String> = mutableStateOf("")
 
-    private val categories = listOf("Food", "Transport", "Bills")
+    protected val categories = listOf("food", "transport", "bills")
     //TODO fetch categories
     protected open var categoryIndex: MutableState<Int> = mutableStateOf(0)
 
@@ -38,16 +38,16 @@ open class BaseExpenseScreenComponent(
 
     protected open var newPrice: MutableState<String> = mutableStateOf("")
 
-    private val currencies = listOf("PLN", "EUR", "USD")
+    protected val currencies = listOf("PLN", "EUR", "USD")
     //TODO fetch currencies
     protected open var currencyIndex: MutableState<Int> = mutableStateOf(0)
 
-    private val methodsOfPayment = listOf("Cash", "Card", "W naturze")
+    protected val methodsOfPayment = listOf("cash", "Card", "W naturze")
     //TODO fetch methods of payment
     protected open var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(0)
 
     //temp
-    private val users = listOf(
+    protected val users = listOf(
         User(1, "Herkules", "1", "Kaczka2137@gmail.com"),
         User(2, "Zeus", "2", "Kaczka2137@gmail.com"),
         User(3, "Posejdon", "3", "Kaczka2137@gmail.com"),
