@@ -19,6 +19,7 @@ public class ExpenseFilter {
     private LocalDate endDate;
     private Double priceMin;
     private Double priceMax;
+    private List<String> methodsOfPayment;
     private String groupName;
     private String email;
     private List<String> emails;
