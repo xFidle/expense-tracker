@@ -24,7 +24,11 @@ class NewExpenseScreenComponent(
         val date: LocalDate = Clock.System.todayIn(TimeZone.UTC)
 //        val category: Category = Category(5, "Test")
 //        val expense: Expense = Expense(id, price.value.toFloat(), user, date, category )
-        val newExpense = NewExpense(title.value, newPrice.value.toFloat(), user, "family2", "food", date, "cash", "PLN")
+        val newExpense = NewExpense(
+            title = title.value,
+            price = newPrice.value.toFloat(),
+            user = user,
+            "family2", "food", date, "cash", "PLN")
 
         runBlocking{
             apiService.expenseApiClient.postNewExpense(newExpense)

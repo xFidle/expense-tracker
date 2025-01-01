@@ -8,6 +8,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.uiSetup.inputFields.DatePickerData
 import pw.edu.pl.pap.data.uiSetup.inputFields.DropdownListData
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
@@ -45,7 +46,13 @@ open class BaseExpenseScreenComponent(
     //TODO fetch methods of payment
     protected open var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(0)
 
-    private val users = listOf("Herkules", "Zeus", "Posejdon", "Hefajstos", "Atena", "Hermes")
+    //temp
+    private val users = listOf(
+        User(1, "Herkules", "1", "Kaczka2137@gmail.com"),
+        User(2, "Zeus", "2", "Kaczka2137@gmail.com"),
+        User(3, "Posejdon", "3", "Kaczka2137@gmail.com"),
+    )
+    private val userNames = users.map { "${it.name} ${it.surname}" }
     //TODO fetch available users
     protected open var userIndex: MutableState<Int> = mutableStateOf(0)
 
@@ -126,7 +133,7 @@ open class BaseExpenseScreenComponent(
                     title = "User: ",
                     isDropdownList = true,
                     dropdownListData = DropdownListData(
-                        itemList = users,
+                        itemList = userNames,
                         selectedIndex = userIndex,
                         onItemClick = {
                             coroutineScope.launch { userIndex.value = it }
