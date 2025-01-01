@@ -18,10 +18,6 @@ public interface ExpenseService extends GenericService<Expense, Long> {
     ExpInfo getExpInfo(String group);
     ExpInfo getExpInfo();
     Map<String, Double> getMapResult(ExpenseFilter filter, String currCode, String keyType);
-    Map<String, Double> getMonthlyExpensesForUser(String year, String currCode);
-    Map<String, Double> getMonthlyExpensesForGroup(String year, String currCode);
-    Map<String, Double> getSumOfCategoryExpansesForGroup(String begin, String end, String currCode);
-    Map<String, Double> getSumOfCategoryExpansesForUser(String begin, String end, String currCode);
     Optional<ExpenseDTO> getRecentExpense(String groupName);
     Map<LocalDate, List<ExpenseDTO>> getGroupExpenseAsDateMap(String name);
     Map<Category, List<ExpenseDTO>> getGroupExpenseAsCategoryMap(String name);

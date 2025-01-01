@@ -27,32 +27,6 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     private final MethodOfPaymentRepository methodOfPaymentRepository;
     private final ExpenseMapper expenseMapper;
 
-    @Override
-    public ExpenseDTO createExpense(ExpenseCreateDTO createDTO) {
-        Expense expense = expenseMapper.expenseCreateDTOToExpense(createDTO);
-        Optional<Membership> membershipOpt = membershipRepository.findByUserIdAndGroupName(createDTO.getUser().getId(), createDTO.getGroupName());
-        if (membershipOpt.isEmpty()) {
-            throw new IllegalArgumentException("Invalid membership ID");
-        }
-        expense.setMembership(membershipOpt.get());
-        if (createDTO.getCategoryName() != null) {
-            Category category = categoryRepository.findByName(createDTO.getCategoryName());
-            expense.setCategory(category);
-        }
-        if (createDTO.getMethodOfPayment() != null) {
-            MethodOfPayment method = methodOfPaymentRepository.findByName(createDTO.getMethodOfPayment());
-            expense.setMethod(method);
-        }
-        if (createDTO.getCurrencyCode() != null) {
-            Currency currency = currencyRepository.findBySymbol(createDTO.getCurrencyCode());
-            expense.setCurrency(currency);
-        }
-        if (createDTO.getExpenseDate() != null) {
-            expense.setDate(createDTO.getExpenseDate());
-        }
-        Expense savedExpense = expenseRepository.save(expense);
-        return expenseMapper.expenseToExpenseDTO(savedExpense);
-    }
     public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository, UserRepository userRepository, MembershipRepository membershipRepository, MethodOfPaymentRepository methodOfPaymentRepository, ExpenseMapper expenseMapper) {
         super(repository);
         this.expenseRepository = repository;
@@ -82,6 +56,33 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             entity.setCurrency(defaultCurrency);
         }
         Expense savedExpense = expenseRepository.save(entity);
+        return expenseMapper.expenseToExpenseDTO(savedExpense);
+    }
+
+    @Override
+    public ExpenseDTO createExpense(ExpenseCreateDTO createDTO) {
+        Expense expense = expenseMapper.expenseCreateDTOToExpense(createDTO);
+        Optional<Membership> membershipOpt = membershipRepository.findByUserIdAndGroupName(createDTO.getUser().getId(), createDTO.getGroupName());
+        if (membershipOpt.isEmpty()) {
+            throw new IllegalArgumentException("Invalid membership ID");
+        }
+        expense.setMembership(membershipOpt.get());
+        if (createDTO.getCategoryName() != null) {
+            Category category = categoryRepository.findByName(createDTO.getCategoryName());
+            expense.setCategory(category);
+        }
+        if (createDTO.getMethodOfPayment() != null) {
+            MethodOfPayment method = methodOfPaymentRepository.findByName(createDTO.getMethodOfPayment());
+            expense.setMethod(method);
+        }
+        if (createDTO.getCurrencyCode() != null) {
+            Currency currency = currencyRepository.findBySymbol(createDTO.getCurrencyCode());
+            expense.setCurrency(currency);
+        }
+        if (createDTO.getExpenseDate() != null) {
+            expense.setDate(createDTO.getExpenseDate());
+        }
+        Expense savedExpense = expenseRepository.save(expense);
         return expenseMapper.expenseToExpenseDTO(savedExpense);
     }
 
@@ -120,18 +121,6 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         return new ExpInfo(userSum, groupSum);
     }
 
-    @Override
-    public Map<String, Double> getMonthlyExpensesForUser(String year, String currCode) {
-        Currency currency = currencyRepository.findBySymbol(currCode);
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setBeginDate(LocalDate.ofYearDay(Integer.parseInt(year), 1));
-        filter.setEndDate(LocalDate.ofYearDay(Integer.parseInt(year), endOfTheYear(year)));
-        filter.setEmail(getUserEmail());
-        List<ExpenseDTO> userExpenses = searchExpensesDTO(filter);
-        return totalExpensesMap(userExpenses, e -> e.getExpenseDate().getMonth().name(), currency);
-
-    }
-
     private int endOfTheYear (String year) {
         if (LocalDate.ofYearDay(Integer.parseInt(year), 1).isLeapYear()) {
             return 366;
@@ -142,47 +131,11 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
 
     @Override
     public Map<String, Double> getMapResult(ExpenseFilter filter, String currCode, String keyType) {
-        List<Expense> result = searchExpenses(filter);
+        List<ExpenseDTO> result = searchExpensesDTO(filter);
         Currency currency = currencyRepository.findBySymbol(currCode);
-        Function<Expense, String> keyExtractor = findKeyExtractor(keyType);
+        Function<ExpenseDTO, String> keyExtractor = findKeyExtractor(keyType);
         if (keyExtractor == null) throw new IllegalArgumentException("Invalid key type");
         return totalExpensesMap(result, keyExtractor, currency);
-    }
-
-    @Override
-    public Map<String, Double> getMonthlyExpensesForGroup(String year, String currCode) {
-        Currency currency = currencyRepository.findBySymbol(currCode);
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setBeginDate(LocalDate.ofYearDay(Integer.parseInt(year), 1));
-        filter.setEndDate(LocalDate.ofYearDay(Integer.parseInt(year), endOfTheYear(year)));
-        filter.setGroupName(getGroupName());
-        List<ExpenseDTO> groupExpenses = searchExpensesDTO(filter);
-        return totalExpensesMap(groupExpenses, e-> e.getExpenseDate().getMonth().name(), currency);
-    }
-
-    @Override
-    public Map<String, Double> getSumOfCategoryExpansesForGroup(String begin, String end, String currCode) {
-        LocalDate beginDate = LocalDate.parse(begin);
-        LocalDate endDate = LocalDate.parse(end);
-        Currency currency = currencyRepository.findBySymbol(currCode);
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setBeginDate(beginDate);
-        filter.setEndDate(endDate);
-        List<ExpenseDTO> categoryExpenses = searchExpensesDTO(filter);
-        return totalExpensesMap(categoryExpenses, expenseDTO -> expenseDTO.getCategory().getName(), currency);
-    }
-
-    @Override
-    public Map<String, Double> getSumOfCategoryExpansesForUser(String begin, String end, String currCode) {
-        LocalDate beginDate = LocalDate.parse(begin);
-        LocalDate endDate = LocalDate.parse(end);
-        Currency currency = currencyRepository.findBySymbol(currCode);
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setBeginDate(beginDate);
-        filter.setEndDate(endDate);
-        filter.setEmail(getUserEmail());
-        List<ExpenseDTO> categoryExpenses = searchExpensesDTO(filter);
-        return totalExpensesMap(categoryExpenses, expenseDTO -> expenseDTO.getCategory().getName(), currency);
     }
 
     @Override
@@ -190,7 +143,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         ExpenseFilter filter = new ExpenseFilter();
         filter.setGroupName(groupName);
         List<ExpenseDTO> expenses = searchExpensesDTO(filter);
-        return expenses.stream().max(Comparator.comparing(ExpenseDTO::getId));
+        return expenses.stream().max(Comparator.comparing(ExpenseDTO::getExpenseDate));
     }
 
 
@@ -265,13 +218,13 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         return value;
     }
 
-    private Function<Expense, String> findKeyExtractor(String keyType) {
+    private Function<ExpenseDTO, String> findKeyExtractor(String keyType) {
         return switch (keyType) {
             case "category" -> e -> e.getCategory().getName();
-            case "method" -> e -> e.getMethod().getName();
-            case "user" -> e -> e.getMembership().getUser().getEmail();
-            case "month" -> e -> e.getDate().getMonth().name();
-            case "year" -> e -> String.valueOf(e.getDate().getYear());
+            case "method" -> ExpenseDTO::getMethodOfPayment;
+            case "user" -> e -> e.getUser().getEmail();
+            case "month" -> e -> e.getExpenseDate().getMonth().name();
+            case "year" -> e -> String.valueOf(e.getExpenseDate().getYear());
             default -> null;
         };
     }
