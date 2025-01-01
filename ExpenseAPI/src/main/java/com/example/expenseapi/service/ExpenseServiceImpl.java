@@ -159,7 +159,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         filter.setBeginDate(beginDate);
         filter.setEndDate(endDate);
         List<ExpenseDTO> categoryExpenses = searchExpensesDTO(filter);
-        return totalExpensesMap(categoryExpenses, ExpenseDTO::getCategoryName, currency);
+        return totalExpensesMap(categoryExpenses, expenseDTO -> expenseDTO.getCategory().getName(), currency);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         filter.setEndDate(endDate);
         filter.setEmail(getUserEmail());
         List<ExpenseDTO> categoryExpenses = searchExpensesDTO(filter);
-        return totalExpensesMap(categoryExpenses, ExpenseDTO::getCategoryName, currency);
+        return totalExpensesMap(categoryExpenses, expenseDTO -> expenseDTO.getCategory().getName(), currency);
     }
 
     @Override
@@ -210,7 +210,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     public Map<Category, List<ExpenseDTO>> getGroupExpenseAsCategoryMap(String name) {
         List<ExpenseDTO> expenses = getExpensesForGroup(name);
         return expenses.stream()
-                .collect(Collectors.groupingBy(expenseDTO -> categoryRepository.findByName(expenseDTO.getCategoryName())));
+                .collect(Collectors.groupingBy(ExpenseDTO::getCategory));
     }
 
     @Override
@@ -256,7 +256,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         Map<String, Double> map = new LinkedHashMap<>();
         for (ExpenseDTO expense : queryResult) {
             String key = keyExtractor.apply(expense);
-            double price = convertFromCurrencyToAnother(expense.getPrice(), currencyRepository.findBySymbol(expense.getCurrencyCode()), dstCurr);
+            double price = convertFromCurrencyToAnother(expense.getPrice(), expense.getCurrency(), dstCurr);
             map.put(key, map.getOrDefault(key, 0.0) + price);
         }
         return map;
