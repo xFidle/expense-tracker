@@ -8,10 +8,9 @@ data class Expense(
     val id: Long,
     val title: String,
     val price: Float,
-    val expenseDate: LocalDate,
+    val membership: Membership,
+    val date: LocalDate,
     val category: Category,
-    val methodOfPayment: String,
+    val method: String,
     val currency: Currency,
-    val user: User,
-    val groupName: String
 )
