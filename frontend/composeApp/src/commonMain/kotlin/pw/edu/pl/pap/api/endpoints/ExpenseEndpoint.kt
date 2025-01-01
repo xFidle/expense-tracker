@@ -1,7 +1,7 @@
 package pw.edu.pl.pap.api.endpoints
 
 sealed class ExpenseEndpoint(relativePath: String) : BaseEndpoint("/expense", relativePath) {
-    data object RecentExpense : ExpenseEndpoint("/recent")
+    data class RecentExpense(val group: String) : ExpenseEndpoint("/recent/$group")
     data object NewExpense : ExpenseEndpoint("/create")
     data class DeleteExpense(val id: Number) : ExpenseEndpoint("/delete/$id")
     data class ExpenseById(val id: Number) : ExpenseEndpoint("/$id")

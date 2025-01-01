@@ -44,12 +44,12 @@ class ExpenseApiClient(baseApiClient: BaseApiClient) :
         emit(getExpenseApi(id))
     }
 
-    private suspend fun getRecentExpenseApi(): Expense {
-        return get(ExpenseEndpoint.RecentExpense).body()
+    private suspend fun getRecentExpenseApi(group: String): Expense {
+        return get(ExpenseEndpoint.RecentExpense(group)).body()
     }
 
-    fun getRecentExpense() = flow {
-        emit(getRecentExpenseApi())
+    fun getRecentExpense(group: String) = flow {
+        emit(getRecentExpenseApi(group))
     }
 
     suspend fun updateExpense(expense: Expense): HttpResponse {

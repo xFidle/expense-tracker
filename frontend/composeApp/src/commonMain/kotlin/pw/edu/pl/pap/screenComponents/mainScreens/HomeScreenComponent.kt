@@ -142,7 +142,7 @@ class HomeScreenComponent(
 //        println("RECENT EXPENSE")
         runBlocking {
             try {
-                apiService.expenseApiClient.getRecentExpense().collect { expense: Expense ->
+                apiService.expenseApiClient.getRecentExpense(currentUserGroup.value!!.name).collect { expense: Expense ->
                     println(expense)
                     _groupedExpenses.value.addExpense(getCurrentKey(expense), expense)
 //                    _groupedExpenses.value = _groupedExpenses.value
