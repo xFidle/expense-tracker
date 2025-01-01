@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import pw.edu.pl.pap.data.databaseAssociatedData.Expense
 import pw.edu.pl.pap.data.databaseAssociatedData.TotalExpenses
+import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.util.sortingSystem.ExpenseMap
 import pw.edu.pl.pap.util.sortingSystem.GroupKey
@@ -16,7 +17,7 @@ import pw.edu.pl.pap.util.sortingSystem.Order
 
 class HomeScreenComponent(
     baseScreenComponent: BaseScreenComponent,
-    val onAddExpenseButtonClicked: () -> Unit,
+    val onAddExpenseButtonClicked: (UserGroup) -> Unit,
     val onExpenseClick: (Expense) -> Unit
 ) : BaseScreenComponent by baseScreenComponent {
 
