@@ -23,10 +23,10 @@ class ExpenseDetailsScreenComponent(
     override var date: MutableState<LocalDate> = mutableStateOf(expense.expenseDate)
 
     override var newPrice: MutableState<String> = mutableStateOf(formatForTextField(expense.price))
+
     override var currencyIndex: MutableState<Int> = mutableStateOf(expense.currency.id.toInt() - 1)
-    //TODO fetch currency
-    override var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(0)
-    //TODO fetch method of payment
+
+    override var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(methodsOfPayment.indexOf(expense.methodOfPayment))
 
     override var userIndex: MutableState<Int> = mutableStateOf(expense.user.id.toInt())
 

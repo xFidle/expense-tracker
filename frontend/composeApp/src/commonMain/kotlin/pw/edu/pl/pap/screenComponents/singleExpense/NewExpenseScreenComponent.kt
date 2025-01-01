@@ -35,8 +35,5 @@ class NewExpenseScreenComponent(
             apiService.expenseApiClient.postNewExpense(newExpense)
             onSave()
         }
-
-        println("confirmed " + newExpense.price)
     }
-
 }
