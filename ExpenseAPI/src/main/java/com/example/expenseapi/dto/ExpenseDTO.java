@@ -22,8 +22,6 @@ public class ExpenseDTO {
     private Category category;
     private String methodOfPayment;
     private Currency currency;
-    private String userEmail;
-    private String name;
-    private String surname;
+    private UserDTO user;
     private String groupName;
 }
