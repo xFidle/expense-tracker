@@ -181,7 +181,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         ExpenseFilter filter = new ExpenseFilter();
         filter.setEmail(getUserEmail());
         List<ExpenseDTO> expenses = searchExpensesDTO(filter);
-        return expenses.stream().max(Comparator.comparing(ExpenseDTO::getExpenseDate));
+        return expenses.stream().max(Comparator.comparing(ExpenseDTO::getId));
     }
 
 
