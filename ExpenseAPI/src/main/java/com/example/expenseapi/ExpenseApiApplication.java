@@ -63,7 +63,6 @@ public class ExpenseApiApplication implements CommandLineRunner {
             groups = new Group[]{
                     new Group("family"),
                     new Group("workers"),
-                    new Group("empty")
             };
             groupRepository.saveAll(Arrays.asList(groups));
         }
@@ -98,7 +97,6 @@ public class ExpenseApiApplication implements CommandLineRunner {
                     new Membership(users[0], groups[1], "workers", roles[0]),
                     new Membership(users[0], archivedGroups[0], "family2", roles[0]),
                     new Membership(users[1], archivedGroups[1], "workers2", roles[1]),
-                    new Membership(users[3], groups[2], "empty", roles[0])
             };
             membershipRepository.saveAll(Arrays.asList(memberships));
         }
