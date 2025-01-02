@@ -2,7 +2,7 @@ package com.example.expenseapi.web;
 
 import com.example.expenseapi.pojo.Group;
 import com.example.expenseapi.service.MembershipService;
-import com.example.expenseapi.service.UserGroupService;
+import com.example.expenseapi.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +17,8 @@ import java.util.List;
 public class GroupController extends GenericController<Group, Long>{
     private final MembershipService membershipService;
 
-    public GroupController(MembershipService membershipService, UserGroupService userGroupService) {
-        super(userGroupService);
+    public GroupController(MembershipService membershipService, GroupService groupService) {
+        super(groupService);
         this.membershipService = membershipService;
     }
 

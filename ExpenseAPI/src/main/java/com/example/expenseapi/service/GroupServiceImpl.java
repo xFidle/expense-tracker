@@ -12,10 +12,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserGroupServiceImpl extends GenericServiceImpl<Group, Long> implements UserGroupService{
+public class GroupServiceImpl extends GenericServiceImpl<Group, Long> implements GroupService {
     private final UserService userService;
     private final MembershipService membershipService;
-    public UserGroupServiceImpl(GroupRepository repository, UserService userService, MembershipService membershipService) {
+    public GroupServiceImpl(GroupRepository repository, UserService userService, MembershipService membershipService) {
         super(repository);
         this.userService = userService;
         this.membershipService = membershipService;
