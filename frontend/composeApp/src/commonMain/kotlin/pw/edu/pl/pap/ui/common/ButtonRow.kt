@@ -10,7 +10,8 @@ import pw.edu.pl.pap.util.constants.padding
 fun ConfirmOrBackButtonRow(
     text: String,
     onBack: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    isConfirmEnabled: Boolean? = null,
 ) {
 
     Box(
@@ -27,7 +28,12 @@ fun ConfirmOrBackButtonRow(
         TextButton(
             text = text,
             modifier = Modifier.align(Alignment.BottomEnd),
-            onUpdate = onConfirm
+            onUpdate = onConfirm,
+            isEnabled = if (isConfirmEnabled!!) {
+                isConfirmEnabled
+            } else {
+                true
+            },
         )
     }
 }

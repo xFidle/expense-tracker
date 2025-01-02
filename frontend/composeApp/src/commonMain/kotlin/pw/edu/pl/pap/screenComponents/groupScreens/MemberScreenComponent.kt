@@ -1,11 +1,10 @@
 package pw.edu.pl.pap.screenComponents.groupScreens
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
+import pw.edu.pl.pap.data.uiSetup.ConfirmationDialogConfig
 import pw.edu.pl.pap.data.uiSetup.inputFields.ButtonData
 import pw.edu.pl.pap.data.uiSetup.inputFields.DropdownListData
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
@@ -23,13 +22,39 @@ class MemberScreenComponent (
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
 
     private val roles = listOf("admin", "viewer")
-    protected var initialIndex: MutableState<Int> = mutableStateOf(0)
-    protected var roleIndex: MutableState<Int> = mutableStateOf(0)
+    //TODO fetch list of roles
+    private var initialIndex: MutableState<Int> = mutableStateOf(0)
+    private var roleIndex: MutableState<Int> = mutableStateOf(0)
+
+    private val isAdmin: Boolean = true
+    //TODO fetch if is admin
 
     var showChangeRoleConfirmationDialog: MutableState<Boolean> = mutableStateOf(false)
     var showKickConfirmationDialog: MutableState<Boolean> = mutableStateOf(false)
 
+    val changeRoleConfirmationData = ConfirmationDialogConfig(
+        mainText = "Change Role",
+        subText = "Are you sure you want to change the role of \"${user.name} ${user.surname}\"?",
+        onNo = { showChangeRoleConfirmationDialog.value = false },
+        onYes = {
+            showChangeRoleConfirmationDialog.value = false
+            coroutineScope.launch { changeRole() }
+            onBack()
+        }
+    )
 
+    val kickConfirmationData = ConfirmationDialogConfig(
+        mainText = "Kick",
+        subText = "Are you sure you want to kick \"${user.name} ${user.surname}\" from ${currentUserGroup.name}?",
+        onNo = { showChangeRoleConfirmationDialog.value = false },
+        onYes = {
+            showChangeRoleConfirmationDialog.value = false
+            coroutineScope.launch { kick() }
+            onBack()
+        }
+    )
+
+    val canConfirm by derivedStateOf { initialIndex.value != roleIndex.value }
 
     fun setupInputFields() {
         _inputFieldsData.clear()
@@ -41,26 +66,37 @@ class MemberScreenComponent (
                     dropdownListData = DropdownListData(
                         itemList = roles,
                         selectedIndex = roleIndex,
-                        onItemClick = {
-                            coroutineScope.launch { roleIndex.value = it }
-                        }
-                    )
-                ),
-                InputFieldData(
-                    title = "",
-                    isButton = true,
-                    buttonData = ButtonData(
-                        title = "KICK",
-                        onClick = {
-                            coroutineScope.launch { showKickConfirmationDialog.value = true }
+                        onItemClick = if (isAdmin) {
+                            { coroutineScope.launch { roleIndex.value = it } }
+                        } else {
+                            {}
                         }
                     )
                 )
-            )
+            ) + if (isAdmin) {
+                listOf(
+                    InputFieldData(
+                        title = "",
+                        isButton = true,
+                        buttonData = ButtonData(
+                            title = "KICK",
+                            onClick = {
+                                coroutineScope.launch { showKickConfirmationDialog.value = true }
+                            }
+                        )
+                    )
+                )
+            } else {
+                emptyList()
+            }
         )
     }
 
     private fun changeRole() {
+        //TODO
+    }
+
+    private fun kick() {
         //TODO
     }
 }

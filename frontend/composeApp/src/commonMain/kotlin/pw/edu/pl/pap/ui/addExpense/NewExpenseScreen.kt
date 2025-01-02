@@ -3,6 +3,7 @@ package pw.edu.pl.pap.ui.addExpense
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import pw.edu.pl.pap.screenComponents.singleExpense.NewExpenseScreenComponent
+import pw.edu.pl.pap.ui.common.ConfirmOrBackButtonRow
 import pw.edu.pl.pap.ui.common.Header
 import pw.edu.pl.pap.ui.common.InputFields
 
@@ -16,7 +17,8 @@ fun NewExpenseScreen(
     component.setupInputFields()
     InputFields(component.inputFieldsData)
 
-    NewExpenseButtonRow(
+    ConfirmOrBackButtonRow(
+        text = "ADD",
         onBack = { scope.launch { component.onDismiss() } },
         onConfirm = { scope.launch { component.confirm() } },
         isConfirmEnabled = component.canConfirm
