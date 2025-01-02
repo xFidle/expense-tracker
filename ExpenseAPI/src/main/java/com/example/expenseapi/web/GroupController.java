@@ -1,7 +1,9 @@
 package com.example.expenseapi.web;
 
 import com.example.expenseapi.pojo.BaseGroup;
+import com.example.expenseapi.pojo.Group;
 import com.example.expenseapi.service.MembershipService;
+import com.example.expenseapi.service.UserGroupService;
 import com.example.expenseapi.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,19 +19,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/group")
-public class GroupController  {
+public class GroupController extends GenericController<Group, Long>{
     private final MembershipService membershipService;
-    private final UserService userService;
 
-    public GroupController(MembershipService membershipService, UserService userService) {
+    public GroupController(MembershipService membershipService, UserGroupService userGroupService) {
+        super(userGroupService);
         this.membershipService = membershipService;
-        this.userService = userService;
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<List<BaseGroup>> getAllGroups(@AuthenticationPrincipal User user) {
-        Optional<com.example.expenseapi.pojo.User> mUser = userService.findByEmail(user.getUsername());
-        return new ResponseEntity<>(mUser.map(value -> membershipService.getBaseGroupsByUserId(value.getId())).orElse(null), HttpStatus.OK);
     }
 
     @GetMapping("/members/{group}")
