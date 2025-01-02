@@ -6,9 +6,11 @@ data class InputFieldData(
     val isDatePicker: Boolean = false,
     val isPassword: Boolean = false,
     val isButton: Boolean = false,
+    val isUserBalanceButton: Boolean = false,
 
     val datePickerData: DatePickerData? = null,
     val textFieldData: TextFieldData? = null,
     val dropdownListData: DropdownListData? = null,
     val buttonData: ButtonData? = null,
+    val userBalanceButtonData: UserBalanceButtonData? = null,
 )
