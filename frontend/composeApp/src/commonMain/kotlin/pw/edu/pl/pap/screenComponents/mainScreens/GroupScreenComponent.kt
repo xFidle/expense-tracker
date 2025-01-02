@@ -27,7 +27,7 @@ class GroupScreenComponent(
     //TODO fetch available users
 
     //temp
-    private val balances = listOf(70.0.toFloat(), 45.0.toFloat(), (-115.0).toFloat())
+    private val balances = listOf(70.0, 45.0, -115.0)
     //TODO fetch balances
 
 
@@ -41,7 +41,7 @@ class GroupScreenComponent(
                     isUserBalanceButton = true,
                     userBalanceButtonData = UserBalanceButtonData(
                         title = username,
-                        balance = balance,
+                        balance = balance.toFloat(),
                         onClick = { onUserClicked(user) }
                     )
                 )

@@ -280,7 +280,7 @@ private fun createClickableUserCard(data: UserBalanceButtonData) {
                 )
 
                 Text(
-                    text = if (data.balance >= 0) "+ ${data.balance} PLN" else "- ${data.balance} PLN",
+                    text = if (data.balance >= 0) "+ ${data.balance} PLN" else "- ${-data.balance} PLN",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (data.balance >= 0) Color.Green else Color.Red
