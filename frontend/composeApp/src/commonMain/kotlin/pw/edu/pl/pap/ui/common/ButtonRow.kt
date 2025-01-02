@@ -11,7 +11,7 @@ fun ConfirmOrBackButtonRow(
     text: String,
     onBack: () -> Unit,
     onConfirm: () -> Unit,
-    isConfirmEnabled: Boolean? = null,
+    isConfirmEnabled: Boolean = true,
 ) {
 
     Box(
@@ -29,11 +29,7 @@ fun ConfirmOrBackButtonRow(
             text = text,
             modifier = Modifier.align(Alignment.BottomEnd),
             onUpdate = onConfirm,
-            isEnabled = if (isConfirmEnabled != null) {
-                isConfirmEnabled
-            } else {
-                true
-            },
+            isEnabled = isConfirmEnabled,
         )
     }
 }

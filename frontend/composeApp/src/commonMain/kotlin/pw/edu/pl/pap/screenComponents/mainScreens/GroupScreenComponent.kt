@@ -10,6 +10,7 @@ import pw.edu.pl.pap.data.uiSetup.inputFields.UserBalanceButtonData
 
 class GroupScreenComponent(
     private val onUserClicked: (UserGroup, User) -> Unit,
+    val onInvitationsClicked: (UserGroup) -> Unit,
     val currentUserGroup: UserGroup,
     baseComponent: BaseScreenComponent,
 ) : BaseScreenComponent by baseComponent {
