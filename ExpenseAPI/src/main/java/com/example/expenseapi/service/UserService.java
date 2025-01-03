@@ -1,9 +1,13 @@
 package com.example.expenseapi.service;
 
+import com.example.expenseapi.dto.UserDTO;
+import com.example.expenseapi.dto.UserFilter;
 import com.example.expenseapi.pojo.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService extends GenericService<User, Long> {
     Optional<User> findByEmail(String email);
+    List<UserDTO> searchUsersDTO(UserFilter filter);
 }
