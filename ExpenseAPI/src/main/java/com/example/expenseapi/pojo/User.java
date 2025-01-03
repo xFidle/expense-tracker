@@ -19,21 +19,25 @@ public class User {
     private Long id;
 
     @NonNull
-    @Column(name = "name", nullable = false, columnDefinition = "VARCHAR2(255)")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @NonNull
-    @Column(name = "surname", nullable = false, columnDefinition = "VARCHAR2(255)")
+    @Column(name = "surname", nullable = false)
     private String surname;
 
     @NonNull
-    @Column(name = "email", nullable = false, columnDefinition = "VARCHAR2(255)", unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "creation_date", nullable = false)
     private LocalDate creationDate = LocalDate.now();
 
     @NonNull
+    @JoinColumn(name = "preferences_id", referencedColumnName = "id")
+    @OneToOne(optional = false)
+    private Preference preference;
+
     @Column(nullable = false)
     private String password;
 }
