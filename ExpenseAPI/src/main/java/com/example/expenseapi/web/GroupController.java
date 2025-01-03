@@ -31,16 +31,14 @@ public class GroupController extends GenericController<Group, Long>{
         this.membershipService = membershipService;
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<BaseGroup>> getAllGroups(@AuthenticationPrincipal User user) {
-        Optional<com.example.expenseapi.pojo.User> mUser = userService.findByEmail(user.getUsername());
-        return new ResponseEntity<>(mUser.map(value -> membershipService.getBaseGroupsByUserId(value.getId())).orElse(null), HttpStatus.OK);
+    @GetMapping("/all/base")
+    public ResponseEntity<List<BaseGroup>> getAllBaseGroups() {
+        return new ResponseEntity<>(((GroupService) service).getBaseGroups(), HttpStatus.OK);
     }
 
-    @GetMapping("all/active")
-    public ResponseEntity<List<Group>> getActiveGroups(@AuthenticationPrincipal User user) {
-        Optional<com.example.expenseapi.pojo.User> mUser = userService.findByEmail(user.getUsername());
-        return new ResponseEntity<>(mUser.map(value -> membershipService.getGroupsByUserId(value.getId())).orElse(null), HttpStatus.OK);
+    @GetMapping("/all/active")
+    public ResponseEntity<List<Group>> getActiveGroups() {
+        return new ResponseEntity<>(((GroupService) service).getActiveGroups(), HttpStatus.OK);
     }
 
     @GetMapping("/members/{group}")
