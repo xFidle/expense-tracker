@@ -7,6 +7,7 @@ import com.example.expenseapi.pojo.BaseMembership;
 import com.example.expenseapi.pojo.Membership;
 import com.example.expenseapi.pojo.User;
 import com.example.expenseapi.repository.MembershipRepository;
+import com.example.expenseapi.utils.AuthHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,27 +27,22 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     }
 
     @Override
-    public List<Group> getGroupsByUserId(Long userId) {
-        return membershipRepository.findGroupsByUserId(userId);
-    }
-
-    @Override
     public List<Membership> getMembershipsByUserId(Long userId) {
         return membershipRepository.findByUserId(userId);
     }
 
     @Override
     public List<UserDTO> findAdmins(String group) {
-        return membershipRepository.findAdmins(group)
+        return AuthHelper.isGroupNameValid(group) ? membershipRepository.findAdmins(group)
                 .stream().map(userMapper::userToUserDTO)
-                .toList();
+                .toList() : List.of();
     }
 
     @Override
     public List<UserDTO> findUsers(String group) {
-        return membershipRepository.findUsers(group)
+        return AuthHelper.isGroupNameValid(group) ? membershipRepository.findUsers(group)
                 .stream().map(userMapper::userToUserDTO)
-                .toList();
+                .toList() : List.of();
     }
 
     @Override
