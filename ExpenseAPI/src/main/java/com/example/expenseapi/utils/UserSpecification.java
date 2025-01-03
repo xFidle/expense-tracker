@@ -10,23 +10,23 @@ import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecification {
-    public static Specification<User> nameContains(String name) {
+    public static Specification<User> nameEquals(String name) {
         return ((root, query, criteriaBuilder) -> {
             if (name == null) {
                 return criteriaBuilder.conjunction();
             }
-            String pattern = "%" + name.toLowerCase() + "%";
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), pattern);
+            String lowerCaseName = name.toLowerCase();
+            return criteriaBuilder.equal(criteriaBuilder.lower(root.get("name")), lowerCaseName);
         });
     }
 
-    public static Specification<User> surnameContains(String surname) {
+    public static Specification<User> surnameEquals(String surname) {
         return (((root, query, criteriaBuilder) -> {
             if (surname == null) {
                 return criteriaBuilder.conjunction();
             }
-            String pattern = "%" + surname.toLowerCase() + "%";
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get("surname")), pattern);
+            String lowerCaseSurname = surname.toLowerCase();
+            return criteriaBuilder.equal(criteriaBuilder.lower(root.get("surname")), lowerCaseSurname);
         }));
     }
 

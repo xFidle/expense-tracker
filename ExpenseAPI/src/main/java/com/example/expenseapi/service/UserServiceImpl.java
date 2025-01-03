@@ -32,8 +32,8 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements U
     @Override
     public List<UserDTO> searchUsersDTO(UserFilter filter, String groupName) {
         Specification<User> spec = Specification.where(null);
-        spec = spec.and(UserSpecification.nameContains(filter.getName()));
-        spec = spec.and(UserSpecification.surnameContains(filter.getSurname()));
+        spec = spec.and(UserSpecification.nameEquals(filter.getName()));
+        spec = spec.and(UserSpecification.surnameEquals(filter.getSurname()));
         spec = spec.and(UserSpecification.notInGroup(groupName));
         return userRepository.findAll(spec).stream()
                 .map(userMapper::userToUserDTO)
