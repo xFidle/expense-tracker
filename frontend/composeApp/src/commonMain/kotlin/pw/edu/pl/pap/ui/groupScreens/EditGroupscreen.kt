@@ -5,9 +5,10 @@ import kotlinx.coroutines.launch
 import pw.edu.pl.pap.screenComponents.groupScreens.EditGroupScreenComponent
 import pw.edu.pl.pap.ui.common.BackDeleteAddButtonRow
 import pw.edu.pl.pap.ui.common.ConfirmationPopup
+import pw.edu.pl.pap.ui.common.DialogFactory.ConfirmationDialogFactory
 import pw.edu.pl.pap.ui.common.Header
 import pw.edu.pl.pap.ui.common.InputFields
-import pw.edu.pl.pap.ui.expenseDetails.ConfirmationDialogState
+import pw.edu.pl.pap.ui.common.DialogFactory.ConfirmationDialogState
 
 @Composable
 fun EditGroupScreen(
@@ -15,7 +16,10 @@ fun EditGroupScreen(
 ) {
     val scope = rememberCoroutineScope()
     var confirmDialogState by remember { mutableStateOf<ConfirmationDialogState>(ConfirmationDialogState.None) }
-    val dialogFactory = remember { ConfirmationDialogFactory(component) }
+    val dialogFactory = remember { ConfirmationDialogFactory(
+        onDismiss = component.onDismiss,
+        onDelete = { component.deleteGroup() }
+    ) }
 
     Header("Expense Details")
     component.setupInputFields()

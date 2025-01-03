@@ -5,6 +5,8 @@ import kotlinx.coroutines.launch
 import pw.edu.pl.pap.screenComponents.singleExpense.ExpenseDetailsScreenComponent
 import pw.edu.pl.pap.ui.common.BackDeleteAddButtonRow
 import pw.edu.pl.pap.ui.common.ConfirmationPopup
+import pw.edu.pl.pap.ui.common.DialogFactory.ConfirmationDialogFactory
+import pw.edu.pl.pap.ui.common.DialogFactory.ConfirmationDialogState
 import pw.edu.pl.pap.ui.common.Header
 import pw.edu.pl.pap.ui.common.InputFields
 
@@ -14,7 +16,10 @@ fun ExpenseDetailsScreen(
 ) {
     val scope = rememberCoroutineScope()
     var confirmDialogState by remember { mutableStateOf<ConfirmationDialogState>(ConfirmationDialogState.None) }
-    val dialogFactory = remember { ConfirmationDialogFactory(component) }
+    val dialogFactory = remember { ConfirmationDialogFactory(
+        onDismiss = component.onDismiss,
+        onDelete = { component.deleteExpense() }
+    ) }
 
     Header("Expense Details")
     component.setupInputFields()
