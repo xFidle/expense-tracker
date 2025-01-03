@@ -168,7 +168,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         spec = spec.and(ExpenseSpecification.hasMethod(filter.getMethodsOfPayment()));
         return expenseRepository.findAll(spec).stream()
                 .map(expenseMapper::expenseToExpenseDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private double convertFromCurrencyToAnother(double value, Currency srcCurr, Currency dstCurr) {
