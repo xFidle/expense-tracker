@@ -27,7 +27,8 @@ fun GroupScreen (component: GroupScreenComponent) {
         contentAlignment = Alignment.BottomCenter
     ){
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ){
             TextButton(
                 text = "NEW GROUP",

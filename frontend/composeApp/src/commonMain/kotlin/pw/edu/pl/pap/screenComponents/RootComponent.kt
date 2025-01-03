@@ -22,7 +22,9 @@ import pw.edu.pl.pap.api.authApi.LoginApi
 import pw.edu.pl.pap.data.databaseAssociatedData.Expense
 import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
+import pw.edu.pl.pap.screenComponents.groupScreens.EditGroupScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.MemberScreenComponent
+import pw.edu.pl.pap.screenComponents.groupScreens.NewGroupScreenComponent
 import pw.edu.pl.pap.screenComponents.loginSystem.*
 import pw.edu.pl.pap.screenComponents.mainScreens.*
 import pw.edu.pl.pap.screenComponents.settingsScreens.*
@@ -79,6 +81,12 @@ class RootComponent(
 
         @Serializable
         data class MemberScreen(val userGroup: UserGroup, val user: User) : Configuration()
+
+        @Serializable
+        data object NewGroupScreen : Configuration()
+
+        @Serializable
+        data class EditGroupScreen(val userGroup: UserGroup) : Configuration()
 
         @Serializable
         data object SettingsScreen : Configuration()
@@ -141,6 +149,8 @@ class RootComponent(
         data class SettingsScreen(val component: SettingsScreenComponent) : Child()
 
         data class MemberScreen(val component: MemberScreenComponent) : Child()
+        data class NewGroupScreen(val component: NewGroupScreenComponent) : Child()
+        data class EditGroupScreen(val component: EditGroupScreenComponent) : Child()
 
         data class ServerAddressScreen(val component: ServerAdressScreenComponent) : Child()
         data class UserPersonalDataScreen(val component: UserPersonalDataScreenComponent) : Child()
@@ -268,8 +278,10 @@ class RootComponent(
 //                    },
                     //TODO
                     onInvitationsClicked = {},
-                    onNewGroupClicked = {},
-                    onEditGroupClicked = {},
+                    onNewGroupClicked = { navigation.pushNew(Configuration.NewGroupScreen)},
+                    onEditGroupClicked = { userGroup ->
+                        navigation.pushNew(Configuration.EditGroupScreen(userGroup))
+                    },
                     currentUserGroup = configuration.userGroup,
                 )
             )
@@ -280,6 +292,44 @@ class RootComponent(
                     onBack = { navigation.pop() },
                     user = configuration.user,
                     currentUserGroup = configuration.userGroup
+                )
+            )
+
+            is Configuration.EditGroupScreen -> Child.EditGroupScreen(
+                component = EditGroupScreenComponent(
+                    baseComponent = createMainScreenComponent(componentContext),
+                    onDismiss = { navigation.pop() },
+//                    onSave = {
+//                        navigation.pop()
+//                        (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
+//                            HomeScreenComponent.NavigationState.FromExpenseDetailsScreenEdit(configuration.expense)
+//                        )
+//                    },
+//                    onDelete = {
+//                        navigation.pop()
+//                        (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
+//                            HomeScreenComponent.NavigationState.FromExpenseDetailsScreenDelete(configuration.expense)
+//                        )
+//                    },
+                    onSave = {},
+                    onDelete = {},
+                    //TODO
+                    group = configuration.userGroup
+                )
+            )
+
+            is Configuration.NewGroupScreen -> Child.NewGroupScreen(
+                component = NewGroupScreenComponent(
+                    baseComponent = createMainScreenComponent(componentContext),
+                    onDismiss = { navigation.pop () },
+                    onSave = {}
+//                            onSave = {
+//                        navigation.pop()
+//                        (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
+//                            HomeScreenComponent.NavigationState.FromNewExpenseScreen
+//                        )
+//                    },
+                    //TODO
                 )
             )
 

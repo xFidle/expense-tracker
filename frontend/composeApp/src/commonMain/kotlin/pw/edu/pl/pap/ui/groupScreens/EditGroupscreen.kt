@@ -21,7 +21,7 @@ fun EditGroupScreen(
         onDelete = { component.deleteGroup() }
     ) }
 
-    Header("Expense Details")
+    Header("Edit Group")
     component.setupInputFields()
     InputFields(component.inputFieldsData)
 
