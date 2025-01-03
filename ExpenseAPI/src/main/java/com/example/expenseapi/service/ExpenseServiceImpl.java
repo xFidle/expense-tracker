@@ -8,7 +8,7 @@ import com.example.expenseapi.pojo.Currency;
 import com.example.expenseapi.repository.*;
 import com.example.expenseapi.mapper.ExpenseMapper;
 import com.example.expenseapi.utils.AuthHelper;
-import com.example.expenseapi.utils.ExpenseSpecification;
+import com.example.expenseapi.specification.ExpenseSpecification;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;

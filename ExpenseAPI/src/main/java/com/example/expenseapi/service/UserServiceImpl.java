@@ -5,7 +5,7 @@ import com.example.expenseapi.filter.UserFilter;
 import com.example.expenseapi.mapper.UserMapper;
 import com.example.expenseapi.pojo.User;
 import com.example.expenseapi.repository.UserRepository;
-import com.example.expenseapi.utils.UserSpecification;
+import com.example.expenseapi.specification.UserSpecification;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 

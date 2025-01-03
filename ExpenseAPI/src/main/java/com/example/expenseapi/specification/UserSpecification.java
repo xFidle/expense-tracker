@@ -1,4 +1,4 @@
-package com.example.expenseapi.utils;
+package com.example.expenseapi.specification;
 
 import com.example.expenseapi.pojo.Group;
 import com.example.expenseapi.pojo.Membership;
