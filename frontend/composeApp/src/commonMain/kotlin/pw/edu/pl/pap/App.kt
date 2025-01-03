@@ -17,7 +17,6 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import pw.edu.pl.pap.screenComponents.RootComponent
-import pw.edu.pl.pap.ui.chartsScreen.ChartsScreen
 import pw.edu.pl.pap.ui.settingsScreens.SettingsScreen
 import pw.edu.pl.pap.ui.addExpense.NewExpenseScreen
 import pw.edu.pl.pap.ui.expenseDetails.ExpenseDetailsScreen
@@ -28,6 +27,7 @@ import pw.edu.pl.pap.ui.loginSystem.SignUpScreen
 import pw.edu.pl.pap.ui.navBar.BottomNavBar
 import pw.edu.pl.pap.ui.navBar.NavBarItem
 import androidx.compose.runtime.getValue
+import pw.edu.pl.pap.ui.chartsScreen.ChartsScreen
 import pw.edu.pl.pap.ui.settingsScreens.*
 
 // Todo refactor function, tweak animations

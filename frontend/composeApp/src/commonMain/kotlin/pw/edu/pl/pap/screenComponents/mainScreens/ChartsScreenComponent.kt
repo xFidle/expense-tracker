@@ -38,18 +38,22 @@ class ChartsScreenComponent(
     private val _plotData = MutableStateFlow<ChartData>(TreeMap())
     val plotData: StateFlow<ChartData> get() = _plotData
 
-    private val _userGroupInfo = MutableStateFlow<List<UserGroup>?>(emptyList())
-    val userGroupInfo: StateFlow<List<UserGroup>?> get() = _userGroupInfo
+    private val _userGroupInfo = MutableStateFlow<List<UserGroup>>(emptyList())
+    val userGroupInfo: StateFlow<List<UserGroup>> get() = _userGroupInfo
 
     private val _currentUserGroup = MutableStateFlow<UserGroup?>(null)
     val currentUserGroup: StateFlow<UserGroup?> get() = _currentUserGroup
 
+    fun updateUserGroup(key: UserGroup) {
+        _currentUserGroup.value = key
+    }
+
     private suspend fun populateGroupList() {
-        when (_userGroupInfo.value) {
-            null -> {
+        when {
+            _userGroupInfo.value.isEmpty() -> {
                 val userGroupInfo = apiService.groupApiClient.getUserGroups()
                 _userGroupInfo.value = userGroupInfo
-                _currentUserGroup.value = _userGroupInfo.value?.first()
+                _currentUserGroup.value = _userGroupInfo.value.first()
             }
             else -> return
         }
@@ -63,10 +67,11 @@ class ChartsScreenComponent(
     }
 
     private fun getChartData() {
-        coroutineScope.launch {
-            _plotData.value = apiService.chartsApiClient.getGroupYearData(2024)
-            println(_plotData.value)
-        }
+    }
+
+    fun getTotal(): Number {
+        //TODO
+        return 0
     }
 
 }
