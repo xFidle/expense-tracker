@@ -1,6 +1,12 @@
 package com.example.expenseapi.utils;
 
+import com.example.expenseapi.pojo.Group;
+import com.example.expenseapi.pojo.Membership;
 import com.example.expenseapi.pojo.User;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecification {
@@ -22,5 +28,25 @@ public class UserSpecification {
             String pattern = "%" + surname.toLowerCase() + "%";
             return criteriaBuilder.like(criteriaBuilder.lower(root.get("surname")), pattern);
         }));
+    }
+
+    public static Specification<User> notInGroup(String groupName) {
+        return ((root, query, criteriaBuilder) -> {
+            if (groupName == null) {
+                return criteriaBuilder.conjunction();
+            }
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<Membership> membershipRoot = subquery.from(Membership.class);
+            Join<Membership, Group> groupJoin = membershipRoot.join("group", JoinType.INNER);
+
+            subquery.select(membershipRoot.get("user").get("id"))
+                    .where(
+                            criteriaBuilder.equal(groupJoin.get("name"), groupName),
+                            criteriaBuilder.equal(membershipRoot.get("user").get("id"), root.get("id"))
+                    );
+            return criteriaBuilder.not(criteriaBuilder.exists(subquery));
+
+        }
+        );
     }
 }
