@@ -266,7 +266,10 @@ class RootComponent(
 //                    onInvitationsClicked = { userGroup ->
 //                        navigation.pushNew(Configuration.InvitationsScreen(userGroup))
 //                    },
+                    //TODO
                     onInvitationsClicked = {},
+                    onNewGroupClicked = {},
+                    onEditGroupClicked = {},
                     currentUserGroup = configuration.userGroup,
                 )
             )
