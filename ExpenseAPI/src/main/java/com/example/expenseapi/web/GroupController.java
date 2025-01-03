@@ -1,5 +1,6 @@
 package com.example.expenseapi.web;
 
+import com.example.expenseapi.dto.UserDTO;
 import com.example.expenseapi.pojo.Group;
 import com.example.expenseapi.service.MembershipService;
 import com.example.expenseapi.service.GroupService;
@@ -23,12 +24,12 @@ public class GroupController extends GenericController<Group, Long>{
     }
 
     @GetMapping("/members/{group}")
-    public ResponseEntity<List<com.example.expenseapi.pojo.User>> getMembers(@PathVariable String group){
+    public ResponseEntity<List<UserDTO>> getMembers(@PathVariable String group){
         return new ResponseEntity<>(membershipService.findUsers(group), HttpStatus.OK);
     }
 
     @GetMapping("/admins/{group}")
-    public ResponseEntity<List<com.example.expenseapi.pojo.User>> getAdmins(@PathVariable String group){
+    public ResponseEntity<List<UserDTO>> getAdmins(@PathVariable String group){
         return new ResponseEntity<>(membershipService.findAdmins(group), HttpStatus.OK);
     }
 }
