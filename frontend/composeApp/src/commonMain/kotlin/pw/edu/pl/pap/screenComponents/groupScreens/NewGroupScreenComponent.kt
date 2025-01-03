@@ -1,8 +1,7 @@
-package pw.edu.pl.pap.screenComponents.editGroupScreens
+package pw.edu.pl.pap.screenComponents.groupScreens
 
 import kotlinx.coroutines.runBlocking
 import pw.edu.pl.pap.data.databaseAssociatedData.NewGroup
-import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.screenComponents.mainScreens.BaseScreenComponent
 
 class NewGroupScreenComponent (

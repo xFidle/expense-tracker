@@ -1,17 +1,10 @@
-package pw.edu.pl.pap.screenComponents.editGroupScreens
+package pw.edu.pl.pap.screenComponents.groupScreens
 
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
-import androidx.compose.ui.text.input.KeyboardType
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import pw.edu.pl.pap.data.uiSetup.inputFields.DatePickerData
-import pw.edu.pl.pap.data.uiSetup.inputFields.DropdownListData
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
 import pw.edu.pl.pap.data.uiSetup.inputFields.TextFieldData
 import pw.edu.pl.pap.screenComponents.mainScreens.BaseScreenComponent
-import pw.edu.pl.pap.util.sanitizePriceInput
-import pw.edu.pl.pap.util.updatePrice
 
 open class BaseGroupEditScreenComponent(
     baseComponent: BaseScreenComponent,
