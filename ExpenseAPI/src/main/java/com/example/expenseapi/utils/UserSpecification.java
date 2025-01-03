@@ -9,7 +9,8 @@ public class UserSpecification {
             if (name == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.like(root.get("name"), "%" + name + "%");
+            String pattern = "%" + name.toLowerCase() + "%";
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), pattern);
         });
     }
 
@@ -18,7 +19,8 @@ public class UserSpecification {
             if (surname == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.like(root.get("surname"), "%" + surname + "%");
+            String pattern = "%" + surname.toLowerCase() + "%";
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get("surname")), pattern);
         }));
     }
 }
