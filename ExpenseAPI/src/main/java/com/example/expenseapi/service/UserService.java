@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface UserService extends GenericService<User, Long> {
     Optional<User> findByEmail(String email);
-    List<UserDTO> searchUsersDTO(UserFilter filter);
+    List<UserDTO> searchUsersDTO(UserFilter filter, String groupName);
 }

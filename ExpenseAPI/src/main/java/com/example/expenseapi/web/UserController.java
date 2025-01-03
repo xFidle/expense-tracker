@@ -34,6 +34,6 @@ public class UserController extends GenericController<User, Long>{
         UserFilter filter = new UserFilter();
         filter.setName(name);
         filter.setSurname(surname);
-        return new ResponseEntity<>(((UserService)service).searchUsersDTO(filter), HttpStatus.OK);
+        return new ResponseEntity<>(((UserService)service).searchUsersDTO(filter, groupName), HttpStatus.OK);
     }
 }
