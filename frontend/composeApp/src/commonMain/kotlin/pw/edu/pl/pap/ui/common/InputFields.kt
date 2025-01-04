@@ -1,40 +1,36 @@
 package pw.edu.pl.pap.ui.common
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.window.Popup
-import kotlinx.datetime.LocalDate
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.datetime.LocalDate
 import pw.edu.pl.pap.data.uiSetup.inputFields.*
-import pw.edu.pl.pap.util.constants.*
+import pw.edu.pl.pap.util.constants.horizontalPadding
+import pw.edu.pl.pap.util.constants.verticalPadding
 
 
 @Composable
 fun InputFields(inputFieldsData: List<InputFieldData>) {
     Box(
         modifier = Modifier.offset(x = 0.dp, y = 100.dp)
-    ){
+    ) {
         LazyColumn {
-            items(inputFieldsData) {
-                data -> createField(data)
+            items(inputFieldsData) { data ->
+                createField(data)
             }
         }
     }
@@ -42,8 +38,9 @@ fun InputFields(inputFieldsData: List<InputFieldData>) {
 
 @Composable
 private fun createField(data: InputFieldData) {
-    if (data.isButton) { createClickableCard(data.buttonData!!) }
-    else {
+    if (data.isButton) {
+        createClickableCard(data.buttonData!!)
+    } else {
         Card(
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier
@@ -77,10 +74,10 @@ private fun createField(data: InputFieldData) {
 @Composable
 private fun createTextField(
     data: TextFieldData
-){
+) {
     TextField(
         value = data.parameter.value,
-        onValueChange = {newParameter -> data.onChange(newParameter)},
+        onValueChange = { newParameter -> data.onChange(newParameter) },
         keyboardOptions = data.keyboardOptions ?: KeyboardOptions.Default
     )
 }
@@ -88,7 +85,7 @@ private fun createTextField(
 @Composable
 private fun createDropdownList(
     data: DropdownListData
-){
+) {
     var showDropdown by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
@@ -96,7 +93,8 @@ private fun createDropdownList(
         modifier = Modifier
             .width(250.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
+        verticalArrangement = Arrangement.Center
+    ) {
 
         // button
         Box(
@@ -107,43 +105,16 @@ private fun createDropdownList(
         )
         {
             Text(text = data.itemList[data.selectedIndex.value], modifier = Modifier.padding(3.dp))
-        }
 
-        // dropdown list
-        Box() {
-            if (showDropdown) {
-                Popup(
-                    alignment = Alignment.TopCenter,
-                    onDismissRequest = { showDropdown = false }
-                ) {
-
-                    Column(
-                        modifier = Modifier
-                            .heightIn(max = 200.dp)
-                            .width(250.dp)
-                            .background(Color.Gray)
-                            .verticalScroll(state = scrollState)
-                            .border(width = 1.dp, color = Color.Gray),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-
-                        data.itemList.onEachIndexed { index, item ->
-                            if (index != 0) {
-                                HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        data.onItemClick(index)
-                                        showDropdown = !showDropdown
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = item)
-                            }
-                        }
-
+            Row(modifier = Modifier.align(Alignment.Center)) {
+                // dropdown list
+                DropdownMenu(
+                    expanded = showDropdown, onDismissRequest = { showDropdown = false }) {
+                    data.itemList.forEachIndexed { idx, item ->
+                        DropdownMenuItem(text = { Text(item) }, onClick = {
+                            data.onItemClick(idx)
+                            showDropdown = false
+                        })
                     }
                 }
             }
@@ -155,7 +126,7 @@ private fun createDropdownList(
 @Composable
 private fun createDatePicker(
     data: DatePickerData
-){
+) {
     var showDatePicker by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf<LocalDate>(data.date.value) }
     val datePickerState = rememberDatePickerState()
@@ -172,7 +143,7 @@ private fun createDatePicker(
 
     if (showDatePicker) {
         DatePickerDialog(
-            onDismissRequest = {showDatePicker = false},
+            onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
                     val millis = datePickerState.selectedDateMillis
@@ -203,12 +174,12 @@ private fun createDatePicker(
 @Composable
 private fun createPasswordField(
     data: TextFieldData
-){
+) {
     var visibility by rememberSaveable { mutableStateOf(false) }
 
     TextField(
         value = data.parameter.value,
-        onValueChange = {newParameter -> data.onChange(newParameter)},
+        onValueChange = { newParameter -> data.onChange(newParameter) },
         visualTransformation = if (visibility) VisualTransformation.None else PasswordVisualTransformation(),
 //        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         keyboardOptions = data.keyboardOptions ?: KeyboardOptions.Default,
@@ -235,7 +206,7 @@ private fun createClickableCard(data: ButtonData) {
         } else {
             CardDefaults.cardColors()
         }
-    ){
+    ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
