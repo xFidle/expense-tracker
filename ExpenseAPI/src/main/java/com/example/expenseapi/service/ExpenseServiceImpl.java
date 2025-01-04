@@ -15,6 +15,8 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.beans.FeatureDescriptor;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -215,7 +217,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     private static String[] getNullPropertyNames(Object source) {
         BeanWrapper beanWrapper = new BeanWrapperImpl(source);
         return Arrays.stream(beanWrapper.getPropertyDescriptors())
-                .map(pd -> pd.getName())
+                .map(FeatureDescriptor::getName)
                 .filter(propertyName -> beanWrapper.getPropertyValue(propertyName) == null)
                 .toArray(String[]::new);
     }
