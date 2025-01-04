@@ -1,4 +1,4 @@
-package pw.edu.pl.pap.ui.chartsScreen.buttonRow
+package pw.edu.pl.pap.ui.chartsScreen.buttons
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Tune
