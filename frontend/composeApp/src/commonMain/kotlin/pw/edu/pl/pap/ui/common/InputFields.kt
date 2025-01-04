@@ -17,10 +17,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.datetime.LocalDate
 import pw.edu.pl.pap.data.uiSetup.inputFields.*
 import pw.edu.pl.pap.util.constants.horizontalPadding
 import pw.edu.pl.pap.util.constants.verticalPadding
+import pw.edu.pl.pap.util.dateFunctions.dateToMilis
 
 
 @Composable
@@ -128,8 +128,8 @@ private fun createDatePicker(
     data: DatePickerData
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf<LocalDate>(data.date.value) }
-    val datePickerState = rememberDatePickerState()
+    val selectedDate by remember { mutableStateOf(data.date.value) }
+    val datePickerState = rememberDatePickerState(dateToMilis(selectedDate))
 
     Box(
         modifier = Modifier
@@ -138,7 +138,7 @@ private fun createDatePicker(
         contentAlignment = Alignment.Center
     )
     {
-        Text(text = data.date.value.toString(), modifier = Modifier.padding(3.dp))
+        Text(text = selectedDate.toString(), modifier = Modifier.padding(3.dp))
     }
 
     if (showDatePicker) {
