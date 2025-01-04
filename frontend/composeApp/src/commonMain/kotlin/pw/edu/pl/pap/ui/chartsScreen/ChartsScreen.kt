@@ -1,47 +1,44 @@
 package pw.edu.pl.pap.ui.chartsScreen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.koalaplot.core.util.generateHueColorPalette
 import pw.edu.pl.pap.screenComponents.mainScreens.ChartsScreenComponent
+import pw.edu.pl.pap.ui.chartsScreen.buttons.ButtonRow
+import pw.edu.pl.pap.ui.chartsScreen.menus.GroupSelection
+import pw.edu.pl.pap.ui.chartsScreen.menus.TabBar
 import pw.edu.pl.pap.util.constants.horizontalPadding
 
-
+//TODO add plot and plot filters menu
 @Composable
 fun ChartsScreen(component: ChartsScreenComponent) {
-    var selectedTab by remember { mutableStateOf("Month") }
-    val tabs = listOf("Month", "Year", "Custom")
+    val plotData by component.plotData.collectAsState()
 
-    var isGroupMenuExpanded by remember { mutableStateOf(false) }
-    val selectedGroup by component.currentUserGroup.collectAsState()
-    val groups by component.userGroupInfo.collectAsState()
-
-    LaunchedEffect(component.navigationState.collectAsState()) {
+    LaunchedEffect(component.navigationState.collectAsState().value) {
         component.getDataBasedOnState()
     }
 
+    val colors = remember(plotData.size) { generateHueColorPalette(plotData.size) }
+
     Column(modifier = Modifier.fillMaxSize()) {
-        TabRow(
-            selectedTabIndex = tabs.indexOf(selectedTab), modifier = Modifier.fillMaxWidth()
+        TabBar(component)
+
+        ButtonRow(component)
+
+        Box(
+            modifier = Modifier.fillMaxWidth().height(300.dp), contentAlignment = Alignment.Center
         ) {
-            tabs.forEachIndexed { index, tab ->
-                Tab(selected = selectedTab == tab, onClick = { selectedTab = tab }, text = { Text(tab) })
+            if (plotData == emptyMap<String, Float>()) {
+                Text(text = "No data to display")
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Box(
-            modifier = Modifier.fillMaxWidth().height(200.dp).padding(8.dp), contentAlignment = Alignment.Center
-        ) {
-            Text(text = "Pie Chart Placeholder")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = horizontalPadding),
@@ -49,18 +46,7 @@ fun ChartsScreen(component: ChartsScreenComponent) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box {
-                TextButton(onClick = { isGroupMenuExpanded = true }) {
-                    selectedGroup?.let { Text(text = it.name) }
-                }
-                DropdownMenu(
-                    expanded = isGroupMenuExpanded, onDismissRequest = { isGroupMenuExpanded = false }) {
-                    groups.forEachIndexed { idx, group ->
-                        DropdownMenuItem(text = { Text(group.name) }, onClick = {
-                            component.updateUserGroup(groups[idx])
-                            isGroupMenuExpanded = false
-                        })
-                    }
-                }
+                GroupSelection(component)
             }
             Text(
                 text = "Total: ${component.getTotal()} zł",
@@ -69,17 +55,6 @@ fun ChartsScreen(component: ChartsScreenComponent) {
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(20) { index ->
-                ListItem(
-                    headlineContent = { Text("Item $index") },
-                    supportingContent = { Text("Details for Item $index") })
-                HorizontalDivider()
-            }
-        }
+        PlotDataList(colors, plotData)
     }
 }
