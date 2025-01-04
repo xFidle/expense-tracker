@@ -126,9 +126,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
-    public Map<String, Double> getMapResult(ExpenseFilter filter, String currCode, String keyType) {
+    public Map<String, Double> getMapResult(ExpenseFilter filter,  String keyType) {
         List<ExpenseDTO> result = searchExpensesDTO(filter);
-        Currency currency = currencyRepository.findBySymbol(currCode);
+        Currency currency = currencyRepository.findBySymbol(AuthHelper.getUser().getPreference().getCurrency().getSymbol());
         Function<ExpenseDTO, String> keyExtractor = findKeyExtractor(keyType);
         if (keyExtractor == null) throw new IllegalArgumentException("Invalid key type");
         return totalExpensesMap(result, keyExtractor, currency);
