@@ -91,6 +91,8 @@ public class ExpenseController extends GenericController<Expense, Long> {
     }
 
     @PutMapping("/modify/{id}")
+    @Operation(summary = "Update endpoint with mapping")
+    @ApiResponse(responseCode = "200", description = "Updated expense", content = @Content(schema = @Schema(implementation = ExpenseDTO.class)))
     public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable Long id, @RequestBody ExpenseDTO expenseDTO) {
         return new ResponseEntity<>(((ExpenseService) service).updateExpense(id, expenseDTO), HttpStatus.OK);
     }
