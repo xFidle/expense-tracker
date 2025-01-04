@@ -16,7 +16,6 @@ fun ExpenseDetailsScreen(
     val dialogFactory = remember { ConfirmationDialogFactory(component) }
 
     Header("Expense Details")
-    component.setupInputFields()
     InputFields(component.inputFieldsData)
 
     ExpenseDetailsButtonRow(

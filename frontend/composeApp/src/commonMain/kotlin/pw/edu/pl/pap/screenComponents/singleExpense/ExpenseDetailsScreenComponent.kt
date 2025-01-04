@@ -31,10 +31,18 @@ class ExpenseDetailsScreenComponent(
 
     override var userIndex: MutableState<Int> = mutableStateOf(expense.user.id.toInt())
 
-    val noChange by derivedStateOf { canConfirm && newPrice.value == formatForTextField(expense.price) }
+    val noChange by derivedStateOf { canConfirm && price.value == formatForTextField(expense.price) }
+
+    init {
+        setupInputFields()
+    }
 
     override fun confirm() {
-        val newExpense = expense.copy(price = newPrice.value.toFloat())
+        val newExpense = expense.copy(
+            title = title.value,
+            price = price.value.toFloat(),
+            expenseDate = date.value,
+        )
 
         if (newExpense == expense) {
             onDismiss()

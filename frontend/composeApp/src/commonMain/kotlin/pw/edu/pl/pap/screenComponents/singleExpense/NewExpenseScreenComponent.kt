@@ -12,6 +12,9 @@ class NewExpenseScreenComponent(
     private val currentUserGroup: UserGroup,
 ) : BaseExpenseScreenComponent(baseComponent, onDismiss, onSave) {
 
+    init {
+        setupInputFields()
+    }
 
     override fun confirm() {
         val newExpense = NewExpense(
