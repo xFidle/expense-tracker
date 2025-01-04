@@ -1,5 +1,6 @@
 package pw.edu.pl.pap.data.uiSetup.inputFields
 
+//TODO refactor to a sealed class with data classes that inherit from it
 data class InputFieldData(
     val title: String,
     val isDropdownList: Boolean = false,
