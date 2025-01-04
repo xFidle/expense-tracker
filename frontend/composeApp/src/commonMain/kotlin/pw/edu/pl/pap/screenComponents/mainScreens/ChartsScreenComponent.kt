@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
 import pw.edu.pl.pap.data.databaseAssociatedData.ChartFilterParams
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.util.charts.ChartData
@@ -20,17 +21,29 @@ class ChartsScreenComponent(
 
     sealed class NavigationState {
         data object InitialLoad : NavigationState()
+        data object LoadData : NavigationState()
         data object Empty : NavigationState()
     }
 
     private val _navigationState = MutableStateFlow<NavigationState>(NavigationState.InitialLoad)
     val navigationState: StateFlow<NavigationState> get() = _navigationState
 
+    fun updateNavigationState(newState: NavigationState) {
+        _navigationState.value = newState
+    }
+
+
     fun getDataBasedOnState() {
         when (_navigationState.value) {
             is NavigationState.InitialLoad -> {
                 coroutineScope.launch {
                     populateGroupList()
+                    getPlotData()
+                }
+            }
+
+            is NavigationState.LoadData -> {
+                coroutineScope.launch {
                     getPlotData()
                 }
             }
@@ -66,21 +79,15 @@ class ChartsScreenComponent(
 
     fun updateCurrentUserGroup(key: UserGroup) {
         _currentUserGroup.value = key
-        _navigationState.value = NavigationState.InitialLoad
+        _navigationState.value = NavigationState.LoadData
     }
 
     private suspend fun populateGroupList() {
-        when {
-            _userGroupInfo.value.isEmpty() -> {
-                val userGroupInfo = apiService.groupApiClient.getUserGroups()
-                _userGroupInfo.value = userGroupInfo
-                _currentUserGroup.value = _userGroupInfo.value.first()
-                println(_userGroupInfo.value)
-                println(_currentUserGroup.value)
-            }
-
-            else -> return
-        }
+        val userGroupInfo = apiService.groupApiClient.getUserGroups()
+        _userGroupInfo.value = userGroupInfo
+        _currentUserGroup.value = _userGroupInfo.value.first()
+        println(_userGroupInfo.value)
+        println(_currentUserGroup.value)
     }
 
     private suspend fun getPlotData() {
@@ -91,9 +98,7 @@ class ChartsScreenComponent(
 
         println("get plot data")
         _plotData.value = apiService.chartsApiClient.getData(
-            _currentUserGroup.value!!.name,
-            "category",
-            _chartFilters.value
+            _currentUserGroup.value!!.name, "category", _chartFilters.value
         )
         println(_plotData.value)
     }
@@ -118,25 +123,50 @@ class ChartsScreenComponent(
             }
         }
         _currentTimeFrame.value = newTimeFrame
-        _navigationState.value = NavigationState.InitialLoad
+        _navigationState.value = NavigationState.LoadData
     }
 
-    fun changeTimeBounds(
-        operation: (LocalDate, Int, DateTimeUnit) -> LocalDate,
+    /**
+     * Shifts current time bounds by a given number of months or years
+     * depending on current time frame
+     *
+     * @param amount The amount to change current bounds
+     */
+    fun modifyTimeBounds(
+        amount: Int,
     ) {
+        val curDate = _currentTimeBounds.value.first!!
+        val unit: DateTimeUnit
+        val newDate: LocalDate
+
         when (_currentTimeFrame.value) {
             FilterTimeFrames.MONTH -> {
-                val curDate = _currentTimeBounds.value.first!!
-                val newDate = operation(curDate, 1, DateTimeUnit.MONTH)
+                unit = DateTimeUnit.MONTH
+                newDate = curDate.plus(amount, unit)
                 _currentTimeBounds.value = getFirstAndLastDayOfAMonth(newDate)
             }
+
             FilterTimeFrames.YEAR -> {
-                val curDate = _currentTimeBounds.value.first!!
-                val newDate = operation(curDate, 1, DateTimeUnit.YEAR)
+                unit = DateTimeUnit.YEAR
+                newDate = curDate.plus(amount, unit)
                 _currentTimeBounds.value = getFirstAndLastDayOfAYear(newDate)
             }
+
             FilterTimeFrames.CUSTOM -> return
         }
-        _navigationState.value = NavigationState.InitialLoad
+        _navigationState.value = NavigationState.LoadData
+    }
+
+    /**
+     * Modifies time bounds to custom date range from
+     * given begin and end date
+     *
+     * @param beginDate time bounds start date
+     * @param endDate time bounds end date
+     */
+    fun modifyTimeBounds(beginDate: LocalDate?, endDate: LocalDate?) {
+        val newTimeBounds = Pair(beginDate, endDate)
+        _currentTimeBounds.value = newTimeBounds
+        _navigationState.value = NavigationState.LoadData
     }
 }
