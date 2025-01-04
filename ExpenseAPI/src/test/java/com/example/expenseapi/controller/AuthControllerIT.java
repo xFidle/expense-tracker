@@ -1,0 +1,46 @@
+package com.example.expenseapi.controller;
+
+import com.example.expenseapi.utils.TokenGenerator;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+@ActiveProfiles("test")
+@SpringBootTest
+@AutoConfigureMockMvc
+public class AuthControllerIT {
+    private final MockMvc mockMvc;
+    private final TokenGenerator tokenGenerator;
+
+    @Autowired
+    public AuthControllerIT(MockMvc mockMvc, TokenGenerator tokenGenerator) {
+        this.mockMvc = mockMvc;
+        this.tokenGenerator = tokenGenerator;
+    }
+
+    @Test
+    void testNoData() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login"))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+    }
+
+    @Test
+    void testLogin() throws Exception {
+        String jsonRequestBody = """
+                {
+                    "email": "herkules1@gmail.com",
+                    "password": "123"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
+                .content(jsonRequestBody)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+    }
+}
