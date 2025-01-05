@@ -34,5 +34,68 @@ class ChartsFilterScreenComponent(
     private var selectedMethods: SnapshotStateList<Int>? = null
     private lateinit var selectedKeyPattern: MutableState<Int>
 
+    init {
+        coroutineScope.launch {
+            val categoriesCor = async { apiService.categoryApiClient.getCategories() }
+            val usersCor = async { apiService.groupApiClient.getUsersInGroup(currentGroup.name) }
+            val methodsCor = async { apiService.paymentMethodApiClient.getMethods() }
+            try {
+                categories = categoriesCor.await()
+                users = usersCor.await()
+                methods = methodsCor.await()
+                patternKeys = listOf("category", "user", "method") //TODO add api request for keys
+
+                selectedCategories =
+                    getIndicesFromItems(categories, filterParams.categoryNames, Category::name)?.toMutableStateList()
+                selectedEmails = getIndicesFromItems(users, filterParams.emails, User::email)?.toMutableStateList()
+                selectedMethods =
+                    getIndicesFromItems(methods, filterParams.methods, PaymentMethod::name)?.toMutableStateList()
+                selectedKeyPattern = mutableStateOf(patternKeys.indexOf(currentKeyPattern))
+
+                initializeInputFieldsData()
+            } catch (e: Exception) {
+                println("Error fetching data: ${e.message}")
+            }
+        }
+    }
+
+    private fun initializeInputFieldsData() {
+        _inputFieldsData.clear()
+        _inputFieldsData.addAll(
+            listOf(
+                InputFieldData.DropdownListData(
+                    title = "Group by",
+                    itemList = patternKeys,
+                    selectedIndex = selectedKeyPattern,
+                    onItemClick = { selectedKeyPattern.value = it }),
+                InputFieldData.CheckboxData(
+                    title = "Categories",
+                    itemList = categories.map { it.name },
+                    selectedIndices = selectedCategories,
+                    onConfirm = { selectedCategories = it?.toMutableStateList() }),
+                InputFieldData.CheckboxData(
+                    title = "Users",
+                    itemList = users.map { "${it.name} ${it.surname}" },
+                    selectedIndices = selectedEmails,
+                    onConfirm = { selectedEmails = it?.toMutableStateList() }),
+                InputFieldData.CheckboxData(
+                    title = "Payment methods",
+                    itemList = methods.map { it.name },
+                    selectedIndices = selectedMethods,
+                    onConfirm = { selectedMethods = it?.toMutableStateList() })
+            )
+        )
+    }
+
+    private fun <T : Any> getIndicesFromItems(
+        dataList: List<T>, items: List<String>?, field: KProperty1<T, *>
+    ): List<Int>? {
+        return items?.let {
+            dataList.mapIndexedNotNull { index, item ->
+                val fieldValue = field.get(item) as? String
+                if (fieldValue in items) index else null
+            }
+        }
+    }
 
 }
