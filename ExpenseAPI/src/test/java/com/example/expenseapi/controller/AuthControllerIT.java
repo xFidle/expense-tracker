@@ -31,7 +31,7 @@ public class AuthControllerIT {
     }
 
     @Test
-    void testLogin() throws Exception {
+    void testLoginSuccessful() throws Exception {
         String jsonRequestBody = """
                 {
                     "email": "herkules1@gmail.com",
@@ -42,5 +42,64 @@ public class AuthControllerIT {
                 .content(jsonRequestBody)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+    }
+
+
+    @Test
+    void testLoginWrongEmail() throws Exception {
+        String jsonRequestBody = """
+                {
+                    "email": "herkules2@gmail.com",
+                    "password": "123"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
+                .content(jsonRequestBody)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
+    void testLoginWrongPassword() throws Exception {
+        String jsonRequestBody = """
+                {
+                    "email": "herkules1@gmail.com",
+                    "password": "1234"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
+                .content(jsonRequestBody)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+    @Test
+    void testRegisterSuccessful() throws Exception {
+        String jsonRequestBody = """
+                {
+                    "name": "Jurek",
+                    "surname": "Ogorek",
+                    "email": "jurekogorek2@gmail.com",
+                    "password": "rura"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .content(jsonRequestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+    }
+    @Test
+    void testRegisterEmailConflict() throws Exception {
+        String jsonRequestBody = """
+                {
+                    "name": "Jurek",
+                    "surname": "Ogorek",
+                    "email": "herkules1@gmail.com",
+                    "password": "rura"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .content(jsonRequestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isConflict());
     }
 }
