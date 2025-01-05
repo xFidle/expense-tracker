@@ -1,7 +1,6 @@
 package com.example.expenseapi.web;
 
 import com.example.expenseapi.pojo.User;
-import com.example.expenseapi.repository.UserRepository;
 import com.example.expenseapi.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
