@@ -7,7 +7,8 @@ fun generateParamRequest(filterParams: FilterParams): String {
     val propertyMap = filterParams.toMap()
     propertyMap.forEach { (key, value) ->
         if (value == "") return@forEach
-        query += "$key=$value&"
+        val param = "$key=$value&".replace(Regex("[\\[\\] ]"), "")
+        query += param
     }
-    return query
+    return query.removeSuffix("?").removeSuffix("&")
 }

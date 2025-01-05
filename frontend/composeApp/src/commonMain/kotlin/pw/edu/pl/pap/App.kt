@@ -28,6 +28,7 @@ import pw.edu.pl.pap.ui.navBar.BottomNavBar
 import pw.edu.pl.pap.ui.navBar.NavBarItem
 import androidx.compose.runtime.getValue
 import pw.edu.pl.pap.ui.chartsScreen.ChartsScreen
+import pw.edu.pl.pap.ui.chartsScreen.filterScreen.ChartsFilterScreen
 import pw.edu.pl.pap.ui.settingsScreens.*
 
 // Todo refactor function, tweak animations
@@ -77,6 +78,8 @@ fun App(rootComponent: RootComponent) {
                             is RootComponent.Child.ExpenseDetailsScreen -> ExpenseDetailsScreen(instance.component)
 
                             is RootComponent.Child.ChartsScreen -> ChartsScreen(instance.component)
+                            is RootComponent.Child.ChartsFilterScreen -> ChartsFilterScreen(instance.component)
+
                             is RootComponent.Child.SettingsScreen -> SettingsScreen(instance.component)
 
                             is RootComponent.Child.ServerAddressScreen -> ServerAddressScreen(instance.component)

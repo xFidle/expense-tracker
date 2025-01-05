@@ -18,12 +18,18 @@ import java.util.*
 
 class ChartsScreenComponent(
     baseComponent: BaseScreenComponent,
+    val onFilterClick: (ChartFilterParams, UserGroup, String) -> Unit,
 ) : BaseScreenComponent by baseComponent {
 
     sealed class NavigationState {
         data object InitialLoad : NavigationState()
         data object LoadData : NavigationState()
         data object Empty : NavigationState()
+
+        data class FromFilterScreen(
+            val filterParams: ChartFilterParams,
+            val patternKey: String
+        ) : NavigationState()
     }
 
     private val _navigationState = MutableStateFlow<NavigationState>(NavigationState.InitialLoad)
@@ -43,7 +49,17 @@ class ChartsScreenComponent(
                 }
             }
 
-            is NavigationState.LoadData -> {
+            is NavigationState.LoadData  -> {
+                coroutineScope.launch {
+                    getPlotData()
+                }
+            }
+
+            is NavigationState.FromFilterScreen -> {
+                val newKeyPattern = (_navigationState.value as NavigationState.FromFilterScreen).patternKey
+                val newFilterParams = (_navigationState.value as NavigationState.FromFilterScreen).filterParams
+                _keyPattern.value = newKeyPattern
+                _chartFilters.value = newFilterParams
                 coroutineScope.launch {
                     getPlotData()
                 }
@@ -58,6 +74,8 @@ class ChartsScreenComponent(
 
     private val _chartFilters = MutableStateFlow(ChartFilterParams())
     val chartFilters: StateFlow<ChartFilterParams> get() = _chartFilters
+
+    private val _keyPattern = MutableStateFlow("category") //TODO fetch default keyPattern
 
     private val _plotData = MutableStateFlow<ChartData>(TreeMap())
     val plotData: StateFlow<ChartData> get() = _plotData
@@ -99,14 +117,13 @@ class ChartsScreenComponent(
 
         println("get plot data")
         _plotData.value = apiService.chartsApiClient.getData(
-            _currentUserGroup.value!!.name, "category", _chartFilters.value
+            _currentUserGroup.value!!.name, _keyPattern.value, _chartFilters.value
         )
         println(_plotData.value)
     }
 
-    fun getTotal(): Number {
-        //TODO
-        return 0
+    fun getTotal(): Double {
+        return plotData.value.values.sumOf { it.toDouble() }
     }
 
     fun changeTimeFrame(newTimeFrame: FilterTimeFrames) {
