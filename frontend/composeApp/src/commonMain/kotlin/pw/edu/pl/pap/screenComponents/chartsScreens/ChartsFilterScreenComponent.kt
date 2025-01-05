@@ -98,4 +98,31 @@ class ChartsFilterScreenComponent(
         }
     }
 
+    private fun <T : Any> getItemsFromIndices(
+        dataList: List<T>, indices: List<Int>?, field: KProperty1<T, *>
+    ): List<String>? {
+        return indices?.let {
+            dataList.mapIndexedNotNull { index, item ->
+                if (index in indices) field.get(item) as? String else null
+            }
+        }
+    }
+
+    fun confirm() {
+        val newFilterParams = filterParams.copy(
+            categoryNames = getItemsFromIndices(categories, selectedCategories, Category::name),
+            emails = getItemsFromIndices(users, selectedEmails, User::email),
+            methods = getItemsFromIndices(methods, selectedMethods, PaymentMethod::name)
+        )
+        onConfirm(newFilterParams, patternKeys[selectedKeyPattern.value])
+    }
+
+    //TODO find a way to force recomposition after reset
+//    fun reset() {
+//        selectedCategories = null
+//        selectedEmails = null
+//        selectedMethods = null
+//        selectedKeyPattern.value = 0 //TODO switch to default key probably category needs improving
+//        initializeInputFieldsData()
+//    }
 }
