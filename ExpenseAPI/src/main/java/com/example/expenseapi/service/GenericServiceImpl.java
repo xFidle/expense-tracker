@@ -2,12 +2,12 @@ package com.example.expenseapi.service;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public class GenericServiceImpl<T, ID> implements GenericService<T, ID> {
-    private final CrudRepository<T, ID> repository;
+    private final JpaRepository<T, ID> repository;
 
-    public GenericServiceImpl(CrudRepository<T, ID> repository) {
+    public GenericServiceImpl(JpaRepository<T, ID> repository) {
         this.repository = repository;
     }
 
@@ -18,7 +18,7 @@ public class GenericServiceImpl<T, ID> implements GenericService<T, ID> {
 
     @Override
     public List<T> getAll() {
-        return (List<T>) repository.findAll();
+        return repository.findAll();
     }
 
     @Override
