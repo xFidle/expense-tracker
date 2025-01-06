@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class BaseGroup {
+public abstract class BaseGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "base_group_gen")
     @SequenceGenerator(
