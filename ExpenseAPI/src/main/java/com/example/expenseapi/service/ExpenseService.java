@@ -5,21 +5,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.example.expenseapi.dto.ExpenseCreateDTO;
+import com.example.expenseapi.dto.ExpenseDTO;
+import com.example.expenseapi.filter.ExpenseFilter;
 import com.example.expenseapi.pojo.Category;
 import com.example.expenseapi.pojo.ExpInfo;
 import com.example.expenseapi.pojo.Expense;
 
 public interface ExpenseService extends GenericService<Expense, Long> {
-    List<Expense> getExpensesByEmail(String email);
-    List<Expense> getExpensesByCategory(String category);
-    List<Expense> getExpensesByDate(String date);
-    List<Expense> getExpensesByPeriod(String begin, String end);
-    List<Expense> getExpensesWherePriceInRange(double left_end, double right_end);
-    List<Expense> getExpensesWherePriceIsLower(double price);
-    List<Expense> getExpensesWherePriceIsGreater(double price);
-    List<Expense> getExpensesForGroup(String name);
+    List<ExpenseDTO> getExpensesForGroup(String name);
+    List<ExpenseDTO> getExpensesForUser();
+    ExpInfo getExpInfo(String group);
     ExpInfo getExpInfo();
-    Map<LocalDate, List<Expense>> getDateExpenseAsMap();
-    Map<Category, List<Expense>> getCategoryExpenseAsMap();
-    Optional<Expense> getRecentExpense();
+    Map<String, Double> getMapResult(ExpenseFilter filter, String keyType);
+    Optional<ExpenseDTO> getRecentExpense(String groupName);
+    Map<LocalDate, List<ExpenseDTO>> getGroupExpenseAsDateMap(String name);
+    Map<Category, List<ExpenseDTO>> getGroupExpenseAsCategoryMap(String name);
+    List<ExpenseDTO> searchExpensesDTO(ExpenseFilter filter);
+    ExpenseDTO createExpense(ExpenseCreateDTO createDTO);
+    ExpenseDTO updateExpense(Long id, ExpenseDTO expenseDTO);
+    List<String> getPatternKeys();
 }

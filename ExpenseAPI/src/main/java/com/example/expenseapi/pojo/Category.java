@@ -13,11 +13,11 @@ import lombok.*;
 
 public class Category {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name", nullable = false, columnDefinition = "VARCHAR(255)")
+    @Column(name = "name", nullable = false)
     private String name = "food";
 
     public Category(String name) {
