@@ -53,7 +53,7 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     }
 
     @Override
-    public String getRole(User user, BaseMembership entity) {
+    public String getRole(User user, Membership entity) {
         return getMembershipsByUserId(user.getId())
                 .stream()
                 .filter(membership -> membership.getGroup().getId().equals(entity.getGroup().getId()))
