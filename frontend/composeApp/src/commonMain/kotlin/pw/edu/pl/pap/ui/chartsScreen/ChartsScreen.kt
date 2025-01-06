@@ -15,16 +15,16 @@ import pw.edu.pl.pap.ui.chartsScreen.menus.TabBar
 import pw.edu.pl.pap.util.constants.horizontalPadding
 import pw.edu.pl.pap.util.formatForDisplay
 
+
 //TODO add plot and plot filters menu
 @Composable
 fun ChartsScreen(component: ChartsScreenComponent) {
     val plotData by component.plotData.collectAsState()
+    val colors = remember(plotData.size) { generateHueColorPalette(plotData.size) }
 
     LaunchedEffect(component.navigationState.collectAsState().value) {
         component.getDataBasedOnState()
     }
-
-    val colors = remember(plotData.size) { generateHueColorPalette(plotData.size) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabBar(component)
@@ -32,10 +32,16 @@ fun ChartsScreen(component: ChartsScreenComponent) {
         ButtonRow(component)
 
         Box(
-            modifier = Modifier.fillMaxWidth().height(300.dp), contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f),
+            contentAlignment = Alignment.Center
         ) {
             if (plotData == emptyMap<String, Float>()) {
                 Text(text = "No data to display")
+            } else {
+                Chart(
+                    colors,
+                    plotData.values.toList(),
+                )
             }
         }
 
