@@ -2,7 +2,6 @@ package com.example.expenseapi.service;
 
 import com.example.expenseapi.dto.UserDTO;
 import com.example.expenseapi.pojo.BaseGroup;
-import com.example.expenseapi.pojo.BaseMembership;
 import com.example.expenseapi.pojo.Membership;
 import com.example.expenseapi.pojo.User;
 

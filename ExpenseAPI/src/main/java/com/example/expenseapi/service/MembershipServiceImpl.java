@@ -4,7 +4,6 @@ import com.example.expenseapi.dto.UserDTO;
 import com.example.expenseapi.exception.ForbiddenException;
 import com.example.expenseapi.mapper.UserMapper;
 import com.example.expenseapi.pojo.BaseGroup;
-import com.example.expenseapi.pojo.BaseMembership;
 import com.example.expenseapi.pojo.Membership;
 import com.example.expenseapi.pojo.User;
 import com.example.expenseapi.repository.MembershipRepository;
