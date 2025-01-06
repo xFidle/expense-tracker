@@ -1,5 +1,7 @@
-package com.example.expenseapi.exception;
+package com.example.expenseapi.utils;
 
+import com.example.expenseapi.exception.BadRequestException;
+import com.example.expenseapi.exception.ForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
