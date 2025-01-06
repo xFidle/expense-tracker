@@ -7,7 +7,7 @@ integration_tests:
   tags: 
     - backend
   stage: integration_test
-  image: maven:3.9.2-eclipse-temurin-21
+  image: maven:3.9.9-eclipse-temurin-21
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   before_script:
