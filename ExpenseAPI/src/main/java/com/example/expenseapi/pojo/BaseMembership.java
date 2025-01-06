@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class BaseMembership {
+public abstract class BaseMembership {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "base_membership_gen")
     @SequenceGenerator(
