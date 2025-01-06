@@ -14,7 +14,7 @@ integration_tests:
     - cd ExpenseAPI
     - mvn clean compile
   script:
-    - mvn test -Dtest=controllerTests.MyControllerTests
+    - mvn test -Dtest=*IT*
   cache:
     paths:
       - ExpenseAPI/.m2/repository
