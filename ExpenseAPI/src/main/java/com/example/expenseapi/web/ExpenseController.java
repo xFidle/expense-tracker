@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,15 +45,18 @@ public class ExpenseController extends GenericController<Expense, Long> {
     @GetMapping("/my/expenses")
     @Operation(summary = "Retrieves expenses from logged-in user")
     @ApiResponse(responseCode = "200", description = "List of expense objects from logged user", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ExpenseDTO.class))))
-    public ResponseEntity<List<ExpenseDTO>> getMyExpenses() {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesForUser(), HttpStatus.OK);
+    public ResponseEntity<Page<ExpenseDTO>> getMyExpenses(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return new ResponseEntity<>(((ExpenseService) service).getExpensesForUser(page, size), HttpStatus.OK);
     }
 
     @GetMapping("/my/group/{name}")
     @Operation(summary = "Retrieves expenses for group of logged-in user")
     @ApiResponse(responseCode = "200", description = "List of expense object for group of logged-in user", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ExpenseDTO.class))))
-    public ResponseEntity<List<ExpenseDTO>> getByGroup(@PathVariable String name) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesForGroup(name), HttpStatus.OK);
+    public ResponseEntity<Page<ExpenseDTO>> getByGroup(@PathVariable String name, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+        return new ResponseEntity<>(((ExpenseService) service).getExpensesForGroup(name, page, size), HttpStatus.OK);
     }
 
     @GetMapping("/state/allGroups")
@@ -72,15 +76,15 @@ public class ExpenseController extends GenericController<Expense, Long> {
     @GetMapping("/dateMap/group/{name}")
     @Operation(summary = "Returns objects grouped by date for group of logged-in user")
     @ApiResponse(responseCode = "200", description = "All expenses grouped by date")
-    public ResponseEntity<Map<LocalDate, List<ExpenseDTO>>> getDateExpensesMap(@PathVariable String name) {
-        return new ResponseEntity<>(((ExpenseService) service).getGroupExpenseAsDateMap(name), HttpStatus.OK);
+    public ResponseEntity<Map<LocalDate, List<ExpenseDTO>>> getDateExpensesMap(@PathVariable String name, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+        return new ResponseEntity<>(((ExpenseService) service).getGroupExpenseAsDateMap(name, page, size), HttpStatus.OK);
     }
 
     @GetMapping("/categoryMap/group/{name}")
     @Operation(summary = "Returns objects grouped by category for group of logged-in user")
     @ApiResponse(responseCode = "200", description = "All expenses grouped by category")
-    public ResponseEntity<Map<Category, List<ExpenseDTO>>> getCategoryExpenseMap(@PathVariable String name) {
-        return new ResponseEntity<>(((ExpenseService) service).getGroupExpenseAsCategoryMap(name), HttpStatus.OK);
+    public ResponseEntity<Map<Category, List<ExpenseDTO>>> getCategoryExpenseMap(@PathVariable String name, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+        return new ResponseEntity<>(((ExpenseService) service).getGroupExpenseAsCategoryMap(name, page, size), HttpStatus.OK);
     }
 
     @GetMapping("/recent/{groupName}")
