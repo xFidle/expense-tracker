@@ -5,7 +5,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,7 +13,6 @@ import pw.edu.pl.pap.ui.common.LoadingScreen
 import pw.edu.pl.pap.ui.home.sortingSystem.ButtonRow
 import pw.edu.pl.pap.ui.home.sortingSystem.GroupKeyPopup
 import pw.edu.pl.pap.ui.common.UserGroupPopup
-import pw.edu.pl.pap.util.constants.padding
 
 @Composable
 fun HomeScreen(component: HomeScreenComponent) {
@@ -24,8 +22,7 @@ fun HomeScreen(component: HomeScreenComponent) {
 //    val homeInfo by component.homeInfo.collectAsState()
 //    val groupedExpenses by component.groupedExpenses.collectAsState()
 
-    LaunchedEffect(component.navigationState.collectAsState()) {
-        component.fetchHomeInfo()
+    LaunchedEffect(component.navigationState.collectAsState().value) {
         component.getDataBasedOnState()
         isLoading = false
     }
@@ -36,7 +33,7 @@ fun HomeScreen(component: HomeScreenComponent) {
 
             else -> {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(padding)
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     item {
                         TopSection(component)

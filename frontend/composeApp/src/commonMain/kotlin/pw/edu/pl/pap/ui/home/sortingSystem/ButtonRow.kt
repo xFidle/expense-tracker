@@ -35,7 +35,6 @@ fun ButtonRow(
 
             RefreshButton {
                 component.updateNavigationState(HomeScreenComponent.NavigationState.InitialLoad)
-                component.getDataBasedOnState()
             }
         }
     }

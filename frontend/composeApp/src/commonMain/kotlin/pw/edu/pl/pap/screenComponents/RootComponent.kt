@@ -19,14 +19,18 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import pw.edu.pl.pap.api.ApiService
 import pw.edu.pl.pap.api.authApi.LoginApi
+import pw.edu.pl.pap.data.databaseAssociatedData.ChartFilterParams
 import pw.edu.pl.pap.data.databaseAssociatedData.Expense
 import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
+import pw.edu.pl.pap.screenComponents.chartsScreens.ChartsFilterScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.EditGroupScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.MemberScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.NewGroupScreenComponent
 import pw.edu.pl.pap.screenComponents.loginSystem.*
-import pw.edu.pl.pap.screenComponents.mainScreens.*
+import pw.edu.pl.pap.screenComponents.mainScreens.ChartsScreenComponent
+import pw.edu.pl.pap.screenComponents.mainScreens.HomeScreenComponent
+import pw.edu.pl.pap.screenComponents.mainScreens.SettingsScreenComponent
 import pw.edu.pl.pap.screenComponents.settingsScreens.*
 import pw.edu.pl.pap.screenComponents.singleExpense.ExpenseDetailsScreenComponent
 import pw.edu.pl.pap.screenComponents.singleExpense.NewExpenseScreenComponent
@@ -77,6 +81,12 @@ class RootComponent(
         data object ChartsScreen : Configuration()
 
         @Serializable
+        data class ChartsFilterScreen(
+            val filterParams: ChartFilterParams,
+            val currentGroup: UserGroup,
+            val currentKeyPattern: String
+        ) : Configuration()
+
         data class GroupScreen(val userGroup: UserGroup) : Configuration()
 
         @Serializable
@@ -112,28 +122,21 @@ class RootComponent(
         apiClient = LoginApi(baseUrl, httpClient),
         onConfirm = { navigation.replaceAll(Configuration.HomeScreen) },
         onBack = { navigation.pop() },
-        setToken = { newToken -> apiService = ApiService(newToken, httpClient, baseUrl) }
-    )
+        setToken = { newToken -> apiService = ApiService(newToken, httpClient, baseUrl) })
 
     private fun createMainScreenComponent(
         componentContext: ComponentContext
     ): BaseScreenComponent = BaseScreenComponentImpl(
-        componentContext = componentContext,
-        apiService = apiService,
-        coroutineScope = coroutineScope
+        componentContext = componentContext, apiService = apiService, coroutineScope = coroutineScope
     )
 
     private fun createSettingsScreenComponent(
         componentContext: ComponentContext
     ): BaseSettingsScreenComponent = SettingsScreenComponentHelper(
-        componentContext = componentContext,
-        apiService = apiService,
-        coroutineScope = coroutineScope,
-        onBack = {
+        componentContext = componentContext, apiService = apiService, coroutineScope = coroutineScope, onBack = {
             navigation.pop()
             navBarItemClicked(NavBarItem.Settings)
-        }
-    )
+        })
 
     sealed class Child {
         data class LogInSignUpSelectionScreen(val component: SelectionLoginSignupScreenComponent) : Child()
@@ -145,7 +148,11 @@ class RootComponent(
         data class ExpenseDetailsScreen(val component: ExpenseDetailsScreenComponent) : Child()
 
         data class ChartsScreen(val component: ChartsScreenComponent) : Child()
+
+        data class ChartsFilterScreen(val component: ChartsFilterScreenComponent) : Child()
+
         data class GroupScreen(val component: GroupScreenComponent) : Child()
+
         data class SettingsScreen(val component: SettingsScreenComponent) : Child()
 
         data class MemberScreen(val component: MemberScreenComponent) : Child()
@@ -264,8 +271,38 @@ class RootComponent(
             is Configuration.ChartsScreen -> Child.ChartsScreen(
                 ChartsScreenComponent(
                     baseComponent = createMainScreenComponent(componentContext),
+                    onFilterClick = { filterParams, currentGroup, patternKey ->
+                        navigation.pushNew(
+                            Configuration.ChartsFilterScreen(
+                                filterParams,
+                                currentGroup,
+                                patternKey
+                            )
+                        )
+                    }
                 )
             )
+
+            is Configuration.ChartsFilterScreen -> {
+                Child.ChartsFilterScreen(
+                    ChartsFilterScreenComponent(
+                        baseComponent = createMainScreenComponent(componentContext),
+                        onDismiss = { navigation.pop() },
+                        onConfirm = { newFilterParams, currentKeyPattern ->
+                            navigation.pop()
+                            (childStack.value.active.instance as Child.ChartsScreen).component.updateNavigationState(
+                                ChartsScreenComponent.NavigationState.FromFilterScreen(
+                                    newFilterParams,
+                                    currentKeyPattern
+                                )
+                            )
+                        },
+                        filterParams = configuration.filterParams,
+                        currentGroup = configuration.currentGroup,
+                        currentKeyPattern = configuration.currentKeyPattern
+                    )
+                )
+            }
 
             is Configuration.GroupScreen -> Child.GroupScreen(
                 component = GroupScreenComponent(

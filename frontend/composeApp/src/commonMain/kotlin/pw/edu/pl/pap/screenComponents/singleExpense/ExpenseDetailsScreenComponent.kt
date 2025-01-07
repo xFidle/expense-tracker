@@ -5,7 +5,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import pw.edu.pl.pap.data.databaseAssociatedData.Expense
-import pw.edu.pl.pap.screenComponents.mainScreens.BaseScreenComponent
+import pw.edu.pl.pap.screenComponents.BaseScreenComponent
 import pw.edu.pl.pap.util.formatForTextField
 
 class ExpenseDetailsScreenComponent(
@@ -22,18 +22,27 @@ class ExpenseDetailsScreenComponent(
 
     override var date: MutableState<LocalDate> = mutableStateOf(expense.expenseDate)
 
-    override var newPrice: MutableState<String> = mutableStateOf(formatForTextField(expense.price))
+    override var price: MutableState<String> = mutableStateOf(formatForTextField(expense.price))
 
     override var currencyIndex: MutableState<Int> = mutableStateOf(expense.currency.id.toInt() - 1)
 
-    override var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(methodsOfPayment.indexOf(expense.methodOfPayment))
+    //TODO when no given currency in list there's an out of bounds error for index -1
+    override var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(methodsOfPayment.indexOf(expense.methodOfPayment.name))
 
     override var userIndex: MutableState<Int> = mutableStateOf(expense.user.id.toInt())
 
-    val noChange by derivedStateOf { canConfirm && newPrice.value == formatForTextField(expense.price) }
+    val noChange by derivedStateOf { canConfirm && price.value == formatForTextField(expense.price) }
+
+    init {
+        setupInputFields()
+    }
 
     override fun confirm() {
-        val newExpense = expense.copy(price = newPrice.value.toFloat())
+        val newExpense = expense.copy(
+            title = title.value,
+            price = price.value.toFloat(),
+            expenseDate = date.value,
+        )
 
         if (newExpense == expense) {
             onDismiss()

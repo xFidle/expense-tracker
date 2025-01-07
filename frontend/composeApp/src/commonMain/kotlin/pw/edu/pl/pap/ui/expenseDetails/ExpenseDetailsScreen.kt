@@ -22,7 +22,6 @@ fun ExpenseDetailsScreen(
     ) }
 
     Header("Expense Details")
-    component.setupInputFields()
     InputFields(component.inputFieldsData)
 
     BackDeleteAddButtonRow(

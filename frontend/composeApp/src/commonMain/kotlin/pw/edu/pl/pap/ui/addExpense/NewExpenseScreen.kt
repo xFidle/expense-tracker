@@ -14,7 +14,6 @@ fun NewExpenseScreen(
     val scope = rememberCoroutineScope()
 
     Header("New expense")
-    component.setupInputFields()
     InputFields(component.inputFieldsData)
 
     ConfirmOrBackButtonRow(
