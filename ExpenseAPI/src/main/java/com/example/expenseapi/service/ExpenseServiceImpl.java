@@ -33,8 +33,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     private final MethodOfPaymentRepository methodOfPaymentRepository;
     private final ExpenseMapper expenseMapper;
     private final UserMapper userMapper;
+    private final PreferenceRepository preferenceRepository;
 
-    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository, MembershipRepository membershipRepository, MethodOfPaymentRepository methodOfPaymentRepository, ExpenseMapper expenseMapper, UserMapper userMapper) {
+    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository, MembershipRepository membershipRepository, MethodOfPaymentRepository methodOfPaymentRepository, ExpenseMapper expenseMapper, UserMapper userMapper, PreferenceRepository preferenceRepository) {
         super(repository);
         this.expenseRepository = repository;
         this.categoryRepository = categoryRepository;
@@ -43,6 +44,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         this.methodOfPaymentRepository = methodOfPaymentRepository;
         this.expenseMapper = expenseMapper;
         this.userMapper = userMapper;
+        this.preferenceRepository = preferenceRepository;
     }
 
     public ExpenseDTO save(ExpenseCreateDTO expenseDTO) {
@@ -119,19 +121,38 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         List<ExpenseDTO> groupExpenses = getExpensesForGroup(group);
         List<ExpenseDTO> userExpenses = groupExpenses.stream()
                 .filter(expense -> expense.getUser().getEmail().equals(AuthHelper.getUserEmail()))
-                .toList(); // Returns only user's expenses in provided group, not in all groups
-        double groupSum = groupExpenses.stream().mapToDouble(ExpenseDTO::getPrice).sum();
-        double userSum = userExpenses.stream().mapToDouble(ExpenseDTO::getPrice).sum();
-        return new ExpInfo(userSum, groupSum);
+                .toList();
+        return calculateExpInfo(groupExpenses, userExpenses);
     }
 
     @Override
     public ExpInfo getExpInfo() {
         List<BaseGroup> groups = AuthHelper.getAllGroups();
-        Set<ExpenseDTO> groupExpenses = groups.stream().flatMap(group -> getExpensesForGroup(group.getName()).stream()).collect(Collectors.toSet());
+        Set<ExpenseDTO> groupExpenses = groups.stream()
+                .flatMap(group -> getExpensesForGroup(group.getName()).stream())
+                .collect(Collectors.toSet());
+
         List<Expense> userExpenses = expenseRepository.findByMembershipUserEmail(AuthHelper.getUserEmail());
-        double groupSum = groupExpenses.stream().mapToDouble(ExpenseDTO::getPrice).sum();
-        double userSum = userExpenses.stream().mapToDouble(Expense::getPrice).sum();
+        List<ExpenseDTO> userExpensesDTO = userExpenses.stream()
+                .map(expenseMapper::expenseToExpenseDTO)
+                .toList();
+        return calculateExpInfo(groupExpenses, userExpensesDTO);
+    }
+
+    private double sumExpensesInCurrency(Collection<ExpenseDTO> expenses, Currency targetCurrency) {
+        return expenses.stream()
+                .mapToDouble(expense ->
+                        convertFromCurrencyToAnother(expense.getPrice(), expense.getCurrency(), targetCurrency)
+                ).sum();
+    }
+
+    private ExpInfo calculateExpInfo(Collection<ExpenseDTO> groupExpenses, Collection<ExpenseDTO> userExpenses) {
+        Currency currency = preferenceRepository
+                .getPreferenceById(AuthHelper.getUser().getId())
+                .getCurrency();
+        double groupSum = sumExpensesInCurrency(groupExpenses, currency);
+        double userSum = sumExpensesInCurrency(userExpenses, currency);
+
         return new ExpInfo(userSum, groupSum);
     }
 
