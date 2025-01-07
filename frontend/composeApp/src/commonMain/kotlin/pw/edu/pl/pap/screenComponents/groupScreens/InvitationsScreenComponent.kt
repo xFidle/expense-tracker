@@ -4,12 +4,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
+import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
 import pw.edu.pl.pap.screenComponents.BaseScreenComponent
 
 open class InvitationsScreenComponent(
     baseComponent: BaseScreenComponent,
-    val onDismiss: () -> Unit
+    val onDismiss: () -> Unit,
+    private val group: UserGroup
 ) : BaseScreenComponent by baseComponent {
 
     var isNewInvitationsScreen: MutableState<Boolean> = mutableStateOf(false)
@@ -35,7 +37,7 @@ open class InvitationsScreenComponent(
                     }
                 ),
                 InputFieldData.TextFieldData(
-                    title = "Name: ",
+                    title = "Surname: ",
                     parameter = surname,
                     onChange = {
                         coroutineScope.launch { surname.value = it }

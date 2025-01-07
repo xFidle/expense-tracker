@@ -29,10 +29,7 @@ import pw.edu.pl.pap.ui.navBar.NavBarItem
 import androidx.compose.runtime.getValue
 import pw.edu.pl.pap.ui.chartsScreen.ChartsScreen
 import pw.edu.pl.pap.ui.chartsScreen.filterScreen.ChartsFilterScreen
-import pw.edu.pl.pap.ui.groupScreens.EditGroupScreen
-import pw.edu.pl.pap.ui.groupScreens.GroupScreen
-import pw.edu.pl.pap.ui.groupScreens.MemberScreen
-import pw.edu.pl.pap.ui.groupScreens.NewGroupScreen
+import pw.edu.pl.pap.ui.groupScreens.*
 import pw.edu.pl.pap.ui.settingsScreens.*
 
 // Todo refactor function, tweak animations
@@ -92,6 +89,7 @@ fun App(rootComponent: RootComponent) {
                             is RootComponent.Child.MemberScreen -> MemberScreen(instance.component)
                             is RootComponent.Child.NewGroupScreen -> NewGroupScreen(instance.component)
                             is RootComponent.Child.EditGroupScreen -> EditGroupScreen(instance.component)
+                            is RootComponent.Child.InvitationsScreen -> InvitationsScreen(instance.component)
 
                             is RootComponent.Child.ServerAddressScreen -> ServerAddressScreen(instance.component)
                             is RootComponent.Child.UserPersonalDataScreen -> UserPersonalDataScreen(instance.component)

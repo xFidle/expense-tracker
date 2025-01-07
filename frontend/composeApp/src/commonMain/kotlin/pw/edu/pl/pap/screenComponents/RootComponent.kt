@@ -23,6 +23,7 @@ import pw.edu.pl.pap.data.databaseAssociatedData.Expense
 import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.screenComponents.chartsScreens.ChartsFilterScreenComponent
+import pw.edu.pl.pap.screenComponents.groupScreens.InvitationsScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.groupEdit.EditGroupScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.MemberScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.groupEdit.NewGroupScreenComponent
@@ -99,6 +100,9 @@ class RootComponent(
         data class EditGroupScreen(val userGroup: UserGroup) : Configuration()
 
         @Serializable
+        data class InvitationsScreen(val userGroup: UserGroup) : Configuration()
+
+        @Serializable
         data object SettingsScreen : Configuration()
 
         @Serializable
@@ -158,6 +162,7 @@ class RootComponent(
         data class MemberScreen(val component: MemberScreenComponent) : Child()
         data class NewGroupScreen(val component: NewGroupScreenComponent) : Child()
         data class EditGroupScreen(val component: EditGroupScreenComponent) : Child()
+        data class InvitationsScreen(val component: InvitationsScreenComponent) : Child()
 
         data class ServerAddressScreen(val component: ServerAdressScreenComponent) : Child()
         data class UserPersonalDataScreen(val component: UserPersonalDataScreenComponent) : Child()
@@ -169,7 +174,7 @@ class RootComponent(
     private val _activeNavBarItem = MutableStateFlow<NavBarItem>(NavBarItem.Home)
     val activeNavBarItem: StateFlow<NavBarItem> get() = _activeNavBarItem
 
-    // TODO add new screens when ready
+    // TODO fix navigation to group screen from other screens (probably move currentGroup to RootComponent)
     fun navBarItemClicked(item: NavBarItem) {
         _activeNavBarItem.value = item
         when (item) {
@@ -310,11 +315,9 @@ class RootComponent(
                     onUserClicked = { userGroup, user ->
                         navigation.pushNew(Configuration.MemberScreen(userGroup, user))
                     },
-//                    onInvitationsClicked = { userGroup ->
-//                        navigation.pushNew(Configuration.InvitationsScreen(userGroup))
-//                    },
-                    //TODO
-                    onInvitationsClicked = {},
+                    onInvitationsClicked = { userGroup ->
+                        navigation.pushNew(Configuration.InvitationsScreen(userGroup))
+                    },
                     onNewGroupClicked = { navigation.pushNew(Configuration.NewGroupScreen)},
                     onEditGroupClicked = { userGroup ->
                         navigation.pushNew(Configuration.EditGroupScreen(userGroup))
@@ -367,6 +370,14 @@ class RootComponent(
 //                        )
 //                    },
                     //TODO
+                )
+            )
+
+            is Configuration.InvitationsScreen -> Child.InvitationsScreen(
+                component = InvitationsScreenComponent(
+                    baseComponent = createMainScreenComponent(componentContext),
+                    onDismiss = { navigation.pop () },
+                    group = configuration.userGroup,
                 )
             )
 
