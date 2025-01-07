@@ -15,6 +15,10 @@ import com.example.expenseapi.specification.ExpenseSpecification;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -103,16 +107,15 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
-    public List<ExpenseDTO> getExpensesForGroup(String name) {
+    public Page<ExpenseDTO> getExpensesForGroup(String name, int page, int size) {
         ExpenseFilter filter = new ExpenseFilter();
         filter.setGroupName(name);
-        return searchExpensesDTO(filter);
+        return searchExpensesPagesDTO(filter, page, size);
     }
 
-    @Override
-    public List<ExpenseDTO> getExpensesForUser() {
+    private List<ExpenseDTO> getExpensesForGroup(String name) {
         ExpenseFilter filter = new ExpenseFilter();
-        filter.setEmail(AuthHelper.getUserEmail());
+        filter.setGroupName(name);
         return searchExpensesDTO(filter);
     }
 
@@ -174,15 +177,15 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
-    public Map<LocalDate, List<ExpenseDTO>> getGroupExpenseAsDateMap(String name) {
-        List<ExpenseDTO> expenses = getExpensesForGroup(name);
+    public Map<LocalDate, List<ExpenseDTO>> getGroupExpenseAsDateMap(String name, int page, int size) {
+        Page<ExpenseDTO> expenses = getExpensesForGroup(name, page, size);
         return expenses.stream()
                 .collect(Collectors.groupingBy(ExpenseDTO::getExpenseDate));
     }
 
     @Override
-    public Map<Category, List<ExpenseDTO>> getGroupExpenseAsCategoryMap(String name) {
-        List<ExpenseDTO> expenses = getExpensesForGroup(name);
+    public Map<Category, List<ExpenseDTO>> getGroupExpenseAsCategoryMap(String name, int page, int size) {
+        Page<ExpenseDTO> expenses = getExpensesForGroup(name, page, size);
         return expenses.stream()
                 .collect(Collectors.groupingBy(ExpenseDTO::getCategory));
     }
@@ -195,6 +198,27 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         if (!AuthHelper.isGroupNameValid(filter.getGroupName())) {
             return Collections.emptyList();
         }
+        Specification<Expense> spec = prepareSpecification(filter);
+        return expenseRepository.findAll(spec).stream()
+                .map(expenseMapper::expenseToExpenseDTO)
+                .toList();
+    }
+
+    @Override
+    public Page<ExpenseDTO> searchExpensesPagesDTO(ExpenseFilter filter, int page, int size) {
+        if (filter.getGroupName() == null || filter.getGroupName().isEmpty()) {
+            filter.setGroupName(AuthHelper.getGroupName());
+        }
+        if (!AuthHelper.isGroupNameValid(filter.getGroupName())) {
+            return Page.empty();
+        }
+        Specification<Expense> spec = prepareSpecification(filter);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+        return expenseRepository.findAll(spec, pageable)
+                .map(expenseMapper::expenseToExpenseDTO);
+    }
+
+    private Specification<Expense> prepareSpecification(ExpenseFilter filter) {
         Specification<Expense> spec = Specification.where(null);
         spec = spec.and(ExpenseSpecification.hasCategory(filter.getCategoryNames()));
         spec = spec.and(ExpenseSpecification.dateIs(filter.getDate()));
@@ -204,10 +228,10 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         spec = spec.and(ExpenseSpecification.isUser(filter.getEmail()));
         spec = spec.and(ExpenseSpecification.isUserInList(filter.getEmails()));
         spec = spec.and(ExpenseSpecification.hasMethod(filter.getMethodsOfPayment()));
-        return expenseRepository.findAll(spec).stream()
-                .map(expenseMapper::expenseToExpenseDTO)
-                .toList();
+        return spec;
     }
+
+
 
     private double convertFromCurrencyToAnother(double value, Currency srcCurr, Currency dstCurr) {
         if (!srcCurr.getSymbol().equals("PLN")) {
@@ -266,5 +290,12 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
                 expenseCreateDTO.getCategoryName() == null ||
                 expenseCreateDTO.getGroupName() == null;
 
+    }
+
+    @Override
+    public Page<ExpenseDTO> getExpensesForUser(int page, int size) {
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setEmail(AuthHelper.getUserEmail());
+        return searchExpensesPagesDTO(filter, page, size);
     }
 }
