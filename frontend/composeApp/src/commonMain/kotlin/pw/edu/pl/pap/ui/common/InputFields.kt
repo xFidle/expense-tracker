@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -285,6 +286,7 @@ private fun createCheckBox(data: InputFieldData.CheckboxData) {
                             checkedStates.fill(true)
                             null
                         }
+
                         else -> checkedStates.mapIndexedNotNull { idx, value ->
                             if (value) idx else null
                         }
@@ -327,8 +329,10 @@ private fun createCheckBox(data: InputFieldData.CheckboxData) {
             }
         }
     }
+}
 
-private fun createClickableUserCard(data: UserBalanceButtonData) {
+@Composable
+private fun createClickableUserCard(data: InputFieldData.UserBalanceButtonData) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -337,7 +341,7 @@ private fun createClickableUserCard(data: UserBalanceButtonData) {
             .height(50.dp)
             .clickable { data.onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-    ){
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -347,7 +351,7 @@ private fun createClickableUserCard(data: UserBalanceButtonData) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
+            ) {
                 Text(
                     text = data.title,
                     fontSize = 18.sp,

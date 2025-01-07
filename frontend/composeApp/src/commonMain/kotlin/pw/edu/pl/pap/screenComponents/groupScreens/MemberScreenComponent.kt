@@ -5,13 +5,10 @@ import kotlinx.coroutines.launch
 import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.data.uiSetup.ConfirmationDialogConfig
-import pw.edu.pl.pap.data.uiSetup.inputFields.ButtonData
-import pw.edu.pl.pap.data.uiSetup.inputFields.DropdownListData
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
-import pw.edu.pl.pap.data.uiSetup.inputFields.TextFieldData
-import pw.edu.pl.pap.screenComponents.mainScreens.BaseScreenComponent
+import pw.edu.pl.pap.screenComponents.BaseScreenComponent
 
-class MemberScreenComponent (
+class MemberScreenComponent(
     baseComponent: BaseScreenComponent,
     val user: User,
     private val currentUserGroup: UserGroup,
@@ -22,6 +19,7 @@ class MemberScreenComponent (
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
 
     private val roles = listOf("admin", "viewer")
+
     //TODO fetch list of roles
     private var initialIndex: MutableState<Int> = mutableStateOf(0)
     private var roleIndex: MutableState<Int> = mutableStateOf(0)
@@ -60,31 +58,24 @@ class MemberScreenComponent (
         _inputFieldsData.clear()
         _inputFieldsData.addAll(
             listOf(
-                InputFieldData(
+                InputFieldData.DropdownListData(
                     title = "Role: ",
-                    isDropdownList = true,
-                    dropdownListData = DropdownListData(
-                        itemList = roles,
-                        selectedIndex = roleIndex,
-                        onItemClick = if (isAdmin) {
-                            { coroutineScope.launch { roleIndex.value = it } }
-                        } else {
-                            {}
-                        }
-                    )
+                    itemList = roles,
+                    selectedIndex = roleIndex,
+                    onItemClick = if (isAdmin) {
+                        { coroutineScope.launch { roleIndex.value = it } }
+                    } else {
+                        {}
+                    }
                 )
             ) + if (isAdmin) {
                 listOf(
-                    InputFieldData(
-                        title = "",
-                        isButton = true,
-                        buttonData = ButtonData(
-                            title = "KICK",
-                            onClick = {
-                                coroutineScope.launch { showKickConfirmationDialog.value = true }
-                            },
-                            isColored = true,
-                        )
+                    InputFieldData.ButtonData(
+                        title = "KICK",
+                        onClick = {
+                            coroutineScope.launch { showKickConfirmationDialog.value = true }
+                        },
+                        isColored = true,
                     )
                 )
             } else {
