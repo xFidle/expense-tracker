@@ -45,6 +45,10 @@ open class InvitationsScreenComponent(
         )
     }
 
+    fun search(){
+        //TODO
+    }
+
 
 
 }
