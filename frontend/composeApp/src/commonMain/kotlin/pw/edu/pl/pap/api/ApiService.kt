@@ -14,6 +14,9 @@ class ApiService(
     val currencyApiClient = CurrencyApiClient(baseApiClient)
     val categoryApiClient = CategoryApiClient(baseApiClient)
     val paymentMethodApiClient = PaymentMethodApiClient(baseApiClient)
+    val userApiCLient = UserApiClient(baseApiClient)
+    val membershipApiClient = MembershipApiClient(baseApiClient)
+    val temporaryMembershipApiClient = TemporaryMembershipApiClient(baseApiClient)
 
     fun updateBaseUrl(newUrl: String) {
         baseApiClient.setUrl(newUrl)
