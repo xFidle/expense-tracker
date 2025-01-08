@@ -17,6 +17,9 @@ open class InvitationsScreenComponent(
     var isNewInvitationsScreen: MutableState<Boolean> = mutableStateOf(false)
     var isPostSearchClicked: MutableState<Boolean> = mutableStateOf(false)
 
+    //TODO
+    // check if user is admin to block new invites if he is not
+
     private val _newInvitationInputFieldsData = mutableStateListOf<InputFieldData>()
     val newInvitationInputFieldsData: List<InputFieldData> get() = _newInvitationInputFieldsData
 
@@ -55,27 +58,32 @@ open class InvitationsScreenComponent(
     }
 
     fun fetchCurrentInvites(){
+        // received and sent
         //TODO
     }
 
     fun search(){
+        // available users (name and surname)
         //TODO
     }
 
     fun invite(){
-        //TODO
-    }
-
-    fun acceptInvite(){
-        //TODO
-    }
-
-    fun declineInvite(){
+        // (User, group)
         //TODO
     }
 
     fun cancelInvite(){
+        //  (User, group / id [?])
         //TODO
     }
 
+    fun acceptInvite(){
+        // (User, group / id [?])
+        //TODO
+    }
+
+    fun declineInvite(){
+        // (User, group / id [?])
+        //TODO
+    }
 }
