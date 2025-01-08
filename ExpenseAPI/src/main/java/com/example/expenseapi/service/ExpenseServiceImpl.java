@@ -13,6 +13,7 @@ import com.example.expenseapi.repository.*;
 import com.example.expenseapi.mapper.ExpenseMapper;
 import com.example.expenseapi.utils.AuthHelper;
 import com.example.expenseapi.specification.ExpenseSpecification;
+import com.example.expenseapi.utils.CursorPaginationUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -198,45 +199,15 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         filter.setGroupName(name);
         Specification<Expense> spec = prepareSpecification(filter);
         if (lastDate != null && lastId != null && lastId > 0) {
-            Specification<Expense> cursorSpec = getCursorSpecification(lastId, lastDate, desc);
-            spec = spec.and(cursorSpec);
+            spec = spec.and(CursorPaginationUtils.dateCursorSpec(lastId, lastDate, desc));
         }
-        Sort sort;
-        if (desc) {
-            sort = Sort.by(Sort.Direction.DESC, "date")
-                    .and(Sort.by(Sort.Direction.DESC, "id"));
-        } else {
-            sort = Sort.by(Sort.Direction.ASC, "date")
-                    .and(Sort.by(Sort.Direction.ASC, "id"));
-        }
+        Sort sort = CursorPaginationUtils.buildSortForDate(desc);
         Pageable pageable = PageRequest.of(0, size, sort);
         Page<Expense> pageResult = expenseRepository.findAll(spec, pageable);
         return pageResult.getContent()
                 .stream()
                 .map(expenseMapper::expenseToExpenseDTO)
                 .toList();
-    }
-
-    private static Specification<Expense> getCursorSpecification(Long lastId, LocalDate lastDate, boolean desc) {
-        Specification<Expense> cursorSpec;
-        if (desc) {
-            cursorSpec = (root, query, cb) -> cb.or(
-                    cb.lessThan(root.get("date"), lastDate),
-                    cb.and(
-                            cb.equal(root.get("date"), lastDate),
-                            cb.lessThan(root.get("id"), lastId)
-                    )
-            );
-        } else {
-            cursorSpec = (root, query, cb) -> cb.or(
-                    cb.greaterThan(root.get("date"), lastDate),
-                    cb.and(
-                            cb.equal(root.get("date"), lastDate),
-                            cb.greaterThan(root.get("id"), lastId)
-                    )
-            );
-        }
-        return cursorSpec;
     }
 
     @Override
@@ -273,17 +244,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         filter.setGroupName(name);
         Specification<Expense> spec = prepareSpecification(filter);
         if (lastCategory != null && !lastCategory.isEmpty() && lastId != null && lastId > 0) {
-            Specification<Expense> cursorSpec = getCursorSpecificationCategory(lastId, lastCategory, desc);
-            spec = spec.and(cursorSpec);
+            spec = spec.and(CursorPaginationUtils.categoryCursorSpec(lastId, lastCategory, desc));
         }
-        Sort sort;
-        if (desc) {
-            sort = Sort.by(Sort.Direction.DESC, "category.name")
-                    .and(Sort.by(Sort.Direction.DESC, "id"));
-        } else {
-            sort = Sort.by(Sort.Direction.ASC, "category.name")
-                    .and(Sort.by(Sort.Direction.ASC, "id"));
-        }
+        Sort sort = CursorPaginationUtils.buildSortForCategory(desc);
         Pageable pageable = PageRequest.of(0, size, sort);
         Page<Expense> pageResult = expenseRepository.findAll(spec, pageable);
         return pageResult.getContent()
@@ -291,29 +254,6 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
                 .map(expenseMapper::expenseToExpenseDTO)
                 .toList();
     }
-
-    private static Specification<Expense> getCursorSpecificationCategory(Long lastId, String lastCategory, boolean desc) {
-        Specification<Expense> cursorSpec;
-        if (desc) {
-            cursorSpec = (root, query, cb) -> cb.or(
-                    cb.lessThan(root.get("category").get("name"), lastCategory),
-                    cb.and(
-                            cb.equal(root.get("category").get("name"), lastCategory),
-                            cb.lessThan(root.get("id"), lastId)
-                    )
-            );
-        } else {
-            cursorSpec = (root, query, cb) -> cb.or(
-                    cb.greaterThan(root.get("category").get("name"), lastCategory),
-                    cb.and(
-                            cb.equal(root.get("category").get("name"), lastCategory),
-                            cb.greaterThan(root.get("id"), lastId)
-                    )
-            );
-        }
-        return cursorSpec;
-    }
-
 
     @Override
     public List<ExpenseDTO> searchExpensesDTO(ExpenseFilter filter) {
