@@ -32,7 +32,7 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
     } else if (component.isNewInvitationsScreen.value && component.isPostSearchClicked.value) {
         //TODO
     } else {
-
+        component.isPostSearchClicked.value = false
     }
 
 }

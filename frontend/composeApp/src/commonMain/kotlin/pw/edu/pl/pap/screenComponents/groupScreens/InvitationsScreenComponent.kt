@@ -5,9 +5,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
+import pw.edu.pl.pap.data.uiSetup.inputFields.InvitationData
 import pw.edu.pl.pap.screenComponents.BaseScreenComponent
+import pw.edu.pl.pap.ui.groupScreens.InvitationsScreen
 
 open class InvitationsScreenComponent(
     baseComponent: BaseScreenComponent,
@@ -24,14 +27,14 @@ open class InvitationsScreenComponent(
     private val _newInvitationInputFieldsData = mutableStateListOf<InputFieldData>()
     val newInvitationInputFieldsData: List<InputFieldData> get() = _newInvitationInputFieldsData
 
-    private val _availableNewInvitationsData  = mutableStateListOf<InputFieldData>()
-    val availableNewInvitationsData: List<InputFieldData> get() = _availableNewInvitationsData
+    private val _availableNewInvitationsData  = mutableStateListOf<InvitationData>()
+    val availableNewInvitationsData: List<InvitationData> get() = _availableNewInvitationsData
 
-    private val _receivedInvitationData = mutableStateListOf<InputFieldData>()
-    val receivedInvitationData: List<InputFieldData> get() = _receivedInvitationData
+    private val _receivedInvitationData = mutableStateListOf<InvitationData>()
+    val receivedInvitationData: List<InvitationData> get() = _receivedInvitationData
 
-    private val _sentInvitationData = mutableStateListOf<InputFieldData>()
-    val sentInvitationData: List<InputFieldData> get() = _sentInvitationData
+    private val _sentInvitationData = mutableStateListOf<InvitationData>()
+    val sentInvitationData: List<InvitationData> get() = _sentInvitationData
 
     protected open var name: MutableState<String> = mutableStateOf("")
     protected open var surname: MutableState<String> = mutableStateOf("")
@@ -66,11 +69,22 @@ open class InvitationsScreenComponent(
 
     fun search(){
         runBlocking{
-            apiService.
+            val users = apiService.userApiCLient.search(group.name, name.value, surname.value)
+            _availableNewInvitationsData.clear()
+            _availableNewInvitationsData.addAll(
+                users.map { user ->
+                    InvitationData.NewInvitationData(
+                        receiver = user,
+                        group = group,
+                        onConfirm = { coroutineScope.launch { invite(user) } }
+                    )
+                }
+            )
         }
+        isPostSearchClicked.value = true
     }
 
-    fun invite(){
+    fun invite(user: User){
         // (User, group)
         //TODO
     }
