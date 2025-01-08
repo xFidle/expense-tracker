@@ -4,6 +4,8 @@ import com.example.expenseapi.pojo.Currency;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface CurrencyRepository extends JpaRepository<Currency, Long> {
-    Currency findBySymbol(@NonNull String symbol);
+    Optional<Currency> findBySymbol(@NonNull String symbol);
 }
