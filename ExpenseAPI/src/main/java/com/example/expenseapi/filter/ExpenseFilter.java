@@ -26,5 +26,6 @@ public class ExpenseFilter {
 
     private Long lastId;
     private LocalDate lastDate;
-    private Boolean ascending;
+    private String lastCategory;
+    private Boolean descending;
 }

@@ -92,8 +92,14 @@ public class ExpenseController extends GenericController<Expense, Long> {
     @GetMapping("/categoryMap/group/{name}")
     @Operation(summary = "Returns objects grouped by category for group of logged-in user")
     @ApiResponse(responseCode = "200", description = "All expenses grouped by category")
-    public ResponseEntity<Map<Category, List<ExpenseDTO>>> getCategoryExpenseMap(@PathVariable String name, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-        return new ResponseEntity<>(((ExpenseService) service).getGroupExpenseAsCategoryMap(name, page, size), HttpStatus.OK);
+    public ResponseEntity<CursorPageResponse<Map<Category, List<ExpenseDTO>>>> getCategoryExpenseMap(
+            @PathVariable String name,
+            @RequestParam(defaultValue = "0") Long lastId,
+            @RequestParam(defaultValue = "") String lastCategory,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "desc") String order) {
+        boolean desc = order.equals("desc");
+        return new ResponseEntity<>(((ExpenseService) service).getGroupExpenseAsCategoryMap(name, lastId, lastCategory, size, desc), HttpStatus.OK);
     }
 
     @GetMapping("/recent/{groupName}")

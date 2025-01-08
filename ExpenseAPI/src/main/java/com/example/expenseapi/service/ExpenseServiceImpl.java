@@ -186,7 +186,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         response.setData(grouped);
         response.setHasMore(expenses.size() == size);
         if (!expenses.isEmpty()) {
-            ExpenseDTO lastItem = expenses.get(expenses.size() - 1);
+            ExpenseDTO lastItem = expenses.getLast();
             response.setNextLastDate(lastItem.getExpenseDate());
             response.setNextLastId(lastItem.getId());
         }
@@ -240,11 +240,80 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
-    public Map<Category, List<ExpenseDTO>> getGroupExpenseAsCategoryMap(String name, int page, int size) {
-        Page<ExpenseDTO> expenses = getExpensesForGroup(name, page, size);
-        return expenses.stream()
-                .collect(Collectors.groupingBy(ExpenseDTO::getCategory));
+    public CursorPageResponse<Map<Category, List<ExpenseDTO>>> getGroupExpenseAsCategoryMap(
+            String name,
+            Long lastId,
+            String lastCategory,
+            int size,
+            boolean desc
+    ) {
+        List<ExpenseDTO> dtos = getExpensesForGroupCategoryCursorBased(name, lastId, lastCategory, size, desc);
+        Map<Category, List<ExpenseDTO>> grouped = dtos.stream()
+                .collect(Collectors.groupingBy(ExpenseDTO::getCategory, LinkedHashMap::new, Collectors.toList()));
+        CursorPageResponse<Map<Category, List<ExpenseDTO>>> response = new CursorPageResponse<>();
+        response.setData(grouped);
+        response.setHasMore(dtos.size() == size);
+        if (!dtos.isEmpty()) {
+            ExpenseDTO lastDto = dtos.getLast();
+            response.setNextLastCategory(lastDto.getCategory().getName());
+            response.setNextLastId(lastDto.getId());
+        }
+
+        return response;
     }
+
+    public List<ExpenseDTO> getExpensesForGroupCategoryCursorBased(
+            String name,
+            Long lastId,
+            String lastCategory,
+            int size,
+            boolean desc
+    ) {
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setGroupName(name);
+        Specification<Expense> spec = prepareSpecification(filter);
+        if (lastCategory != null && !lastCategory.isEmpty() && lastId != null && lastId > 0) {
+            Specification<Expense> cursorSpec = getCursorSpecificationCategory(lastId, lastCategory, desc);
+            spec = spec.and(cursorSpec);
+        }
+        Sort sort;
+        if (desc) {
+            sort = Sort.by(Sort.Direction.DESC, "category.name")
+                    .and(Sort.by(Sort.Direction.DESC, "id"));
+        } else {
+            sort = Sort.by(Sort.Direction.ASC, "category.name")
+                    .and(Sort.by(Sort.Direction.ASC, "id"));
+        }
+        Pageable pageable = PageRequest.of(0, size, sort);
+        Page<Expense> pageResult = expenseRepository.findAll(spec, pageable);
+        return pageResult.getContent()
+                .stream()
+                .map(expenseMapper::expenseToExpenseDTO)
+                .toList();
+    }
+
+    private static Specification<Expense> getCursorSpecificationCategory(Long lastId, String lastCategory, boolean desc) {
+        Specification<Expense> cursorSpec;
+        if (desc) {
+            cursorSpec = (root, query, cb) -> cb.or(
+                    cb.lessThan(root.get("category").get("name"), lastCategory),
+                    cb.and(
+                            cb.equal(root.get("category").get("name"), lastCategory),
+                            cb.lessThan(root.get("id"), lastId)
+                    )
+            );
+        } else {
+            cursorSpec = (root, query, cb) -> cb.or(
+                    cb.greaterThan(root.get("category").get("name"), lastCategory),
+                    cb.and(
+                            cb.equal(root.get("category").get("name"), lastCategory),
+                            cb.greaterThan(root.get("id"), lastId)
+                    )
+            );
+        }
+        return cursorSpec;
+    }
+
 
     @Override
     public List<ExpenseDTO> searchExpensesDTO(ExpenseFilter filter) {

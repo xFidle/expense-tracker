@@ -15,5 +15,6 @@ public class CursorPageResponse<T>{
     private T data;
     private Long nextLastId;
     private LocalDate nextLastDate;
+    private String nextLastCategory;
     private boolean hasMore;
 }
