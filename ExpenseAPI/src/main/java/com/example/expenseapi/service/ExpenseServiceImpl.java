@@ -1,5 +1,6 @@
 package com.example.expenseapi.service;
 
+import com.example.expenseapi.dto.CursorPageResponse;
 import com.example.expenseapi.dto.ExpenseCreateDTO;
 import com.example.expenseapi.dto.ExpenseDTO;
 import com.example.expenseapi.exception.BadRequestException;
@@ -177,10 +178,65 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     @Override
-    public Map<LocalDate, List<ExpenseDTO>> getGroupExpenseAsDateMap(String name, int page, int size) {
-        Page<ExpenseDTO> expenses = getExpensesForGroup(name, page, size);
-        return expenses.stream()
-                .collect(Collectors.groupingBy(ExpenseDTO::getExpenseDate));
+    public CursorPageResponse<Map<LocalDate, List<ExpenseDTO>>> getGroupExpenseAsDateMap(String name, Long lastId, LocalDate lastDate, int size, boolean desc) {
+        List<ExpenseDTO> expenses = getExpensesForGroupCursorBased(name, lastId, lastDate, size, desc);
+        Map<LocalDate, List<ExpenseDTO>> grouped = expenses.stream()
+                .collect(Collectors.groupingBy(ExpenseDTO::getExpenseDate, LinkedHashMap::new, Collectors.toList()));
+        CursorPageResponse<Map<LocalDate, List<ExpenseDTO>>> response = new CursorPageResponse<>();
+        response.setData(grouped);
+        response.setHasMore(expenses.size() == size);
+        if (!expenses.isEmpty()) {
+            ExpenseDTO lastItem = expenses.get(expenses.size() - 1);
+            response.setNextLastDate(lastItem.getExpenseDate());
+            response.setNextLastId(lastItem.getId());
+        }
+        return response;
+    }
+
+    public List<ExpenseDTO> getExpensesForGroupCursorBased(String name, Long lastId, LocalDate lastDate, int size, boolean desc) {
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setGroupName(name);
+        Specification<Expense> spec = prepareSpecification(filter);
+        if (lastDate != null && lastId != null && lastId > 0) {
+            Specification<Expense> cursorSpec = getCursorSpecification(lastId, lastDate, desc);
+            spec = spec.and(cursorSpec);
+        }
+        Sort sort;
+        if (desc) {
+            sort = Sort.by(Sort.Direction.DESC, "date")
+                    .and(Sort.by(Sort.Direction.DESC, "id"));
+        } else {
+            sort = Sort.by(Sort.Direction.ASC, "date")
+                    .and(Sort.by(Sort.Direction.ASC, "id"));
+        }
+        Pageable pageable = PageRequest.of(0, size, sort);
+        Page<Expense> pageResult = expenseRepository.findAll(spec, pageable);
+        return pageResult.getContent()
+                .stream()
+                .map(expenseMapper::expenseToExpenseDTO)
+                .toList();
+    }
+
+    private static Specification<Expense> getCursorSpecification(Long lastId, LocalDate lastDate, boolean desc) {
+        Specification<Expense> cursorSpec;
+        if (desc) {
+            cursorSpec = (root, query, cb) -> cb.or(
+                    cb.lessThan(root.get("date"), lastDate),
+                    cb.and(
+                            cb.equal(root.get("date"), lastDate),
+                            cb.lessThan(root.get("id"), lastId)
+                    )
+            );
+        } else {
+            cursorSpec = (root, query, cb) -> cb.or(
+                    cb.greaterThan(root.get("date"), lastDate),
+                    cb.and(
+                            cb.equal(root.get("date"), lastDate),
+                            cb.greaterThan(root.get("id"), lastId)
+                    )
+            );
+        }
+        return cursorSpec;
     }
 
     @Override
