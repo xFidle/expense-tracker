@@ -10,6 +10,6 @@ public class TokenGenerator {
     private JwtUtil jwtUtil;
 
     public  String getToken(String username) {
-        return jwtUtil.generateToken(username);
+        return jwtUtil.generateAccessToken(username);
     }
 }
