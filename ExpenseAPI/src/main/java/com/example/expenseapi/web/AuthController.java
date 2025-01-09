@@ -63,8 +63,8 @@ public class AuthController {
     @Operation(summary = "User Login", description = "Authenticates a user with email and password, returning a JWT token upon successful authentication.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Authentication successful. JWT token returned.",
-                    content = @Content(mediaType = "text/plain",
-                            schema = @Schema(type = "string", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."))),
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AuthResponseDTO.class))),
             @ApiResponse(responseCode = "403", description = "Access forbidden.",
                     content = @Content)
     })
@@ -81,6 +81,14 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "Refresh Access Token", description = "Generates a new access token using a valid refresh token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Access token successfully refreshed.",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(type = "string", example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJh..."))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized.",
+                    content = @Content)
+    })
     public ResponseEntity<String> refreshToken(@RequestBody RefreshTokenDTO token) {
         Optional<RefreshToken> refreshToken = refreshTokenService.findByToken(token.getRefreshToken());
         if (refreshToken.isEmpty()) {
