@@ -117,20 +117,36 @@ public class PreferencesControllerIT {
 
     @Transactional
     @Test
+    void testPreferenceUpdate_InvalidCurrencyFormat() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/preferences/update")
+                        .header("Authorization", "Bearer " + gen.getToken(activeUser))
+                        .content("""
+                        {
+                            "currencySymbol": "abcdef"
+                        }
+                        """)
+                        .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Transactional
+    @Test
     void testPreferencesUpdate_CurrencyNotPresentInDatabase() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/preferences/update")
                 .header("Authorization", "Bearer " + gen.getToken(activeUser))
                 .content("""
                         {
-                            "currencySymbol": "AED"
+                            "currencySymbol": "THB"
                         }
                         """)
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.method.name").value("cash"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currency.symbol").value("AED"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.currency.symbol").value("THB"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.language").value("pl"));
     }
+
+
 
     @Transactional
     @Test

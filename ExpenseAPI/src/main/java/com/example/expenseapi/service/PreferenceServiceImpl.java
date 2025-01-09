@@ -1,6 +1,7 @@
 package com.example.expenseapi.service;
 
 import com.example.expenseapi.dto.PreferenceUpdateDTO;
+import com.example.expenseapi.exception.BadRequestException;
 import com.example.expenseapi.pojo.Currency;
 import com.example.expenseapi.pojo.MethodOfPayment;
 import com.example.expenseapi.pojo.Preference;
@@ -37,7 +38,9 @@ public class PreferenceServiceImpl extends GenericServiceImpl<Preference, Long> 
         Optional<Currency> currency = currencyRepository.findBySymbol(preferenceUpdateDTO.getCurrencySymbol());
         if (currency.isEmpty() && preferenceUpdateDTO.getCurrencySymbol() != null) {
             String symbol = preferenceUpdateDTO.getCurrencySymbol();
-            Currency newCurrency = new Currency(symbol, CurrencyRatesFetcher.getCurrencyRates(symbol));
+            double rate = CurrencyRatesFetcher.getCurrencyRates(symbol);
+            if (rate == -1) throw new BadRequestException("Invalid currency symbol");
+            Currency newCurrency = new Currency(symbol, rate);
             currencyRepository.save(newCurrency);
             pref.setCurrency(newCurrency);
         } else currency.ifPresent(pref::setCurrency);
