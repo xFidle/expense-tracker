@@ -221,7 +221,7 @@ public class ExpanseControllerIT {
                         .header("Authorization", "Bearer " + gen.getToken(activeUser)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userExpenses").value(150))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groupExpenses").value(2540));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groupExpenses").value(2750));
     }
 
     @Test
@@ -245,7 +245,7 @@ public class ExpanseControllerIT {
                         .header("Authorization", "Bearer " + gen.getToken(activeUser)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userExpenses").value(150))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groupExpenses").value(965));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groupExpenses").value(950));
     }
 
     @Test
@@ -254,7 +254,7 @@ public class ExpanseControllerIT {
                         .header("Authorization", "Bearer " + gen.getToken(activeUser)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userExpenses").value(0))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groupExpenses").value(1575));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groupExpenses").value(1800));
     }
 
     @Test

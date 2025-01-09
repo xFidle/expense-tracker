@@ -8,4 +8,5 @@ import lombok.Setter;
 public class PreferenceUpdateDTO {
     private String currencySymbol;
     private String methodOfPayment;
+    private String language;
 }

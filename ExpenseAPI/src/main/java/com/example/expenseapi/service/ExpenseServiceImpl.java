@@ -102,8 +102,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         if (createDTO.getExpenseDate() != null) {
             expense.setDate(createDTO.getExpenseDate());
         }
-        expense.setMethod(methodOfPaymentRepository.findByName(createDTO.getMethodOfPayment()));
-        expense.setCurrency(currencyRepository.findBySymbol(createDTO.getCurrencyCode()));
+        expense.setMethod(methodOfPaymentRepository.findByName(createDTO.getMethodOfPayment()).get()); // TODO check if method exists
+        expense.setCurrency(currencyRepository.findBySymbol(createDTO.getCurrencyCode()).get()); // TODO check if currency exists
         Expense savedExpense = expenseRepository.save(expense);
         return expenseMapper.expenseToExpenseDTO(savedExpense);
     }
@@ -164,7 +164,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     @Override
     public Map<String, Double> getMapResult(ExpenseFilter filter,  String keyType) {
         List<ExpenseDTO> result = searchExpensesDTO(filter);
-        Currency currency = currencyRepository.findBySymbol(AuthHelper.getUser().getPreference().getCurrency().getSymbol());
+        Currency currency = currencyRepository.findBySymbol(AuthHelper.getUser().getPreference().getCurrency().getSymbol()).get(); //TODO check if currency exists
         Function<ExpenseDTO, String> keyExtractor = findKeyExtractor(keyType);
         if (keyExtractor == null) throw new BadRequestException("Invalid key type");
         return totalExpensesMap(result, keyExtractor, currency);
@@ -345,7 +345,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         Expense expense = expenseRepository.findById(id).orElse(null);
         Expense updatedExpense = expenseMapper.expenseDTOToExpense(expenseDTO);
         BeanUtils.copyProperties(updatedExpense, expense, getNullPropertyNames(updatedExpense));
-        expense.setMethod(methodOfPaymentRepository.findByName(updatedExpense.getMethod().getName()));
+        expense.setMethod(methodOfPaymentRepository.findByName(updatedExpense.getMethod().getName()).get()); //TODO check if method exists
         return expenseMapper.expenseToExpenseDTO(expenseRepository.save(expense));
     }
 

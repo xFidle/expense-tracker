@@ -65,9 +65,9 @@ public class ExpenseApiApplication implements CommandLineRunner {
         }
         if (currencyRepository.count() == 0) {
             currencies = new Currency[]{
-                    new Currency("Zlotowka", "PLN", 1),
-                    new Currency("Dollar", "USD", CurrencyRatesFetcher.getCurrencyRates("USD")),
-                    new Currency("Euro", "EUR", CurrencyRatesFetcher.getCurrencyRates("EUR"))
+                    new Currency("PLN", 1),
+                    new Currency("USD", 4.0),
+                    new Currency("EUR", 5.0)
             };
             currencyRepository.saveAll(Arrays.asList(currencies));
         }
