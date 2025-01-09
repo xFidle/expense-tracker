@@ -11,11 +11,22 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    public String generateToken(String email) {
+
+    public String generateAccessToken(String email) {
+        long accessExpiration = 1000 * 60 * 60; // 1 hour
+        return buildToken(email, accessExpiration);
+    }
+
+    public String generateRefreshToken(String email) {
+        long refreshExpiration = 1000 * 60 * 60 * 24 * 7; // 7 days
+        return buildToken(email, refreshExpiration);
+    }
+
+    private String buildToken(String email, long expiration) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
