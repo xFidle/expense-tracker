@@ -2,13 +2,11 @@ package com.example.expenseapi;
 
 import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.repository.*;
-import com.example.expenseapi.utils.CurrencyRatesFetcher;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 
@@ -25,7 +23,6 @@ public class ExpenseApiApplication implements CommandLineRunner {
     private final MethodOfPaymentRepository methodOfPaymentRepository;
     private final RoleRepository roleRepository;
     private final PreferenceRepository preferenceRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
 
     public ExpenseApiApplication(ExpenseRepository expenseRepository, UserRepository userRepository, CategoryRepository categoryRepository, GroupRepository groupRepository, MembershipRepository membershipRepository, ArchivedGroupRepository archivedGroupRepository, CurrencyRepository currencyRepository, PasswordEncoder passwordEncoder, MethodOfPaymentRepository methodOfPaymentRepository, RoleRepository roleRepository, PreferenceRepository preferenceRepository, RefreshTokenRepository refreshTokenRepository) {
         this.expenseRepository = expenseRepository;
@@ -39,7 +36,6 @@ public class ExpenseApiApplication implements CommandLineRunner {
         this.methodOfPaymentRepository = methodOfPaymentRepository;
         this.roleRepository = roleRepository;
         this.preferenceRepository = preferenceRepository;
-        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     public static void main(String[] args) {
