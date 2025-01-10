@@ -2,12 +2,9 @@ package com.example.expenseapi.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.expenseapi.pojo.RefreshToken;
 import com.example.expenseapi.repository.RefreshTokenRepository;
-import com.example.expenseapi.repository.UserRepository;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,8 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.time.Instant;
-
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -28,7 +23,7 @@ public class AuthControllerIT {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    public AuthControllerIT(MockMvc mockMvc, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
+    public AuthControllerIT(MockMvc mockMvc, RefreshTokenRepository refreshTokenRepository) {
         this.mockMvc = mockMvc;
         this.refreshTokenRepository = refreshTokenRepository;
     }
