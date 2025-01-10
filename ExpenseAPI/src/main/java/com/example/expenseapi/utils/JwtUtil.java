@@ -3,6 +3,7 @@ package com.example.expenseapi.utils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -12,14 +13,18 @@ import java.util.Date;
 public class JwtUtil {
     private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
+    @Value("${jwt.access.expiration.time}")
+    private long ACCESS_EXPIRATION; // 1 hour
+
+    @Value("${jwt.refresh.expiration.time}")
+    private long REFRESH_EXPIRATION; // 7 days
+
     public String generateAccessToken(String email) {
-        long accessExpiration = 1000 * 60 * 60; // 1 hour
-        return buildToken(email, accessExpiration);
+        return buildToken(email, ACCESS_EXPIRATION);
     }
 
     public String generateRefreshToken(String email) {
-        long refreshExpiration = 1000 * 60 * 60 * 24 * 7; // 7 days
-        return buildToken(email, refreshExpiration);
+        return buildToken(email, REFRESH_EXPIRATION);
     }
 
     private String buildToken(String email, long expiration) {
