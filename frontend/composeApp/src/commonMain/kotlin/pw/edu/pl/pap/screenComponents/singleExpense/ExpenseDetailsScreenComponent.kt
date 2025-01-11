@@ -58,7 +58,7 @@ class ExpenseDetailsScreenComponent(
         }
 
         coroutineScope.launch {
-            expenseRepository.updateExpense(newExpense)
+            expenseRepository.updateExpense(newExpense, expense)
             onBack()
         }
     }

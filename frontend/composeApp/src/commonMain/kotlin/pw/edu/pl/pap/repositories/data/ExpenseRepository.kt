@@ -98,12 +98,11 @@ class ExpenseRepository(val api: ExpenseApi) {
         return api.getExpenseCatMap(group, nextPageInfo.toMap())
     }
 
-    suspend fun updateExpense(expense: Expense) {
+    suspend fun updateExpense(updatedExpense: Expense, oldExpense: Expense) {
         try {
-            api.updateExpense(expense.id, expense)
+            api.updateExpense(updatedExpense.id, updatedExpense)
             val newMap = _groupedExpenses.value
-            val updatedExpense = api.getExpense(expense.id)
-            newMap.updateExpense(getKeyFromExpense(updatedExpense), updatedExpense, getKeyFromExpense(expense))
+            newMap.updateExpense(getKeyFromExpense(updatedExpense), updatedExpense, getKeyFromExpense(oldExpense))
             _groupedExpenses.value = newMap
         } catch (e: Exception) {
             e.printStackTrace()

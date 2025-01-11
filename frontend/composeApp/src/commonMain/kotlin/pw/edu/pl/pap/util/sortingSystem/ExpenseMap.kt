@@ -33,6 +33,8 @@ class ExpenseMap(
             } else {
                 this[oldKey] = oldExpenseList
             }
+            addExpense(key, updatedExpense)
+            return
         }
 
         val expenseList = this[key] ?: return
