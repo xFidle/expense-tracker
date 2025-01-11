@@ -2,8 +2,7 @@ package pw.edu.pl.pap.api.data
 
 import de.jensklingenberg.ktorfit.http.*
 import io.ktor.client.statement.*
-import pw.edu.pl.pap.data.databaseAssociatedData.User
-import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
+import pw.edu.pl.pap.data.databaseAssociatedData.Invitation
 
 interface TemporaryMembershipApi {
 
@@ -18,11 +17,6 @@ interface TemporaryMembershipApi {
 
     @GET("tempMembership/invitations")
     suspend fun getSent(): List<Invitation>
-    //TODO correct endpoint
-
-    //    data class Accept(val id: Long): TemporaryMembershipEndpoint("/accept/$id")
-    //    data class Decline(val id: Long): TemporaryMembershipEndpoint("/delete/$id")
-    //    data object GetReceived: TemporaryMembershipEndpoint("/invitations")
-    //    data object GetSent: TemporaryMembershipEndpoint("/invitations")
+    //TODO correct this endpoint
 
 }
