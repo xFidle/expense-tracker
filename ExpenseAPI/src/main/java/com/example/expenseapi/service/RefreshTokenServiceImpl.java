@@ -6,6 +6,7 @@ import com.example.expenseapi.pojo.User;
 import com.example.expenseapi.repository.RefreshTokenRepository;
 import com.example.expenseapi.repository.UserRepository;
 import com.example.expenseapi.utils.JwtUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -55,5 +56,11 @@ public class RefreshTokenServiceImpl extends GenericServiceImpl<RefreshToken, Lo
         refreshToken.setExpiryDate(jwtUtil.getExpiration(refreshToken.getToken()).toInstant());
         refreshTokenRepository.save(refreshToken);
         return refreshToken;
+    }
+
+    @Override
+    @Transactional
+    public void deleteByUserId(Long Id) {
+        refreshTokenRepository.deleteAllByUserId(Id);
     }
 }
