@@ -14,14 +14,15 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+    jvm("desktop") {
+        compilations["test"].defaultSourceSet {
+            dependencies {
+//                implementation(kotlin("test"))
+                implementation(libs.kotlin.test)
+                implementation(libs.ktor.mock)
+            }
         }
     }
-
-    jvm("desktop")
 
     sourceSets {
         val desktopMain by getting
@@ -59,20 +60,24 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
         }
+        commonTest.dependencies {
+                implementation(libs.kotlin.test) // Testy Kotlin (z TOML)
+                implementation(libs.ktor.mock)  // Mock Engine dla Ktor
+        }
     }
     sourceSets.commonMain.dependencies {
         implementation(kotlin("reflect"))
     }
 
-    sourceSets {
-        val commonTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test) // Zależność do testów Kotlin
-                implementation(libs.ktor.mock)  // Ktor Mock Engine
-            }
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 }
+
+
 
 val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties()
@@ -115,6 +120,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -138,3 +146,18 @@ tasks.withType<ProcessResources> {
         expand("ip" to localProperties.getProperty("baseUrl", "localhost:8080"))
     }
 }
+
+tasks.withType<Test> {
+    useJUnitPlatform()  // Wykorzystanie platformy JUnit do testów
+    jvmArgs = listOf("-Dorg.gradle.parallel=true")  // Dodatkowe parametry JVM, jeśli są wymagane
+    testLogging {
+        events("passed", "skipped", "failed")  // Wyświetlanie wyników testów
+    }
+}
+
+//tasks.withType<Test> {
+//    useJUnitPlatform()
+//    testLogging {
+//        events("passed", "skipped", "failed")
+//    }
+//}
