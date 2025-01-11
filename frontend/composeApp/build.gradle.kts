@@ -14,15 +14,7 @@ plugins {
 }
 
 kotlin {
-    jvm("desktop") {
-        compilations["test"].defaultSourceSet {
-            dependencies {
-//                implementation(kotlin("test"))
-                implementation(libs.kotlin.test)
-                implementation(libs.ktor.mock)
-            }
-        }
-    }
+    jvm("desktop")
 
     sourceSets {
         val desktopMain by getting
@@ -61,8 +53,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
         }
         commonTest.dependencies {
-                implementation(libs.kotlin.test) // Testy Kotlin (z TOML)
-                implementation(libs.ktor.mock)  // Mock Engine dla Ktor
+                implementation(libs.kotlin.test)
+                implementation(libs.ktor.mock)
         }
     }
     sourceSets.commonMain.dependencies {
@@ -120,9 +112,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    testOptions {
-        unitTests.isReturnDefaultValues = true
-    }
 }
 
 dependencies {
@@ -148,16 +137,9 @@ tasks.withType<ProcessResources> {
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform()  // Wykorzystanie platformy JUnit do testów
-    jvmArgs = listOf("-Dorg.gradle.parallel=true")  // Dodatkowe parametry JVM, jeśli są wymagane
+    useJUnitPlatform()
+    jvmArgs = listOf("-Dorg.gradle.parallel=true")
     testLogging {
-        events("passed", "skipped", "failed")  // Wyświetlanie wyników testów
+        events("passed", "skipped", "failed")
     }
 }
-
-//tasks.withType<Test> {
-//    useJUnitPlatform()
-//    testLogging {
-//        events("passed", "skipped", "failed")
-//    }
-//}
