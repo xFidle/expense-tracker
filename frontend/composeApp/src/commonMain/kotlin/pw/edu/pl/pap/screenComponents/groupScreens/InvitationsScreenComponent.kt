@@ -76,10 +76,10 @@ open class InvitationsScreenComponent(
 
     fun search(){
         runBlocking{
-            val users: List<User> = userRepository.searchUsers(currentUserGroup.value!!, name.value, surname.value)
+            userRepository.searchUsers(currentUserGroup.value!!, name.value, surname.value)
             _availableNewInvitationsData.clear()
             _availableNewInvitationsData.addAll(
-                users.map { user ->
+                userRepository.usersFound.value.map { user ->
                     InvitationData.NewInvitationData(
                         receiver = user,
                         group = currentUserGroup.value!!,
