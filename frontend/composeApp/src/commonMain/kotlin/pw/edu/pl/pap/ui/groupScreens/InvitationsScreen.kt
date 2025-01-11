@@ -38,6 +38,33 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
         )
     }
 
+    if (component.isPostSearchClicked.value){
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            TextButton(
+                text = "BACK",
+                modifier = Modifier.align(Alignment.BottomStart),
+                onUpdate = { component.coroutineScope.launch { component.isPostSearchClicked.value = false } },
+            )
+        }
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            TextButton(
+                text = "BACK",
+                modifier = Modifier.align(Alignment.BottomStart),
+                onUpdate = { component.coroutineScope.launch { component.onDismiss() } },
+            )
+        }
+    }
+
+
 
     if (component.isNewInvitationsScreen.value && !component.isPostSearchClicked.value){
         InputFields(component.newInvitationInputFieldsData)
@@ -52,18 +79,6 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
             component.availableNewInvitationsData,
             Modifier.offset(x = 0.dp, y = 100.dp)
         )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            TextButton(
-                text = "BACK",
-                modifier = Modifier.align(Alignment.BottomStart),
-                onUpdate = { component.coroutineScope.launch { component.isPostSearchClicked.value = false } },
-            )
-        }
     } else {
         component.isPostSearchClicked.value = false
 
