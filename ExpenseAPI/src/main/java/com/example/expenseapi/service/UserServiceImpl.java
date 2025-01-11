@@ -55,7 +55,7 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements U
 
     @Override
     public List<UserDTO> searchUsersDTO(UserFilter filter, String groupName) {
-        if (!AuthHelper.isGroupNameValid(groupName))
+        if (AuthHelper.isGroupNameInvalid(groupName))
             throw new ForbiddenRequestException("User is not in the group");
         Specification<User> spec = Specification.where(null);
         spec = spec.and(UserSpecification.nameContains(filter.getName()));

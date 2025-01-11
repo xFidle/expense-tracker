@@ -103,7 +103,7 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     }
 
     private List<UserDTO> findUsersForGroup(String group, Function<String, List<User>> repoMethod) {
-        if (!AuthHelper.isGroupNameValid(group)) {
+        if (AuthHelper.isGroupNameInvalid(group)) {
             throw new ForbiddenRequestException("User is not a member of the group");
         }
         return repoMethod.apply(group)

@@ -310,7 +310,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         if (filter.getGroupName() == null || filter.getGroupName().isEmpty()) {
             filter.setGroupName(AuthHelper.getGroupName());
         }
-        if (!AuthHelper.isGroupNameValid(filter.getGroupName())) {
+        if (AuthHelper.isGroupNameInvalid(filter.getGroupName())) {
             return Collections.emptyList();
         }
         Specification<Expense> spec = prepareSpecification(filter);
@@ -325,7 +325,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         if (filter.getGroupName() == null || filter.getGroupName().isEmpty()) {
             filter.setGroupName(AuthHelper.getGroupName());
         }
-        if (!AuthHelper.isGroupNameValid(filter.getGroupName())) {
+        if (AuthHelper.isGroupNameInvalid(filter.getGroupName())) {
             return Page.empty();
         }
         Specification<Expense> spec = prepareSpecification(filter);
