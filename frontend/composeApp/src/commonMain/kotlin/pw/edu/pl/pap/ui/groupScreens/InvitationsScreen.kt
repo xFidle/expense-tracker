@@ -7,14 +7,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import pw.edu.pl.pap.screenComponents.groupScreens.InvitationsScreenComponent
-import pw.edu.pl.pap.ui.common.ConfirmOrBackButtonRow
-import pw.edu.pl.pap.ui.common.InputFields
-import pw.edu.pl.pap.ui.common.TextButton
-import pw.edu.pl.pap.ui.common.TwoChoiceClickableHeader
 import pw.edu.pl.pap.util.constants.padding
 import androidx.compose.material3.Text
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import pw.edu.pl.pap.ui.common.*
 
 
 @Composable
@@ -22,16 +19,23 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
 
     component.setupNewInvitationInputFields()
 
-    TwoChoiceClickableHeader(
-        text = "  NEW  ",
-        onClick = { component.isNewInvitationsScreen.value = true },
-        text2 = "PENDING",
-        onClick2 = {
-            component.isNewInvitationsScreen.value = false
-            component.fetchCurrentInvites()
-       },
-        isHighlighted = component.isNewInvitationsScreen.value
-    )
+    if (component.isAdmin){
+        TwoChoiceClickableHeader(
+            text = "  NEW  ",
+            onClick = { component.isNewInvitationsScreen.value = true },
+            text2 = "PENDING",
+            onClick2 = {
+                component.isNewInvitationsScreen.value = false
+                component.fetchCurrentInvites()
+            },
+            isHighlighted = component.isNewInvitationsScreen.value
+        )
+    } else {
+        Header(
+            text = "PENDING"
+        )
+    }
+
 
     if (component.isNewInvitationsScreen.value && !component.isPostSearchClicked.value){
         InputFields(component.newInvitationInputFieldsData)

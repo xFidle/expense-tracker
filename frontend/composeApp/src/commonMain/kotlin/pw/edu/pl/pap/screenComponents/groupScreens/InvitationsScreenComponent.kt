@@ -34,6 +34,7 @@ open class InvitationsScreenComponent(
 
     //TODO
     // check if user is admin to block new invites if he is not
+    val isAdmin: Boolean = true
 
     private val _newInvitationInputFieldsData = mutableStateListOf<InputFieldData>()
     val newInvitationInputFieldsData: List<InputFieldData> get() = _newInvitationInputFieldsData
