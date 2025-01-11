@@ -9,4 +9,6 @@ val repoModule = module {
     single { ChartsRepository(get()) }
     single { ConfigRepository(get()) }
     single { UserRepository(get()) }
+    single { MembershipRepository(get()) }
+    single { TemporaryMembershipRepository(get()) }
 }
