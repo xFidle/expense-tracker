@@ -1,9 +1,7 @@
 package com.example.expenseapi.web;
 
-import com.example.expenseapi.pojo.BaseMembership;
-import com.example.expenseapi.pojo.Membership;
-import com.example.expenseapi.pojo.TemporaryMembership;
-import com.example.expenseapi.pojo.User;
+import com.example.expenseapi.dto.MembershipCreateDTO;
+import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.service.MembershipService;
 import com.example.expenseapi.service.TemporaryMembershipService;
 import com.example.expenseapi.service.UserService;
@@ -40,11 +38,11 @@ public class MembershipController extends GenericController<Membership, Long> {
             @ApiResponse(responseCode = "403", description = "Forbidden. User does not have admin privileges.",
                     content = @Content)
     })
-    public ResponseEntity<HttpStatus> save(@RequestBody BaseMembership entity, @AuthenticationPrincipal org.springframework.security.core.userdetails.User user) {
+    public ResponseEntity<HttpStatus> save(@RequestBody MembershipCreateDTO entity, @AuthenticationPrincipal org.springframework.security.core.userdetails.User user) {
         String email = user.getUsername();
         User mUser = userService.findByEmail(email).get();
-        if (((MembershipService) service).getRole(mUser, entity).equals("admin")) {
-            temporaryMembershipService.save(new TemporaryMembership(entity));
+        if (((MembershipService) service).getRole(mUser, entity.getGroup()).equals("admin")) {
+            temporaryMembershipService.save(entity);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -61,7 +59,7 @@ public class MembershipController extends GenericController<Membership, Long> {
     public ResponseEntity<HttpStatus> delete(@RequestBody Membership entity, @AuthenticationPrincipal org.springframework.security.core.userdetails.User user) {
         String email = user.getUsername();
         User mUser = userService.findByEmail(email).get();
-        if (((MembershipService) service).getRole(mUser, entity).equals("admin")) {
+        if (((MembershipService) service).getRole(mUser, entity.getGroup()).equals("admin")) {
             membershipService.delete(entity.getId());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -79,7 +77,7 @@ public class MembershipController extends GenericController<Membership, Long> {
     public ResponseEntity<HttpStatus> update(@RequestBody Membership entity, @AuthenticationPrincipal org.springframework.security.core.userdetails.User user) {
         String email = user.getUsername();
         User mUser = userService.findByEmail(email).get();
-        if (((MembershipService) service).getRole(mUser, entity).equals("admin")) {
+        if (((MembershipService) service).getRole(mUser, entity.getGroup()).equals("admin")) {
             membershipService.update(entity.getId(), entity);
             return new ResponseEntity<>(HttpStatus.OK);
         }

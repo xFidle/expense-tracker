@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class FilterController {
     @GetMapping("/search")
     @Operation(summary = "Retrieves expenses which satisfies conditions")
     @ApiResponse(responseCode = "200", description = "List of expense objects satisfying conditions", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ExpenseDTO.class))))
-    public ResponseEntity<List<ExpenseDTO>> search(
+    public ResponseEntity<Page<ExpenseDTO>> search(
             @RequestParam(required = false) List<String> categories,
             @RequestParam(required = false) String groupName,
             @RequestParam(required = false) Double minPrice,
@@ -37,7 +38,9 @@ public class FilterController {
             @RequestParam(required = false) String endDate,
             @RequestParam(required = false) List<String> methods,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) List<String> emails
+            @RequestParam(required = false) List<String> emails,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
     ) {
         ExpenseFilter filter = new ExpenseFilter();
         filter.setCategoryNames(categories);
@@ -50,6 +53,6 @@ public class FilterController {
         if (beginDate != null) filter.setBeginDate(LocalDate.parse(beginDate));
         if (endDate != null) filter.setEndDate(LocalDate.parse(endDate));
 
-        return new ResponseEntity<>(service.searchExpensesDTO(filter), HttpStatus.OK);
+        return new ResponseEntity<>(service.searchExpensesPagesDTO(filter, page, size), HttpStatus.OK);
     }
 }

@@ -3,6 +3,8 @@ package com.example.expenseapi.service;
 import com.example.expenseapi.dto.ChangePasswordDTO;
 import com.example.expenseapi.dto.UserDTO;
 import com.example.expenseapi.dto.UserUpdateDTO;
+import com.example.expenseapi.exception.BadRequestException;
+import com.example.expenseapi.exception.ForbiddenRequestException;
 import com.example.expenseapi.filter.UserFilter;
 import com.example.expenseapi.mapper.UserMapper;
 import com.example.expenseapi.pojo.Preference;
@@ -47,9 +49,11 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements U
 
     @Override
     public List<UserDTO> searchUsersDTO(UserFilter filter, String groupName) {
+        if (!AuthHelper.isGroupNameValid(groupName))
+            throw new ForbiddenRequestException("User is not in the group");
         Specification<User> spec = Specification.where(null);
-        spec = spec.and(UserSpecification.nameEquals(filter.getName()));
-        spec = spec.and(UserSpecification.surnameEquals(filter.getSurname()));
+        spec = spec.and(UserSpecification.nameContains(filter.getName()));
+        spec = spec.and(UserSpecification.surnameContains(filter.getSurname()));
         spec = spec.and(UserSpecification.notInGroup(groupName));
         return userRepository.findAll(spec).stream()
                 .map(userMapper::userToUserDTO)
@@ -76,7 +80,9 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long> implements U
         UserDTO response = null;
         if (user.isPresent()) {
             User temp = user.get();
-            if (userUpdateDTO.getEmail() != null){
+            if (userUpdateDTO.getEmail() != null) {
+                if (userRepository.findByEmail(userUpdateDTO.getEmail()).isPresent())
+                    throw new BadRequestException("Email already exists");
                 temp.setEmail(userUpdateDTO.getEmail());
             }
             if (userUpdateDTO.getName() != null){

@@ -2,7 +2,6 @@ package com.example.expenseapi;
 
 import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.repository.*;
-import com.example.expenseapi.utils.CurrencyRatesFetcher;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,7 +24,7 @@ public class ExpenseApiApplication implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final PreferenceRepository preferenceRepository;
 
-    public ExpenseApiApplication(ExpenseRepository expenseRepository, UserRepository userRepository, CategoryRepository categoryRepository, GroupRepository groupRepository, MembershipRepository membershipRepository, ArchivedGroupRepository archivedGroupRepository, CurrencyRepository currencyRepository, PasswordEncoder passwordEncoder, MethodOfPaymentRepository methodOfPaymentRepository, RoleRepository roleRepository, PreferenceRepository preferenceRepository) {
+    public ExpenseApiApplication(ExpenseRepository expenseRepository, UserRepository userRepository, CategoryRepository categoryRepository, GroupRepository groupRepository, MembershipRepository membershipRepository, ArchivedGroupRepository archivedGroupRepository, CurrencyRepository currencyRepository, PasswordEncoder passwordEncoder, MethodOfPaymentRepository methodOfPaymentRepository, RoleRepository roleRepository, PreferenceRepository preferenceRepository, RefreshTokenRepository refreshTokenRepository) {
         this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -54,6 +53,7 @@ public class ExpenseApiApplication implements CommandLineRunner {
         MethodOfPayment[] methods = null;
         Membership[] memberships = null;
         Preference[] preferences = null;
+        RefreshToken[] tokens = null;
 
         if (methodOfPaymentRepository.count() == 0) {
             methods = new MethodOfPayment[]{
@@ -65,9 +65,9 @@ public class ExpenseApiApplication implements CommandLineRunner {
         }
         if (currencyRepository.count() == 0) {
             currencies = new Currency[]{
-                    new Currency("Zlotowka", "PLN", 1),
-                    new Currency("Dollar", "USD", CurrencyRatesFetcher.getCurrencyRates("USD")),
-                    new Currency("Euro", "EUR", CurrencyRatesFetcher.getCurrencyRates("EUR"))
+                    new Currency("PLN", 1),
+                    new Currency("USD", 4.0),
+                    new Currency("EUR", 5.0)
             };
             currencyRepository.saveAll(Arrays.asList(currencies));
         }
@@ -104,6 +104,7 @@ public class ExpenseApiApplication implements CommandLineRunner {
             };
             userRepository.saveAll(Arrays.asList(users));
         }
+
         if (roleRepository.count() == 0) {
             roles = new Role[]{
                     new Role("admin"),
@@ -117,15 +118,14 @@ public class ExpenseApiApplication implements CommandLineRunner {
                     new Membership(users[1], groups[0], roles[0]),
                     new Membership(users[2], groups[1], roles[1]),
                     new Membership(users[0], groups[1], roles[1]),
-                    new Membership(users[0], archivedGroups[0], roles[0]),
-                    new Membership(users[1], archivedGroups[1], roles[1]),
+                    new Membership(users[1], groups[1], roles[1]),
             };
             membershipRepository.saveAll(Arrays.asList(memberships));
         }
         if (categoryRepository.count() == 0) {
             categories = new Category[]{
                     new Category(),
-                    new Category("Transport")
+                    new Category("transport")
             };
             categoryRepository.saveAll((Arrays.asList(categories)));
         }

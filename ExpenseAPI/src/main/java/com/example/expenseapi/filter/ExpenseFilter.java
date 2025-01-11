@@ -23,4 +23,9 @@ public class ExpenseFilter {
     private String groupName;
     private String email;
     private List<String> emails;
+
+    private Long lastId;
+    private LocalDate lastDate;
+    private String lastCategory;
+    private Boolean descending;
 }
