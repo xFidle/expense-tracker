@@ -5,18 +5,26 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.core.component.inject
 import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
 import pw.edu.pl.pap.data.uiSetup.inputFields.InvitationData
-import pw.edu.pl.pap.screenComponents.BaseScreenComponent
+import pw.edu.pl.pap.repositories.data.GroupRepository
+import pw.edu.pl.pap.repositories.data.UserRepository
+import pw.edu.pl.pap.screenComponents.BaseComponent
 import pw.edu.pl.pap.ui.groupScreens.InvitationsScreen
 
 open class InvitationsScreenComponent(
-    baseComponent: BaseScreenComponent,
+    baseComponent: BaseComponent,
     val onDismiss: () -> Unit,
     private val group: UserGroup
-) : BaseScreenComponent by baseComponent {
+) : BaseComponent by baseComponent {
+
+    private val userRepository: UserRepository by inject()
+
+    private val groupRepository: GroupRepository by inject()
+    val currentUserGroup = groupRepository.currentUserGroup
 
     var isNewInvitationsScreen: MutableState<Boolean> = mutableStateOf(false)
     var isPostSearchClicked: MutableState<Boolean> = mutableStateOf(false)
@@ -69,7 +77,7 @@ open class InvitationsScreenComponent(
 
     fun search(){
         runBlocking{
-            val users = apiService.userApiCLient.search(group.name, name.value, surname.value)
+            val users: List<User> = userRepository.searchUsers(group, name.value, surname.value)
             _availableNewInvitationsData.clear()
             _availableNewInvitationsData.addAll(
                 users.map { user ->

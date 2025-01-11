@@ -79,6 +79,9 @@ class RootComponent(
         data class MemberScreen(val user: User) : Configuration()
 
         @Serializable
+        data class InvitatonsScreen()
+
+        @Serializable
         data object NewGroupScreen : Configuration()
 
         @Serializable

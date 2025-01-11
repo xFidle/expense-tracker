@@ -74,4 +74,8 @@ class DataServiceCreator(tokenRepository: TokenRepository, baseUrl: String) {
     fun createConfigApi(): ConfigApi {
         return ktorfit.createConfigApi()
     }
+
+    fun createUserApi(): UserApi {
+        return ktorfit.createUserApi()
+    }
 }
