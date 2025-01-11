@@ -134,15 +134,11 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     @Override
     @Cacheable(value = "expensesPage", key = "#name + '_' + #page + '_' + #size")
     public Page<ExpenseDTO> getExpensesForGroup(String name, int page, int size) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setGroupName(name);
-        return searchExpensesPagesDTO(filter, page, size);
+        return searchExpensesPagesDTO(buildGroupFilter(name), page, size);
     }
 
     private List<ExpenseDTO> getExpensesForGroup(String name) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setGroupName(name);
-        return searchExpensesDTO(filter);
+        return searchExpensesDTO(buildGroupFilter(name));
     }
 
     @Override
@@ -198,12 +194,16 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         return totalExpensesMap(result, keyExtractor, currency);
     }
 
+    private ExpenseFilter buildGroupFilter(String groupName) {
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setGroupName(groupName);
+        return filter;
+    }
+
     @Override
     @Cacheable(value = "recentExpense", key = "#groupName")
     public Optional<ExpenseDTO> getRecentExpense(String groupName) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setGroupName(groupName);
-        List<ExpenseDTO> expenses = searchExpensesDTO(filter);
+        List<ExpenseDTO> expenses = searchExpensesDTO(buildGroupFilter(groupName));
         return expenses.stream().max(Comparator.comparing(ExpenseDTO::getId));
     }
 
@@ -225,9 +225,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     public List<ExpenseDTO> getExpensesForGroupCursorBased(String name, Long lastId, LocalDate lastDate, int size, boolean desc) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setGroupName(name);
-        Specification<Expense> spec = prepareSpecification(filter);
+        Specification<Expense> spec = prepareSpecification(buildGroupFilter(name));
         if (lastDate != null && lastId != null && lastId > 0) {
             spec = spec.and(CursorPaginationUtils.dateCursorSpec(lastId, lastDate, desc));
         }
@@ -271,9 +269,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             int size,
             boolean desc
     ) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setGroupName(name);
-        Specification<Expense> spec = prepareSpecification(filter);
+        Specification<Expense> spec = prepareSpecification(buildGroupFilter(name));
         if (lastCategory != null && !lastCategory.isEmpty() && lastId != null && lastId > 0) {
             spec = spec.and(CursorPaginationUtils.categoryCursorSpec(lastId, lastCategory, desc));
         }
