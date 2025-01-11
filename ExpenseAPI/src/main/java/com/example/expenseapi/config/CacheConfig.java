@@ -34,7 +34,11 @@ public class CacheConfig {
                 "currencies",
                 "methods",
                 "baseGroups",
-                "activeGroups"
+                "activeGroups",
+                "membershipsByUserId",
+                "admins",
+                "users",
+                "roles"
         );
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .expireAfterWrite(60, TimeUnit.MINUTES)
