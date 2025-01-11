@@ -14,6 +14,7 @@ import com.example.expenseapi.mapper.ExpenseMapper;
 import com.example.expenseapi.utils.AuthHelper;
 import com.example.expenseapi.specification.ExpenseSpecification;
 import com.example.expenseapi.utils.CursorPaginationUtils;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -474,6 +475,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             "expensesUserPage",
             "ExpenseID"
     }, allEntries = true)
+    @Transactional
     public void deleteAllExpensesForUserId(Long id) {
         expenseRepository.deleteAllByMembershipUserId(id);
     }
