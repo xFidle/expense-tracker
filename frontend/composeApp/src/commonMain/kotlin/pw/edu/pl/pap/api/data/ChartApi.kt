@@ -11,7 +11,7 @@ interface ChartApi {
     suspend fun getData(
         @Path("group") group: String,
         @Path("keyPattern") keyPattern: String,
-        @QueryMap paramsMap: Map<String, String>
+        @QueryMap paramsMap: Map<String, String?>
     ): ChartData
 
     @GET("chart/keys")

@@ -15,4 +15,8 @@ interface ConfigApi {
 
     @GET("category/all")
     suspend fun getCategories(): List<Category>
+
+    @GET("chart/keys")
+    suspend fun getChartKeys(): List<String>
+
 }

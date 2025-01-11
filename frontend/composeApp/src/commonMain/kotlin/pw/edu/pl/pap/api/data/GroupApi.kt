@@ -20,6 +20,9 @@ interface GroupApi {
     @GET("group/members/{group}")
     suspend fun getUsersInGroup(@Path("group") group: String): List<User>
 
+    @GET("group/{id}")
+    suspend fun getGroup(@Path("id") id: Int): UserGroup
+
     @DELETE("group/delete/{id}")
     suspend fun deleteGroup(@Path("id") id: Int): HttpResponse
 

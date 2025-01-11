@@ -12,27 +12,27 @@ interface ExpenseApi {
     @GET("expense/recent/{group}")
     suspend fun getRecentExpense(@Path("group") group: String): Expense
 
-    @GET("expense/total/{group}")
+    @GET("expense/state/{group}")
     suspend fun getTotalExpenses(@Path("group") group: String): TotalExpenses
 
-    @GET("expense/dateMap/{group}")
+    @GET("expense/dateMap/group/{group}")
     suspend fun getExpenseDateMap(
         @Path("group") group: String,
-        @QueryMap paramsMap: Map<String, String>
+        @QueryMap paramsMap: Map<String, String?>
     ): DateKeyExpensePage
 
-    @GET("expense/categoryMap/{group}")
+    @GET("expense/categoryMap/group/{group}")
     suspend fun getExpenseCatMap(
         @Path("group") group: String,
-        @QueryMap paramsMap: Map<String, String>
+        @QueryMap paramsMap: Map<String, String?>
     ): StringKeyExpensePage
 
-    @POST("expense")
+    @POST("expense/create")
     suspend fun postNewExpense(@Body newExpense: NewExpense): HttpResponse
 
-    @PUT("expense/{id}")
+    @PUT("expense/modify/{id}")
     suspend fun updateExpense(@Path("id") id: Long, @Body expense: Expense): HttpResponse
 
-    @DELETE("expense/{id}")
+    @DELETE("expense/delete/{id}")
     suspend fun deleteExpense(@Path("id") id: Long): HttpResponse
 }
