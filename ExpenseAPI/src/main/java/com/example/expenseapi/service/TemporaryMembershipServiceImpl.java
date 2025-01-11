@@ -2,6 +2,7 @@ package com.example.expenseapi.service;
 
 import com.example.expenseapi.dto.InvitationDTO;
 import com.example.expenseapi.dto.MembershipCreateDTO;
+import com.example.expenseapi.exception.BadRequestException;
 import com.example.expenseapi.mapper.InvitationMapper;
 import com.example.expenseapi.mapper.UserMapper;
 import com.example.expenseapi.pojo.TemporaryMembership;
@@ -56,8 +57,10 @@ public class TemporaryMembershipServiceImpl extends GenericServiceImpl<Temporary
     public TemporaryMembership save(MembershipCreateDTO temporaryMembershipCreateDTO) {
         TemporaryMembership temporaryMembership = new TemporaryMembership();
         temporaryMembership.setUser(userMapper.UserDTOToUser(temporaryMembershipCreateDTO.getUser()));
-        temporaryMembership.setGroup(groupRepository.findById(temporaryMembershipCreateDTO.getGroup().getId()).get());
-        temporaryMembership.setRole(roleRepository.findById(2L).get());
+        temporaryMembership.setGroup(groupRepository.findById(temporaryMembershipCreateDTO.getGroup().getId())
+                .orElseThrow(() -> new BadRequestException("Group with id " + temporaryMembershipCreateDTO.getGroup().getId() + "was not found")));
+        temporaryMembership.setRole(roleRepository.findById(2L)
+                .orElseThrow(() -> new BadRequestException("Role with id = 2 does not exist")));
         temporaryMembership.setSender(AuthHelper.getUser());
         return temporaryMembershipRepository.save(temporaryMembership);
     }
