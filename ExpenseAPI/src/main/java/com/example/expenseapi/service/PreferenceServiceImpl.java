@@ -20,9 +20,9 @@ public class PreferenceServiceImpl extends GenericServiceImpl<Preference, Long> 
     private final CurrencyRepository currencyRepository;
     private final MethodOfPaymentRepository methodOfPaymentRepository;
 
-    public PreferenceServiceImpl(PreferenceRepository repository, PreferenceRepository preferenceRepository, CurrencyRepository currencyRepository, MethodOfPaymentRepository methodOfPaymentRepository) {
+    public PreferenceServiceImpl(PreferenceRepository repository, CurrencyRepository currencyRepository, MethodOfPaymentRepository methodOfPaymentRepository) {
         super(repository);
-        this.preferenceRepository = preferenceRepository;
+        this.preferenceRepository = repository;
         this.currencyRepository = currencyRepository;
         this.methodOfPaymentRepository = methodOfPaymentRepository;
     }
