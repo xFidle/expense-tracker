@@ -101,7 +101,7 @@ open class InvitationsScreenComponent(
                     receiver = invitation.receiver,
                     id = invitation.id,
                     group = invitation.group,
-                    onCancel = { coroutineScope.launch { declineInvite(invitation.id)}}
+                    onCancel = { coroutineScope.launch { cancelInvite(invitation.id)}}
                 )
             }
         )
@@ -125,22 +125,34 @@ open class InvitationsScreenComponent(
     }
 
     private fun invite(user: User){
-        // (User, group)
-        //TODO
+        coroutineScope.launch { membershipRepository.invite(user, currentUserGroup.value!!)}
+
+        _availableNewInvitationsData.removeAll { invitation ->
+            invitation is InvitationData.NewInvitationData && invitation.receiver == user
+        }
     }
 
-    fun cancelInvite(){
-        //  (User, group / id [?])
-        //TODO
+    private fun cancelInvite(id: Long){
+        coroutineScope.launch {temporaryMembershipRepository.decline(id)}
+
+        _sentInvitationData.removeAll{ invitation ->
+            invitation is InvitationData.SentInvitationData && invitation.id == id
+        }
     }
 
-    fun acceptInvite(id: Long){
-        // (User, group / id [?])
-        //TODO
+    private fun acceptInvite(id: Long){
+        coroutineScope.launch {temporaryMembershipRepository.accept(id)}
+
+        _sentInvitationData.removeAll{ invitation ->
+            invitation is InvitationData.ReceivedInvitationData && invitation.id == id
+        }
     }
 
-    fun declineInvite(id: Long){
-        // (User, group / id [?])
-        //TODO
+    private fun declineInvite(id: Long){
+        coroutineScope.launch {temporaryMembershipRepository.decline(id)}
+
+        _sentInvitationData.removeAll{ invitation ->
+            invitation is InvitationData.ReceivedInvitationData && invitation.id == id
+        }
     }
 }

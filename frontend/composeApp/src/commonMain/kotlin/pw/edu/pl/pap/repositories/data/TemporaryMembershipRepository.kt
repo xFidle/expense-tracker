@@ -29,7 +29,7 @@ class TemporaryMembershipRepository(val api: TemporaryMembershipApi) {
         getInvitationsSent()
     }
 
-    suspend fun accept(id: Int){
+    suspend fun accept(id: Long){
         try {
             api.accept(id)
             getPendingInvitations()
@@ -38,7 +38,7 @@ class TemporaryMembershipRepository(val api: TemporaryMembershipApi) {
         }
     }
 
-    suspend fun decline(id: Int){
+    suspend fun decline(id: Long){
         try {
             api.decline(id)
             getPendingInvitations()
