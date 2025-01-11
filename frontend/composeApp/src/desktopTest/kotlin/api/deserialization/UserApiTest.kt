@@ -6,13 +6,10 @@ import io.ktor.client.engine.mock.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
-import pw.edu.pl.pap.data.databaseAssociatedData.Category
-import pw.edu.pl.pap.data.databaseAssociatedData.Currency
-import pw.edu.pl.pap.data.databaseAssociatedData.PaymentMethod
 import pw.edu.pl.pap.data.databaseAssociatedData.User
 import kotlin.test.*
 
-class ApiSerializationTest {
+class UserApiTest {
 
     @Test
     fun `test deserialization of user data`() {
