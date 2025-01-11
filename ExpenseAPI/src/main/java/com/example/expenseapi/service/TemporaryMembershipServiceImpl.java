@@ -66,4 +66,10 @@ public class TemporaryMembershipServiceImpl extends GenericServiceImpl<Temporary
     public void delete(Long id) {
         super.delete(id);
     }
+
+    @Override
+    @CacheEvict(value = "temporaryMembershipsByUserId", key = "T(com.example.expenseapi.utils.AuthHelper).getUser().getId()")
+    public void deleteAllTemporaryMembershipsForUser(Long id) {
+        temporaryMembershipRepository.deleteAllByUserId(id);
+    }
 }
