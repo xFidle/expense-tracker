@@ -15,14 +15,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import pw.edu.pl.pap.api.ApiService
-import pw.edu.pl.pap.api.authApi.LoginApi
-import pw.edu.pl.pap.data.databaseAssociatedData.ChartFilterParams
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import pw.edu.pl.pap.data.databaseAssociatedData.Expense
 import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
+import pw.edu.pl.pap.di.apiModule
+import pw.edu.pl.pap.di.loadAdditionalModules
+import pw.edu.pl.pap.di.repoModule
+import pw.edu.pl.pap.repositories.data.ConfigRepository
 import pw.edu.pl.pap.screenComponents.chartsScreens.ChartsFilterScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.EditGroupScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.MemberScreenComponent
@@ -38,19 +41,17 @@ import pw.edu.pl.pap.screenComponents.singleExpense.NewExpenseScreenComponent
 import pw.edu.pl.pap.ui.navBar.NavBarItem
 
 class RootComponent(
-    componentContext: ComponentContext, private val baseUrl: String
-) : ComponentContext by componentContext {
+    componentContext: ComponentContext,
+) : ComponentContext by componentContext, KoinComponent {
 
     private val navigation = StackNavigation<Configuration>()
     private lateinit var apiService: ApiService
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    private val httpClient = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                ignoreUnknownKeys = true
-            })
+    private fun loadConfig() {
+        val configRepository: ConfigRepository by inject()
+        coroutineScope.launch {
+            configRepository.loadConfig()
         }
         install(HttpTimeout) {
             requestTimeoutMillis = 3000
@@ -117,13 +118,18 @@ class RootComponent(
 
     private fun createLoginScreenComponent(
         componentContext: ComponentContext
-    ): BaseLoginScreenComponent = LoginScreenComponentHelper(
-        componentContext = componentContext,
-        coroutineScope = coroutineScope,
-        apiClient = LoginApi(baseUrl, httpClient),
-        onConfirm = { navigation.replaceAll(Configuration.HomeScreen) },
-        onBack = { navigation.pop() },
-        setToken = { newToken -> apiService = ApiService(newToken, httpClient, baseUrl) })
+    ): BaseLoginScreenComponent {
+        return LoginScreenComponentHelper(
+            componentContext = componentContext,
+            coroutineScope = coroutineScope,
+            onConfirm = {
+                loadAdditionalModules(apiModule, repoModule)
+                loadConfig()
+                navigation.replaceAll(Configuration.HomeScreen)
+            },
+            onBack = { navigation.pop() },
+        )
+    }
 
     private fun createMainScreenComponent(
         componentContext: ComponentContext
