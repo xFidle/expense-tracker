@@ -9,6 +9,6 @@ import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 interface MembershipApi {
 
     @POST("membership/invite")
-    suspend fun updateGroup(@Body user: User, group: UserGroup): HttpResponse
+    suspend fun sendInvite(@Body user: User, group: UserGroup): HttpResponse
 
 }
