@@ -76,6 +76,8 @@ open class InvitationsScreenComponent(
     fun fetchCurrentInvites(){
         runBlocking {
             temporaryMembershipRepository.getPendingInvitations()
+            setupReceivedInvitationsData()
+            setupSentInvitationsData()
         }
     }
 

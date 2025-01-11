@@ -19,6 +19,8 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
 
     component.setupNewInvitationInputFields()
 
+    component.fetchCurrentInvites()
+
     if (component.isAdmin){
         TwoChoiceClickableHeader(
             text = "  NEW  ",
