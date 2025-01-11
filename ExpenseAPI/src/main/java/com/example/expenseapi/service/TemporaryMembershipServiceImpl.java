@@ -2,6 +2,7 @@ package com.example.expenseapi.service;
 
 import com.example.expenseapi.dto.InvitationDTO;
 import com.example.expenseapi.dto.MembershipCreateDTO;
+import com.example.expenseapi.exception.BadRequestException;
 import com.example.expenseapi.mapper.InvitationMapper;
 import com.example.expenseapi.mapper.UserMapper;
 import com.example.expenseapi.pojo.TemporaryMembership;
@@ -52,24 +53,26 @@ public class TemporaryMembershipServiceImpl extends GenericServiceImpl<Temporary
     }
 
     @Override
-    @CacheEvict(value = "temporaryMembershipsByUserId", key = "#temporaryMembershipCreateDTO.user.id")
+    @CacheEvict(value = {"temporaryMembershipsByUserId", "temporaryMembershipsBySenderId"}, allEntries = true)
     public TemporaryMembership save(MembershipCreateDTO temporaryMembershipCreateDTO) {
         TemporaryMembership temporaryMembership = new TemporaryMembership();
         temporaryMembership.setUser(userMapper.UserDTOToUser(temporaryMembershipCreateDTO.getUser()));
-        temporaryMembership.setGroup(groupRepository.findById(temporaryMembershipCreateDTO.getGroup().getId()).get());
-        temporaryMembership.setRole(roleRepository.findById(2L).get());
+        temporaryMembership.setGroup(groupRepository.findById(temporaryMembershipCreateDTO.getGroup().getId())
+                .orElseThrow(() -> new BadRequestException("Group with id " + temporaryMembershipCreateDTO.getGroup().getId() + " was not found")));
+        temporaryMembership.setRole(roleRepository.findById(2L)
+                .orElseThrow(() -> new BadRequestException("Role with id = 2 does not exist")));
         temporaryMembership.setSender(AuthHelper.getUser());
         return temporaryMembershipRepository.save(temporaryMembership);
     }
 
     @Override
-    @CacheEvict(value = "temporaryMembershipsByUserId", key = "T(com.example.expenseapi.utils.AuthHelper).getUser().getId()")
+    @CacheEvict(value = {"temporaryMembershipsByUserId", "temporaryMembershipsBySenderId"}, allEntries = true)
     public void delete(Long id) {
         super.delete(id);
     }
 
     @Override
-    @CacheEvict(value = "temporaryMembershipsByUserId", key = "T(com.example.expenseapi.utils.AuthHelper).getUser().getId()")
+        @CacheEvict(value = {"temporaryMembershipsByUserId", "temporaryMembershipsBySenderId"}, allEntries = true)
     @Transactional
     public void deleteAllTemporaryMembershipsForUser(Long id) {
         temporaryMembershipRepository.deleteAllByUserId(id);

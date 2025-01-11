@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.beans.FeatureDescriptor;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.*;
 
@@ -72,21 +73,6 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }, allEntries = true)
     public ExpenseDTO save(ExpenseCreateDTO expenseDTO) {
         Expense entity = expenseMapper.expenseCreateDTOToExpense(expenseDTO);
-        if (entity.getCategory() == null) {
-            Category defaultCategory = categoryRepository.findById(1L)
-                    .orElseGet(() -> categoryRepository.save(new Category()));
-            entity.setCategory(defaultCategory);
-        }
-        if (entity.getMethod() == null) {
-            MethodOfPayment defaultMethod = methodOfPaymentRepository.findById(1L)
-                    .orElseGet(() -> methodOfPaymentRepository.save(new MethodOfPayment()));
-            entity.setMethod(defaultMethod);
-        }
-        if (entity.getCurrency() == null) {
-            Currency defaultCurrency = currencyRepository.findById(1L)
-                    .orElseGet(() -> currencyRepository.save(new Currency()));
-            entity.setCurrency(defaultCurrency);
-        }
         Expense savedExpense = expenseRepository.save(entity);
         return expenseMapper.expenseToExpenseDTO(savedExpense);
     }
@@ -113,24 +99,15 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }, allEntries = true)
     public ExpenseDTO createExpense(ExpenseCreateDTO createDTO) {
         User user = AuthHelper.getUser();
-        if (areNeededFieldsProvided(createDTO)) {
+        if (!hasAllRequiredFields(createDTO)) {
             throw new BadRequestException("Title, price, category name and group name are required");
         }
-        if (createDTO.getUser() == null) {
-            createDTO.setUser(userMapper.userToUserDTO(user));
-        }
-        if (createDTO.getCurrencyCode() == null) {
-            createDTO.setCurrencyCode(user.getPreference().getCurrency().getSymbol());
-        }
-        if (createDTO.getMethodOfPayment() == null) {
-            createDTO.setMethodOfPayment(user.getPreference().getMethod().getName());
-        }
+        fillDefaultsFromUserPreferences(createDTO, user);
         Expense expense = expenseMapper.expenseCreateDTOToExpense(createDTO);
-        Optional<Membership> membershipOpt = membershipRepository.findByUserIdAndGroupName(createDTO.getUser().getId(), createDTO.getGroupName());
-        if (membershipOpt.isEmpty()) {
-            throw new ForbiddenRequestException("User is not a member of the group");
-        }
-        expense.setMembership(membershipOpt.get());
+        Membership membership = membershipRepository
+                .findByUserIdAndGroupName(createDTO.getUser().getId(), createDTO.getGroupName())
+                .orElseThrow(() -> new ForbiddenRequestException("User is not a member of the group"));
+        expense.setMembership(membership);
         if (createDTO.getCategoryName() != null) {
             Category category = categoryRepository.findByName(createDTO.getCategoryName());
             expense.setCategory(category);
@@ -138,24 +115,34 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         if (createDTO.getExpenseDate() != null) {
             expense.setDate(createDTO.getExpenseDate());
         }
-        expense.setMethod(methodOfPaymentRepository.findByName(createDTO.getMethodOfPayment()).get()); // TODO check if method exists
-        expense.setCurrency(currencyRepository.findBySymbol(createDTO.getCurrencyCode()).get()); // TODO check if currency exists
+        expense.setMethod(methodOfPaymentRepository.findByName(createDTO.getMethodOfPayment())
+                .orElseThrow(() -> new BadRequestException("Method of payment not found: " + createDTO.getMethodOfPayment())));
+        expense.setCurrency(currencyRepository.findBySymbol(createDTO.getCurrencyCode())
+                .orElseThrow(() -> new BadRequestException("Currency not found: " + createDTO.getCurrencyCode())));
         Expense savedExpense = expenseRepository.save(expense);
         return expenseMapper.expenseToExpenseDTO(savedExpense);
+    }
+
+    private void fillDefaultsFromUserPreferences(ExpenseCreateDTO dto, User user) {
+        if (dto.getUser() == null) {
+            dto.setUser(userMapper.userToUserDTO(user));
+        }
+        if (dto.getCurrencyCode() == null) {
+            dto.setCurrencyCode(user.getPreference().getCurrency().getSymbol());
+        }
+        if (dto.getMethodOfPayment() == null) {
+            dto.setMethodOfPayment(user.getPreference().getMethod().getName());
+        }
     }
 
     @Override
     @Cacheable(value = "expensesPage", key = "#name + '_' + #page + '_' + #size")
     public Page<ExpenseDTO> getExpensesForGroup(String name, int page, int size) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setGroupName(name);
-        return searchExpensesPagesDTO(filter, page, size);
+        return searchExpensesPagesDTO(buildGroupFilter(name), page, size);
     }
 
     private List<ExpenseDTO> getExpensesForGroup(String name) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setGroupName(name);
-        return searchExpensesDTO(filter);
+        return searchExpensesDTO(buildGroupFilter(name));
     }
 
     @Override
@@ -204,25 +191,30 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     @Cacheable(value = "expensesMap", key = "#filter.toString() + '_' + #keyType")
     public Map<String, Double> getMapResult(ExpenseFilter filter,  String keyType) {
         List<ExpenseDTO> result = searchExpensesDTO(filter);
-        Currency currency = currencyRepository.findBySymbol(AuthHelper.getUser().getPreference().getCurrency().getSymbol()).get(); //TODO check if currency exists
+        Currency currency = currencyRepository.findBySymbol(AuthHelper.getUser().getPreference().getCurrency().getSymbol())
+                .orElseThrow(() -> new BadRequestException("Currency not found " + AuthHelper.getUser().getPreference().getCurrency().getSymbol()));
         Function<ExpenseDTO, String> keyExtractor = findKeyExtractor(keyType);
         if (keyExtractor == null) throw new BadRequestException("Invalid key type");
         return totalExpensesMap(result, keyExtractor, currency);
     }
 
+    private ExpenseFilter buildGroupFilter(String groupName) {
+        ExpenseFilter filter = new ExpenseFilter();
+        filter.setGroupName(groupName);
+        return filter;
+    }
+
     @Override
     @Cacheable(value = "recentExpense", key = "#groupName")
     public Optional<ExpenseDTO> getRecentExpense(String groupName) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setGroupName(groupName);
-        List<ExpenseDTO> expenses = searchExpensesDTO(filter);
+        List<ExpenseDTO> expenses = searchExpensesDTO(buildGroupFilter(groupName));
         return expenses.stream().max(Comparator.comparing(ExpenseDTO::getId));
     }
 
     @Override
     @Cacheable(value = "groupExpenseDateMap", key = "#name + '_' + #lastId + '_' + #lastDate + '_' + #size + '_' + #desc")
     public CursorPageResponse<Map<LocalDate, List<ExpenseDTO>>> getGroupExpenseAsDateMap(String name, Long lastId, LocalDate lastDate, int size, boolean desc) {
-        List<ExpenseDTO> expenses = getExpensesForGroupCursorBased(name, lastId, lastDate, size, desc);
+        List<ExpenseDTO> expenses = getExpensesForGroupDateCursorBased(name, lastId, lastDate, size, desc);
         Map<LocalDate, List<ExpenseDTO>> grouped = expenses.stream()
                 .collect(Collectors.groupingBy(ExpenseDTO::getExpenseDate, LinkedHashMap::new, Collectors.toList()));
         CursorPageResponse<Map<LocalDate, List<ExpenseDTO>>> response = new CursorPageResponse<>();
@@ -236,20 +228,40 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         return response;
     }
 
-    public List<ExpenseDTO> getExpensesForGroupCursorBased(String name, Long lastId, LocalDate lastDate, int size, boolean desc) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setGroupName(name);
+    private List<ExpenseDTO> getExpensesForGroupCursorBased(
+            String groupName,
+            Long lastId,
+            Object cursorValue,
+            int size,
+            boolean desc,
+            Function<Boolean, Sort> sortBuilder,
+            BiFunction<Long, Object, Specification<Expense>> cursorSpecBuilder
+    ) {
+        ExpenseFilter filter = buildGroupFilter(groupName);
         Specification<Expense> spec = prepareSpecification(filter);
-        if (lastDate != null && lastId != null && lastId > 0) {
-            spec = spec.and(CursorPaginationUtils.dateCursorSpec(lastId, lastDate, desc));
+        if (cursorValue != null && lastId != null && lastId > 0) {
+            spec = spec.and(cursorSpecBuilder.apply(lastId, cursorValue));
         }
-        Sort sort = CursorPaginationUtils.buildSortForDate(desc);
+        Sort sort = sortBuilder.apply(desc);
         Pageable pageable = PageRequest.of(0, size, sort);
         Page<Expense> pageResult = expenseRepository.findAll(spec, pageable);
         return pageResult.getContent()
                 .stream()
                 .map(expenseMapper::expenseToExpenseDTO)
                 .toList();
+    }
+
+
+    public List<ExpenseDTO> getExpensesForGroupDateCursorBased(String name, Long lastId, LocalDate lastDate, int size, boolean desc) {
+        return getExpensesForGroupCursorBased(
+                name,
+                lastId,
+                lastDate,
+                size,
+                desc,
+                CursorPaginationUtils::buildSortForDate,
+                (id, dateVal) -> CursorPaginationUtils.dateCursorSpec(id, (LocalDate) dateVal, desc)
+        );
     }
 
     @Override
@@ -261,14 +273,14 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             int size,
             boolean desc
     ) {
-        List<ExpenseDTO> dtos = getExpensesForGroupCategoryCursorBased(name, lastId, lastCategory, size, desc);
-        Map<Category, List<ExpenseDTO>> grouped = dtos.stream()
+        List<ExpenseDTO> expensesList = getExpensesForGroupCategoryCursorBased(name, lastId, lastCategory, size, desc);
+        Map<Category, List<ExpenseDTO>> grouped = expensesList.stream()
                 .collect(Collectors.groupingBy(ExpenseDTO::getCategory, LinkedHashMap::new, Collectors.toList()));
         CursorPageResponse<Map<Category, List<ExpenseDTO>>> response = new CursorPageResponse<>();
         response.setData(grouped);
-        response.setHasMore(dtos.size() == size);
-        if (!dtos.isEmpty()) {
-            ExpenseDTO lastDto = dtos.getLast();
+        response.setHasMore(expensesList.size() == size);
+        if (!expensesList.isEmpty()) {
+            ExpenseDTO lastDto = expensesList.getLast();
             response.setNextLastKey(lastDto.getCategory().getName());
             response.setNextLastId(lastDto.getId());
         }
@@ -283,28 +295,22 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             int size,
             boolean desc
     ) {
-        ExpenseFilter filter = new ExpenseFilter();
-        filter.setGroupName(name);
-        Specification<Expense> spec = prepareSpecification(filter);
-        if (lastCategory != null && !lastCategory.isEmpty() && lastId != null && lastId > 0) {
-            spec = spec.and(CursorPaginationUtils.categoryCursorSpec(lastId, lastCategory, desc));
-        }
-        Sort sort = CursorPaginationUtils.buildSortForCategory(desc);
-        Pageable pageable = PageRequest.of(0, size, sort);
-        Page<Expense> pageResult = expenseRepository.findAll(spec, pageable);
-        return pageResult.getContent()
-                .stream()
-                .map(expenseMapper::expenseToExpenseDTO)
-                .toList();
+        return getExpensesForGroupCursorBased(
+                name,
+                lastId,
+                lastCategory,
+                size,
+                desc,
+                CursorPaginationUtils::buildSortForCategory,
+                (id, catVal) -> CursorPaginationUtils.categoryCursorSpec(id, (String) catVal, desc)
+        );
     }
 
-    @Override
-    @Cacheable(value = "searchExpensesDTO", key = "#filter.toString()")
-    public List<ExpenseDTO> searchExpensesDTO(ExpenseFilter filter) {
+    private List<ExpenseDTO> searchExpensesDTO(ExpenseFilter filter) {
         if (filter.getGroupName() == null || filter.getGroupName().isEmpty()) {
             filter.setGroupName(AuthHelper.getGroupName());
         }
-        if (!AuthHelper.isGroupNameValid(filter.getGroupName())) {
+        if (AuthHelper.isGroupNameInvalid(filter.getGroupName())) {
             return Collections.emptyList();
         }
         Specification<Expense> spec = prepareSpecification(filter);
@@ -319,7 +325,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         if (filter.getGroupName() == null || filter.getGroupName().isEmpty()) {
             filter.setGroupName(AuthHelper.getGroupName());
         }
-        if (!AuthHelper.isGroupNameValid(filter.getGroupName())) {
+        if (AuthHelper.isGroupNameInvalid(filter.getGroupName())) {
             return Page.empty();
         }
         Specification<Expense> spec = prepareSpecification(filter);
@@ -401,18 +407,20 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             @CacheEvict(value = "ExpenseID", key = "#id")
     })
     public ExpenseDTO updateExpense(Long id, ExpenseDTO expenseDTO) {
-        Expense expense = expenseRepository.findById(id).orElse(null);
+        Expense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Expense not found"));
         Expense updatedExpense = expenseMapper.expenseDTOToExpense(expenseDTO);
         BeanUtils.copyProperties(updatedExpense, expense, getNullPropertyNames(updatedExpense));
-        expense.setMethod(methodOfPaymentRepository.findByName(updatedExpense.getMethod().getName()).get()); //TODO check if method exists
+        expense.setMethod(methodOfPaymentRepository.findByName(updatedExpense.getMethod().getName())
+                .orElseThrow(()->new BadRequestException("Method does not exist")));
         return expenseMapper.expenseToExpenseDTO(expenseRepository.save(expense));
     }
 
-    private boolean areNeededFieldsProvided(ExpenseCreateDTO expenseCreateDTO) {
-        return expenseCreateDTO.getTitle() == null ||
-                expenseCreateDTO.getPrice() == null ||
-                expenseCreateDTO.getCategoryName() == null ||
-                expenseCreateDTO.getGroupName() == null;
+    private boolean hasAllRequiredFields(ExpenseCreateDTO expenseCreateDTO) {
+        return expenseCreateDTO.getTitle() != null &&
+                expenseCreateDTO.getPrice() != null &&
+                expenseCreateDTO.getCategoryName() != null &&
+                expenseCreateDTO.getGroupName() != null;
 
     }
 

@@ -1,7 +1,6 @@
 package com.example.expenseapi.utils;
 
-import com.example.expenseapi.dto.UserDTO;
-import com.example.expenseapi.mapper.UserMapper;
+import com.example.expenseapi.exception.BadRequestException;
 import com.example.expenseapi.pojo.BaseGroup;
 import com.example.expenseapi.pojo.User;
 import com.example.expenseapi.repository.MembershipRepository;
@@ -17,13 +16,11 @@ import java.util.Optional;
 public class AuthHelper {
     private static UserRepository userRepository;
     private static MembershipRepository membershipRepository;
-    private static UserMapper userMapper;
 
     @Autowired
-    public AuthHelper(UserRepository userRepository, MembershipRepository membershipRepository, UserMapper userMapper) {
+    public AuthHelper(UserRepository userRepository, MembershipRepository membershipRepository) {
         AuthHelper.userRepository = userRepository;
         AuthHelper.membershipRepository = membershipRepository;
-        AuthHelper.userMapper = userMapper;
     }
 
     public static String getUserEmail() {
@@ -31,7 +28,8 @@ public class AuthHelper {
     }
 
     public static User getUser() {
-        return userRepository.findByEmail(getUserEmail()).get();
+        return userRepository.findByEmail(getUserEmail())
+                .orElseThrow(()->new BadRequestException("User with email " + getUserEmail() + " not found"));
     }
 
     public static String getGroupName() {
@@ -47,8 +45,8 @@ public class AuthHelper {
         return groups;
     }
 
-    public static boolean isGroupNameValid(String name) {
+    public static boolean isGroupNameInvalid(String name) {
         return getAllGroups().stream()
-                .anyMatch(group -> group.getName().equals(name));
+                .noneMatch(group -> group.getName().equals(name));
     }
 }
