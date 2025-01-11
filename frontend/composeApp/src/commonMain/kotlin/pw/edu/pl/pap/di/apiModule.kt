@@ -12,4 +12,7 @@ val apiModule = module {
     single { get<DataServiceCreator>().createChartApi() }
     single { get<DataServiceCreator>().createGroupApi() }
     single { get<DataServiceCreator>().createConfigApi() }
+    single { get<DataServiceCreator>().createUserApi() }
+    single { get<DataServiceCreator>().createMembershipApi() }
+    single { get<DataServiceCreator>().createTemporaryMembershipApi() }
 }

@@ -15,6 +15,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import pw.edu.pl.pap.data.databaseAssociatedData.RefreshToken
 import pw.edu.pl.pap.repositories.auth.TokenRepository
+import java.lang.reflect.Member
 
 class DataServiceCreator(tokenRepository: TokenRepository, baseUrl: String) {
     private val bearerTokenStorage =
@@ -73,5 +74,17 @@ class DataServiceCreator(tokenRepository: TokenRepository, baseUrl: String) {
 
     fun createConfigApi(): ConfigApi {
         return ktorfit.createConfigApi()
+    }
+
+    fun createUserApi(): UserApi {
+        return ktorfit.createUserApi()
+    }
+
+    fun createMembershipApi(): MembershipApi {
+        return ktorfit.createMembershipApi()
+    }
+
+    fun createTemporaryMembershipApi(): TemporaryMembershipApi {
+        return ktorfit.createTemporaryMembershipApi()
     }
 }

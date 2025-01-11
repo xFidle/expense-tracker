@@ -21,6 +21,7 @@ import pw.edu.pl.pap.di.repoModule
 import pw.edu.pl.pap.repositories.data.ConfigRepository
 import pw.edu.pl.pap.screenComponents.chartsScreens.ChartsFilterScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.EditGroupScreenComponent
+import pw.edu.pl.pap.screenComponents.groupScreens.InvitationsScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.MemberScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.NewGroupScreenComponent
 import pw.edu.pl.pap.screenComponents.loginSystem.*
@@ -77,6 +78,9 @@ class RootComponent(
 
         @Serializable
         data class MemberScreen(val user: User) : Configuration()
+
+        @Serializable
+        data object InvitationsScreen : Configuration()
 
         @Serializable
         data object NewGroupScreen : Configuration()
@@ -149,6 +153,7 @@ class RootComponent(
         data class MemberScreen(val component: MemberScreenComponent) : Child()
         data class NewGroupScreen(val component: NewGroupScreenComponent) : Child()
         data class EditGroupScreen(val component: EditGroupScreenComponent) : Child()
+        data class InvitationsScreen(val component: InvitationsScreenComponent) : Child()
 
         data class ServerAddressScreen(val component: ServerAdressScreenComponent) : Child()
         data class UserPersonalDataScreen(val component: UserPersonalDataScreenComponent) : Child()
@@ -258,11 +263,7 @@ class RootComponent(
                     onUserClicked = { userGroup, user ->
                         navigation.pushNew(Configuration.MemberScreen(user))
                     },
-//                    onInvitationsClicked = { userGroup ->
-//                        navigation.pushNew(Configuration.InvitationsScreen(userGroup))
-//                    },
-                    //TODO
-                    onInvitationsClicked = {},
+                    onInvitationsClicked = { navigation.pushNew(Configuration.InvitationsScreen) },
                     onNewGroupClicked = { navigation.pushNew(Configuration.NewGroupScreen) },
                     onEditGroupClicked = { navigation.pushNew(Configuration.EditGroupScreen) },
                 )
@@ -313,6 +314,13 @@ class RootComponent(
 //                    },
                     //TODO
                 ))
+
+            is Configuration.InvitationsScreen -> Child.InvitationsScreen(
+                InvitationsScreenComponent(
+                    onDismiss = { navigation.pop() },
+                    baseComponent = createMainScreenComponent(componentContext)
+                )
+            )
 
             is Configuration.SettingsScreen -> Child.SettingsScreen(
                 SettingsScreenComponent(

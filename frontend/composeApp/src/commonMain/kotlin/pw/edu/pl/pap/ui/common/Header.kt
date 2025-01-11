@@ -8,6 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.graphics.Color
+import pw.edu.pl.pap.util.constants.padding
 
 @Composable
 fun Header(text: String) {
@@ -37,8 +39,42 @@ fun ClickableHeader(
             fontSize = 40.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier
-                .align(Alignment.TopCenter)
+                .align(Alignment.Center)
                 .clickable { onClick() },
+        )
+    }
+}
+
+@Composable
+fun TwoChoiceClickableHeader(
+    text: String,
+    onClick: () -> Unit,
+    text2: String,
+    onClick2: () -> Unit,
+    isHighlighted: Boolean
+){
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding)
+    ) {
+        Text(
+            text = text,
+            fontSize = 40.sp,
+            fontWeight = FontWeight.Medium,
+            color = if (isHighlighted) Color.LightGray else Color.Gray,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .clickable { onClick() },
+        )
+        Text(
+            text = text2,
+            fontSize = 40.sp,
+            fontWeight = FontWeight.Medium,
+            color = if (!isHighlighted) Color.LightGray else Color.Gray,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .clickable { onClick2() },
         )
     }
 }
