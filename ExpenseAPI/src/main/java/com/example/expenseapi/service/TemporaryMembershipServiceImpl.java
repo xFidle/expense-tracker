@@ -6,6 +6,7 @@ import com.example.expenseapi.pojo.TemporaryMembership;
 import com.example.expenseapi.repository.GroupRepository;
 import com.example.expenseapi.repository.RoleRepository;
 import com.example.expenseapi.repository.TemporaryMembershipRepository;
+import com.example.expenseapi.utils.AuthHelper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class TemporaryMembershipServiceImpl extends GenericServiceImpl<Temporary
         temporaryMembership.setUser(userMapper.UserDTOToUser(temporaryMembershipCreateDTO.getUser()));
         temporaryMembership.setGroup(groupRepository.findById(temporaryMembershipCreateDTO.getGroup().getId()).get());
         temporaryMembership.setRole(roleRepository.findById(2L).get());
+        temporaryMembership.setSender(AuthHelper.getUser());
         return temporaryMembershipRepository.save(temporaryMembership);
     }
 
