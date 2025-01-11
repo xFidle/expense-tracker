@@ -7,11 +7,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
-import org.junit.jupiter.api.Assertions.assertTrue
-import pw.edu.pl.pap.data.databaseAssociatedData.DateKeyExpensePage
 import pw.edu.pl.pap.data.databaseAssociatedData.Expense
 import pw.edu.pl.pap.data.databaseAssociatedData.TotalExpenses
-import pw.edu.pl.pap.util.sortingSystem.GroupMapKey
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
