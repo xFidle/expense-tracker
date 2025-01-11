@@ -399,9 +399,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     private boolean hasAllRequiredFields(ExpenseCreateDTO expenseCreateDTO) {
-        return expenseCreateDTO.getTitle() != null ||
-                expenseCreateDTO.getPrice() != null ||
-                expenseCreateDTO.getCategoryName() != null ||
+        return expenseCreateDTO.getTitle() != null &&
+                expenseCreateDTO.getPrice() != null &&
+                expenseCreateDTO.getCategoryName() != null &&
                 expenseCreateDTO.getGroupName() != null;
 
     }
