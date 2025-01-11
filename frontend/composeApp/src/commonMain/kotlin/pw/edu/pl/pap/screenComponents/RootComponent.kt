@@ -133,14 +133,14 @@ class RootComponent(
 
     private fun createMainScreenComponent(
         componentContext: ComponentContext
-    ): BaseScreenComponent = BaseScreenComponentImpl(
-        componentContext = componentContext, apiService = apiService, coroutineScope = coroutineScope
+    ): BaseComponent = BaseComponentImpl(
+        componentContext = componentContext, coroutineScope = coroutineScope
     )
 
     private fun createSettingsScreenComponent(
         componentContext: ComponentContext
     ): BaseSettingsScreenComponent = SettingsScreenComponentHelper(
-        componentContext = componentContext, apiService = apiService, coroutineScope = coroutineScope, onBack = {
+        componentContext = componentContext, coroutineScope = coroutineScope, onBack = {
             navigation.pop()
             navBarItemClicked(NavBarItem.Settings)
         })
@@ -244,8 +244,8 @@ class RootComponent(
             is Configuration.NewExpenseScreen -> Child.NewExpenseScreen(
                 component = NewExpenseScreenComponent(
                     baseComponent = createMainScreenComponent(componentContext),
-                    onDismiss = { navigation.pop() },
-                    onSave = {
+                    onBack = { navigation.pop() },
+                    onAdd = {
                         navigation.pop()
                         (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
                             HomeScreenComponent.NavigationState.FromNewExpenseScreen
@@ -258,19 +258,7 @@ class RootComponent(
             is Configuration.ExpenseDetailsScreen -> Child.ExpenseDetailsScreen(
                 component = ExpenseDetailsScreenComponent(
                     baseComponent = createMainScreenComponent(componentContext),
-                    onDismiss = { navigation.pop() },
-                    onSave = {
-                        navigation.pop()
-                        (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
-                            HomeScreenComponent.NavigationState.FromExpenseDetailsScreenEdit(configuration.expense)
-                        )
-                    },
-                    onDelete = {
-                        navigation.pop()
-                        (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
-                            HomeScreenComponent.NavigationState.FromExpenseDetailsScreenDelete(configuration.expense)
-                        )
-                    },
+                    onBack = { navigation.pop() },
                     expense = configuration.expense
                 )
             )
