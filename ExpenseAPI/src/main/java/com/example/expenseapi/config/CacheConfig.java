@@ -9,11 +9,10 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-@EnableCaching  // Włącza mechanizm cache'owania w Spring
+@EnableCaching
 public class CacheConfig {
 
     @Bean
