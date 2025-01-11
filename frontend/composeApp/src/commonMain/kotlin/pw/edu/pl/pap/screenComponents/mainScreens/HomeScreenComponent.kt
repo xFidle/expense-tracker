@@ -30,6 +30,8 @@ class HomeScreenComponent(
     private val _navigationState = MutableStateFlow<NavigationState>(NavigationState.InitialLoad)
     val navigationState: StateFlow<NavigationState> get() = _navigationState
 
+    val loadingData = expenseRepository.loadingData
+
     init {
         if (groupRepository.currentUserGroup.value == null) {
             runBlocking { populateGroupList() }
@@ -93,10 +95,9 @@ class HomeScreenComponent(
         }
     }
 
-    fun fetchNextPage() {
-        coroutineScope.launch {
-            expenseRepository.loadNextPage(groupRepository.getCurrentGroupName())
-        }
+    suspend fun fetchNextPage() {
+        println("next page")
+        expenseRepository.loadNextPage(groupRepository.getCurrentGroupName())
     }
 
     private fun getRecentExpense() {
