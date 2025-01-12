@@ -2,7 +2,6 @@ package com.example.expenseapi.web;
 
 
 import com.example.expenseapi.dto.PreferenceDTO;
-import com.example.expenseapi.pojo.Preference;
 import com.example.expenseapi.service.PreferenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
