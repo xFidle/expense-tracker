@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.core.component.inject
 import pw.edu.pl.pap.data.uiSetup.ConfirmationDialogConfig
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
+import pw.edu.pl.pap.repositories.data.UserRepository
 import pw.edu.pl.pap.screenComponents.BaseComponent
 
 class SettingsScreenComponent(
@@ -17,6 +19,8 @@ class SettingsScreenComponent(
     private val onEditPreferencesClicked: () -> Unit,
     baseComponent: BaseComponent
 ) : BaseComponent by baseComponent {
+
+    private val userRepository: UserRepository by inject()
 
     private val _inputFieldsData = mutableStateListOf<InputFieldData>()
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
@@ -39,7 +43,8 @@ class SettingsScreenComponent(
         onNo = { showDeleteAccountDialog.value = false },
         onYes = {
             showDeleteAccountDialog.value = false
-            runBlocking { deleteAccount() }
+            onLogOut()
+            coroutineScope.launch { deleteAccount() }
         })
 //    private var debounceJob by mutableStateOf<Job?>(null)
 //
@@ -90,11 +95,14 @@ class SettingsScreenComponent(
             )
         ))
     }
+
+    private suspend fun deleteAccount() {
+        userRepository.deleteUser()
+        //TODO test it
+    }
 }
 
-private suspend fun deleteAccount() {
-    //TODO
-}
+
 
 
 

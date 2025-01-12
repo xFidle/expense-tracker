@@ -70,4 +70,12 @@ class UserRepository(val api: UserApi) {
             e.printStackTrace()
         }
     }
+
+    suspend fun deleteUser() {
+        try {
+            api.deleteUser(currentUserInfo.value!!.id)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

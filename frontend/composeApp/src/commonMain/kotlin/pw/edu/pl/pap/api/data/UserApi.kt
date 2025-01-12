@@ -1,9 +1,6 @@
 package pw.edu.pl.pap.api.data
 
-import de.jensklingenberg.ktorfit.http.Body
-import de.jensklingenberg.ktorfit.http.GET
-import de.jensklingenberg.ktorfit.http.PUT
-import de.jensklingenberg.ktorfit.http.Path
+import de.jensklingenberg.ktorfit.http.*
 import io.ktor.client.statement.*
 import pw.edu.pl.pap.data.databaseAssociatedData.NewPassword
 import pw.edu.pl.pap.data.databaseAssociatedData.Preferences
@@ -32,4 +29,7 @@ interface UserApi {
 
     @PUT("preferences/update")
     suspend fun updatePreferences(@Body newPreferences: Preferences): Preferences
+
+    @DELETE("user/delete/{id}")
+    suspend fun deleteUser(@Path id: Long): HttpResponse
 }

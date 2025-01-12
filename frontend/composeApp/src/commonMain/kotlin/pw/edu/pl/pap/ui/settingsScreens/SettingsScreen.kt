@@ -18,6 +18,10 @@ fun SettingsScreen(component: SettingsScreenComponent) {
     if (component.showLogOutDialog.value) {
         showConfirmationPopup(component.logOutConfirmationData)
     }
+
+    if (component.showDeleteAccountDialog.value) {
+        showConfirmationPopup(component.deleteAccountConfirmationData)
+    }
 }
 
 
