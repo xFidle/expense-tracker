@@ -50,13 +50,17 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "User successfully registered."),
             @ApiResponse(responseCode = "409", description = "A user with the provided email already exists.")
     })
-    public ResponseEntity<HttpStatus> registerUser(@RequestBody User user) {
+    public ResponseEntity<AuthResponseDTO> registerUser(@RequestBody User user) {
         if (userService.findByEmail(user.getEmail()).isPresent()) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.save(user);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        RefreshToken refreshToken = refreshTokenService.findOrCreateToken(user.getEmail());
+        return new ResponseEntity<>(new AuthResponseDTO(accessToken,
+                refreshToken.getToken()),
+                HttpStatus.OK);
     }
 
     @PostMapping("/login")
