@@ -55,6 +55,11 @@ public class TemporaryMembershipServiceImpl extends GenericServiceImpl<Temporary
     @Override
     @CacheEvict(value = {"temporaryMembershipsByUserId", "temporaryMembershipsBySenderId"}, allEntries = true)
     public TemporaryMembership save(MembershipCreateDTO temporaryMembershipCreateDTO) {
+        if (temporaryMembershipRepository.findByUserId(temporaryMembershipCreateDTO.getUser().getId())
+                .stream()
+                .anyMatch(temporaryMembership -> temporaryMembership.getGroup().getId().equals(temporaryMembershipCreateDTO.getGroup().getId()))) {
+            throw new BadRequestException("User already got an invitation");
+        }
         TemporaryMembership temporaryMembership = new TemporaryMembership();
         temporaryMembership.setUser(userMapper.UserDTOToUser(temporaryMembershipCreateDTO.getUser()));
         temporaryMembership.setGroup(groupRepository.findById(temporaryMembershipCreateDTO.getGroup().getId())
