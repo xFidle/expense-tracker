@@ -11,6 +11,9 @@ class UserRepository(val api: UserApi) {
     private val _usersFound = MutableStateFlow<List<User>>(listOf())
     val usersFound: StateFlow<List<User>> get() = _usersFound
 
+    private val _isAdmin = MutableStateFlow<Boolean>(false)
+    val isAdmin: StateFlow<Boolean> get() = _isAdmin
+
 
 
     suspend fun searchUsers(group: UserGroup, name: String, surname:String){
@@ -21,13 +24,13 @@ class UserRepository(val api: UserApi) {
         }
     }
 
-    suspend fun isAdmin(group: UserGroup): Boolean{
-        var result: Boolean? = null
+    suspend fun checkIsAdmin(group: UserGroup){
         try {
-           result = api.isAdmin(group.name)
+           _isAdmin.value = api.isAdmin(group.name)
+            println(group.name)
+            println(api.isAdmin(group.name))
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return result!!
     }
 }

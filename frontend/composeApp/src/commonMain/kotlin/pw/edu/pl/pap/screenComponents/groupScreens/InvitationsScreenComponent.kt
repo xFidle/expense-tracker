@@ -22,14 +22,7 @@ class InvitationsScreenComponent(
     val onDismiss: () -> Unit
 ) : BaseComponent by baseComponent {
 
-    var isAdmin: Boolean = false
 
-    init {
-        coroutineScope.launch {
-            var isAdmin: Boolean = userRepository.isAdmin(currentUserGroup.value!!)
-        }
-        println("init done")
-    }
 
     private val userRepository: UserRepository by inject()
     private val membershipRepository: MembershipRepository by inject()
@@ -37,6 +30,14 @@ class InvitationsScreenComponent(
 
     private val groupRepository: GroupRepository by inject()
     val currentUserGroup = groupRepository.currentUserGroup
+
+    val isAdmin = userRepository.isAdmin
+
+    init{
+        runBlocking {
+            userRepository.checkIsAdmin(currentUserGroup.value!!)
+        }
+    }
 
     var isNewInvitationsScreen: MutableState<Boolean> = mutableStateOf(false)
     var isPostSearchClicked: MutableState<Boolean> = mutableStateOf(false)

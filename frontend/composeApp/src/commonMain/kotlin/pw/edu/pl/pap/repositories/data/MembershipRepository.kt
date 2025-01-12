@@ -8,7 +8,7 @@ class MembershipRepository(val api: MembershipApi) {
 
     suspend fun invite(user: User, group: UserGroup){
         try {
-            api.sendInvite(user, group)
+            println(api.sendInvite(user, group))
         } catch (e: Exception) {
             e.printStackTrace()
         }
