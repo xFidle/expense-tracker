@@ -19,6 +19,7 @@ import pw.edu.pl.pap.di.apiModule
 import pw.edu.pl.pap.di.loadAdditionalModules
 import pw.edu.pl.pap.di.repoModule
 import pw.edu.pl.pap.repositories.data.ConfigRepository
+import pw.edu.pl.pap.repositories.data.UserRepository
 import pw.edu.pl.pap.screenComponents.chartsScreens.ChartsFilterScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.EditGroupScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.InvitationsScreenComponent
@@ -43,8 +44,10 @@ class RootComponent(
 
     private fun loadConfig() {
         val configRepository: ConfigRepository by inject()
+        val userRepository: UserRepository by inject()
         coroutineScope.launch {
             configRepository.loadConfig()
+            userRepository.getCurrentUserInfo()
         }
     }
 

@@ -8,6 +8,9 @@ import pw.edu.pl.pap.data.databaseAssociatedData.User
 
 interface UserApi {
 
+    @GET("user/current")
+    suspend fun getCurrentUserInfo(): User
+
     @GET("user/search/{group}")
     suspend fun searchUsers(@Path("group") group: String, @Body user: List<String>): List<User>
 

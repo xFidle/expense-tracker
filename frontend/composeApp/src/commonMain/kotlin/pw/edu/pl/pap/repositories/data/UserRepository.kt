@@ -15,6 +15,9 @@ class UserRepository(val api: UserApi) {
     private val _isAdmin = MutableStateFlow<Boolean>(false)
     val isAdmin: StateFlow<Boolean> get() = _isAdmin
 
+    private val _currentUserInfo = MutableStateFlow<User?>(null)
+    val currentUserInfo : StateFlow<User?> get() = _currentUserInfo
+
 
 
     suspend fun searchUsers(group: UserGroup, name: String, surname:String){
@@ -39,5 +42,9 @@ class UserRepository(val api: UserApi) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    suspend fun getCurrentUserInfo() {
+        _currentUserInfo.value = api.getCurrentUserInfo()
     }
 }

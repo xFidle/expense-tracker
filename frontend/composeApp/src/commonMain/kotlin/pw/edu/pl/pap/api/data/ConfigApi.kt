@@ -19,7 +19,4 @@ interface ConfigApi {
 
     @GET("chart/keys")
     suspend fun getChartKeys(): List<String>
-
-    @GET("user/current")
-    suspend fun getCurrentUserInfo(): User
 }

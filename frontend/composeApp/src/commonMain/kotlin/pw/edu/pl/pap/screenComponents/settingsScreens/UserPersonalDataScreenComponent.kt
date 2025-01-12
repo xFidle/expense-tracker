@@ -18,9 +18,9 @@ class UserPersonalDataScreenComponent(
     private val configRepository: ConfigRepository by inject()
     private val userRepository: UserRepository by inject()
 
-    private var email: MutableState<String> = mutableStateOf(configRepository.currentUserInfo.value!!.email)
-    private var name: MutableState<String> = mutableStateOf(configRepository.currentUserInfo.value!!.name)
-    private var surname: MutableState<String> = mutableStateOf(configRepository.currentUserInfo.value!!.surname)
+    private var email: MutableState<String> = mutableStateOf(userRepository.currentUserInfo.value!!.email)
+    private var name: MutableState<String> = mutableStateOf(userRepository.currentUserInfo.value!!.name)
+    private var surname: MutableState<String> = mutableStateOf(userRepository.currentUserInfo.value!!.surname)
 
     override var confirmationData = ConfirmationDialogConfig(
         mainText = "Change Personal Data",
@@ -34,10 +34,10 @@ class UserPersonalDataScreenComponent(
     )
 
     override suspend fun postChanges() {
-        val id = configRepository.currentUserInfo.value!!.id
+        val id = userRepository.currentUserInfo.value!!.id
         val updatedUser = User(id, name.value, surname.value ,email.value)
         runBlocking { userRepository.updateUser(updatedUser) }
-        configRepository.loadConfig()
+        userRepository.getCurrentUserInfo()
     }
 
     override fun setupInputFields() {
