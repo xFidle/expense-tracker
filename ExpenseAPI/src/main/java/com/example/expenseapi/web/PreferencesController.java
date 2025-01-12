@@ -1,8 +1,7 @@
 package com.example.expenseapi.web;
 
 
-import com.example.expenseapi.dto.PreferenceUpdateDTO;
-import com.example.expenseapi.pojo.Preference;
+import com.example.expenseapi.dto.PreferenceDTO;
 import com.example.expenseapi.service.PreferenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,14 +21,14 @@ public class PreferencesController {
 
     @GetMapping("/current")
     @Operation(summary = "Retrieve currently set preferences")
-    public ResponseEntity<Preference> getUserPreference() {
+    public ResponseEntity<PreferenceDTO> getUserPreference() {
         return new ResponseEntity<>(service.getUserPreferences(), HttpStatus.OK);
     }
 
     @PutMapping("/update")
     @Operation(summary = "Setup user's preferences (methodOfPayment, currency)")
-    public ResponseEntity<Preference> updateUserPreferences(@RequestBody PreferenceUpdateDTO preferenceUpdateDTO) {
-        return new ResponseEntity<>(service.updateUserPreferences(preferenceUpdateDTO), HttpStatus.OK);
+    public ResponseEntity<PreferenceDTO> updateUserPreferences(@RequestBody PreferenceDTO preferenceDTO) {
+        return new ResponseEntity<>(service.updateUserPreferences(preferenceDTO), HttpStatus.OK);
     }
 
 }
