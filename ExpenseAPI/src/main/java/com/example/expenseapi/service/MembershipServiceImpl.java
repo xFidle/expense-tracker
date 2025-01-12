@@ -9,6 +9,7 @@ import com.example.expenseapi.pojo.Group;
 import com.example.expenseapi.pojo.Membership;
 import com.example.expenseapi.pojo.User;
 import com.example.expenseapi.repository.MembershipRepository;
+import com.example.expenseapi.repository.RoleRepository;
 import com.example.expenseapi.utils.AuthHelper;
 import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,10 +23,13 @@ import java.util.function.Function;
 public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> implements MembershipService {
     private final MembershipRepository membershipRepository;
     private final UserMapper userMapper;
-    public MembershipServiceImpl(MembershipRepository repository, UserMapper userMapper) {
+    private final RoleRepository roleRepository;
+
+    public MembershipServiceImpl(MembershipRepository repository, UserMapper userMapper, RoleRepository roleRepository) {
         super(repository);
         this.membershipRepository = repository;
         this.userMapper = userMapper;
+        this.roleRepository = roleRepository;
     }
     @Override
     @Cacheable(value = "baseGroups", keyGenerator = "userBasedKeyGenerator")
@@ -100,6 +104,18 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
         return findUsersForGroup(group, membershipRepository::findAdmins).stream()
                 .map(UserDTO::getId)
                 .anyMatch(memberId -> memberId.equals(user.getId()));
+    }
+
+    @Override
+    @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
+    public void changeRole(String groupName, String role, Long userId) {
+        if (!isAdmin(groupName)) {
+            throw new ForbiddenRequestException("You do not have permission to change role");
+        }
+        Membership membership = membershipRepository.findByUserIdAndGroupName(userId, groupName)
+                .orElseThrow(() -> new BadRequestException("User not in this group"));
+        membership.setRole(roleRepository.findByName(role));
+        membershipRepository.save(membership);
     }
 
     private List<UserDTO> findUsersForGroup(String group, Function<String, List<User>> repoMethod) {
