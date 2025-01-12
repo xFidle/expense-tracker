@@ -5,25 +5,32 @@ import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.inject
+import pw.edu.pl.pap.data.databaseAssociatedData.Preferences
+import pw.edu.pl.pap.data.databaseAssociatedData.UpdatedUserData
 import pw.edu.pl.pap.data.uiSetup.ConfirmationDialogConfig
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
 import pw.edu.pl.pap.repositories.data.ConfigRepository
+import pw.edu.pl.pap.repositories.data.UserRepository
 
 class PreferencesScreenComponent(
     baseSettingsScreenComponent: BaseSettingsScreenComponent
 ) : BaseSettingsScreenComponentImpl(baseSettingsScreenComponent) {
 
     private val configRepository: ConfigRepository by inject()
+    private val userRepository: UserRepository by inject()
 
     private val currencies = configRepository.currencies.value.map { it.symbol }
 
     var currencyIndex: MutableState<Int> = mutableStateOf(0)
-    //TODO fetch currency
+//    var currenctIndex: MutableState<Int> = mutableStateOf(configRepository.currencies.value.map { it.symbol }.indexOf(userRepository.currentPreferences.value!!.currencySymbol))
+    //TODO uncomment when api is ready
 
     private val methodsOfPayment = configRepository.paymentMethods.value.map { it.name }
 
+
     var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(0)
-    //TODO fetch method of payment
+//    var methodOfPaymentIndex: MutableState<Int> = mutableStateOf(configRepository.paymentMethods.value.map { it.name }.indexOf(userRepository.currentPreferences.value!!.methodOFPayment))
+    //TODO uncomment when api is ready
 
     override var confirmationData = ConfirmationDialogConfig(
         mainText = "Change Preferences",
@@ -36,20 +43,19 @@ class PreferencesScreenComponent(
         }
     )
 
-    private fun fetchUserPreferences() {
-        runBlocking {
-            //TODO
-        }
-    }
-
     override suspend fun postChanges() {
-        //TODO
+        val updatedPreferences = Preferences(
+            currencies[currencyIndex.value],
+            methodsOfPayment[methodOfPaymentIndex.value],
+            userRepository.currentPreferences.value!!.language
+        )
+        userRepository.updatePreferences(updatedPreferences)
+        //TODO test it
     }
 
 
     override fun setupInputFields() {
         _inputFieldsData.clear()
-        fetchUserPreferences()
         _inputFieldsData.addAll(
             listOf(
                 InputFieldData.DropdownListData(
