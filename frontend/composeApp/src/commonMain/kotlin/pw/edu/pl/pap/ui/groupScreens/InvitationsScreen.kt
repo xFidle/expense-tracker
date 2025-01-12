@@ -79,6 +79,7 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
             component.availableNewInvitationsData,
             Modifier.offset(x = 0.dp, y = 100.dp)
         )
+        //TODO add text if nothing found
     } else {
         component.isPostSearchClicked.value = false
 
