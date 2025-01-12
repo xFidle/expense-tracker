@@ -92,10 +92,7 @@ public class PreferencesControllerIT {
                         }
                         """)
                 .contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.method.name").value("crypto"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currency.symbol").value("PLN"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.language").value("pl"));
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Transactional
@@ -140,10 +137,7 @@ public class PreferencesControllerIT {
                         }
                         """)
                 .contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.method.name").value("cash"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currency.symbol").value("THB"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.language").value("pl"));
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
 

@@ -32,12 +32,16 @@ public class PreferenceServiceImpl extends GenericServiceImpl<Preference, Long> 
     @Override
     public Preference updateUserPreferences(PreferenceUpdateDTO preferenceUpdateDTO) {
         Preference pref = getUserPreferences();
-        Currency currency = currencyRepository.findBySymbol(preferenceUpdateDTO.getCurrencySymbol())
-                .orElseThrow(() -> new BadRequestException("Currency not found " + preferenceUpdateDTO.getCurrencySymbol()));
-        pref.setCurrency(currency);
-        MethodOfPayment method = methodOfPaymentRepository.findByName(preferenceUpdateDTO.getMethodOfPayment())
-                .orElseThrow(() -> new BadRequestException(("Method of payment not found ")));
-        pref.setMethod(method);
+        if (preferenceUpdateDTO.getCurrencySymbol() != null) {
+            Currency currency = currencyRepository.findBySymbol(preferenceUpdateDTO.getCurrencySymbol())
+                    .orElseThrow(() -> new BadRequestException("Currency not found " + preferenceUpdateDTO.getCurrencySymbol()));
+            pref.setCurrency(currency);
+        }
+        if (preferenceUpdateDTO.getMethodOfPayment() != null) {
+            MethodOfPayment method = methodOfPaymentRepository.findByName(preferenceUpdateDTO.getMethodOfPayment())
+                    .orElseThrow(() -> new BadRequestException(("Method of payment not found ")));
+            pref.setMethod(method);
+        }
         if (preferenceUpdateDTO.getLanguage() != null)
             pref.setLanguage(preferenceUpdateDTO.getLanguage());
         return preferenceRepository.save(pref);
