@@ -8,12 +8,14 @@ import org.koin.core.component.inject
 import pw.edu.pl.pap.data.uiSetup.ConfirmationDialogConfig
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
 import pw.edu.pl.pap.repositories.data.ConfigRepository
+import pw.edu.pl.pap.repositories.data.UserRepository
 
 class UserPersonalDataScreenComponent(
     baseSettingsScreenComponent: BaseSettingsScreenComponent
 ) : BaseSettingsScreenComponentImpl(baseSettingsScreenComponent) {
 
     private val configRepository: ConfigRepository by inject()
+    private val userRepository: UserRepository by inject()
 
     private var email: MutableState<String> = mutableStateOf(configRepository.currentUserInfo.value!!.email)
     private var name: MutableState<String> = mutableStateOf(configRepository.currentUserInfo.value!!.name)
