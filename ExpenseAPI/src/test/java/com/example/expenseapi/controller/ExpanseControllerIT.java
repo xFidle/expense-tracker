@@ -121,6 +121,59 @@ public class ExpanseControllerIT {
     }
 
     @Test
+    void testCreate_InvalidCategory() throws Exception {
+        String jsonBody = """
+                {
+                    "title": "Test",
+                    "price": 100,
+                    "categoryName": "ABCDEF",
+                    "groupName": "family"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/expense/create")
+                .header("Authorization", "Bearer " + gen.getToken(activeUser))
+                .contentType("application/json")
+                .content(jsonBody))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void testCreate_InvalidCurrency() throws Exception {
+        String jsonBody = """
+                {
+                    "title": "Test",
+                    "price": 100,
+                    "categoryName": "food",
+                    "groupName": "family",
+                    "currencyCode": "ABC"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/expense/create")
+                .header("Authorization", "Bearer " + gen.getToken(activeUser))
+                .contentType("application/json")
+                .content(jsonBody))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void testCreate_InvalidMethod() throws Exception {
+        String jsonBody = """
+                {
+                    "title": "Test",
+                    "price": 100,
+                    "categoryName": "food",
+                    "groupName": "family",
+                    "methodOfPayment": "ABC"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/expense/create")
+                .header("Authorization", "Bearer " + gen.getToken(activeUser))
+                .contentType("application/json")
+                .content(jsonBody))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
     void testCreate_EmptyBody() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/expense/create")
                         .header("Authorization", "Bearer " + gen.getToken(activeUser))
