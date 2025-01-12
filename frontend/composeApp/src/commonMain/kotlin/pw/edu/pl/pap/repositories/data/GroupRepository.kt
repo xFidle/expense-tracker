@@ -54,19 +54,27 @@ class GroupRepository(val api: GroupApi) {
     suspend fun updateGroup(group: UserGroup) {
         try {
             api.updateGroup(group.id, group)
+            _currentUserGroup.value = group
             getGroups(true)
         } catch (e: Exception) {
             e.printStackTrace()
         }
+//        _allGroups.value = _allGroups.value.map { existingGroup ->
+//            if (existingGroup.id == group.id) group else existingGroup
+//        }
     }
 
     suspend fun deleteGroup(group: UserGroup) {
         try {
-            api.deleteGroup(group.id)
-            getGroups(true)
+            println(api.deleteGroup(group.id))
+            _currentUserGroup.value = null
+            getGroups()
         } catch (e: Exception) {
             e.printStackTrace()
         }
+//        _allGroups.value = _allGroups.value.filter { existingGroup ->
+//            existingGroup.id != group.id
+//        }
     }
 
     suspend fun addGroup(group: NewGroup) {

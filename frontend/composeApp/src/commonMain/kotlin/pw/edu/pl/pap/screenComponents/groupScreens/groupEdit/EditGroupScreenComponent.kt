@@ -5,6 +5,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import pw.edu.pl.pap.screenComponents.BaseComponent
 
 class EditGroupScreenComponent(
@@ -28,7 +29,7 @@ class EditGroupScreenComponent(
 
         coroutineScope.launch {
             groupRepository.updateGroup(newGroup)
-            onSave()
+            onDismiss()
         }
 
         println("Updated Group ${newGroup.id} from ${group.name} to ${newGroup.name}")
@@ -37,9 +38,8 @@ class EditGroupScreenComponent(
     fun deleteGroup() {
         println("Deleting group $group")
         coroutineScope.launch {
-            groupRepository.deleteGroup(group!!)
-            onDelete()
-
+            runBlocking { groupRepository.deleteGroup(group!!) }
+            onDismiss()
         }
     }
 }
