@@ -91,7 +91,7 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     @Transactional
     public void deleteMembership(Long userId, String groupName) {
         if(!isAdmin(groupName) && !userId.equals(AuthHelper.getUser().getId())) {
-            throw new BadRequestException("User does not have admin privileges");
+            throw new PermissionNeededException(groupName);
         }
         expenseService.deleteAllExpensesForUserIdAndGroupName(userId, groupName);
         membershipRepository.deleteByUserIdAndGroupName(userId, groupName);
@@ -145,6 +145,6 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     public String getCurrentRole(String groupName, Long userId) {
         return membershipRepository.findByUserIdAndGroupName(userId, groupName)
                 .map(membership -> membership.getRole().getName())
-                .orElseThrow(() -> new BadRequestException("No role for this user in this group"));
+                .orElseThrow(() -> new MembershipNotFoundException(userId, groupName));
     }
 }
