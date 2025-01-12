@@ -17,10 +17,19 @@ import pw.edu.pl.pap.repositories.data.UserRepository
 import pw.edu.pl.pap.screenComponents.BaseComponent
 import pw.edu.pl.pap.ui.groupScreens.InvitationsScreen
 
-open class InvitationsScreenComponent(
+class InvitationsScreenComponent(
     baseComponent: BaseComponent,
     val onDismiss: () -> Unit
 ) : BaseComponent by baseComponent {
+
+    var isAdmin: Boolean = false
+
+    init {
+        coroutineScope.launch {
+            var isAdmin: Boolean = userRepository.isAdmin(currentUserGroup.value!!)
+        }
+        println("init done")
+    }
 
     private val userRepository: UserRepository by inject()
     private val membershipRepository: MembershipRepository by inject()
@@ -31,10 +40,6 @@ open class InvitationsScreenComponent(
 
     var isNewInvitationsScreen: MutableState<Boolean> = mutableStateOf(false)
     var isPostSearchClicked: MutableState<Boolean> = mutableStateOf(false)
-
-    //TODO
-    // check if user is admin to block new invites if he is not
-    val isAdmin: Boolean = true
 
     private val _newInvitationInputFieldsData = mutableStateListOf<InputFieldData>()
     val newInvitationInputFieldsData: List<InputFieldData> get() = _newInvitationInputFieldsData
@@ -48,8 +53,8 @@ open class InvitationsScreenComponent(
     private val _sentInvitationData = mutableStateListOf<InvitationData>()
     val sentInvitationData: List<InvitationData> get() = _sentInvitationData
 
-    protected open var name: MutableState<String> = mutableStateOf("")
-    protected open var surname: MutableState<String> = mutableStateOf("")
+    private var name: MutableState<String> = mutableStateOf("")
+    private var surname: MutableState<String> = mutableStateOf("")
 
     fun setupNewInvitationInputFields() {
         _newInvitationInputFieldsData.clear()
