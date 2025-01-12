@@ -36,8 +36,8 @@ public class PreferencesControllerIT {
         mockMvc.perform(MockMvcRequestBuilders.get("/preferences/current")
                 .header("Authorization", "Bearer " + gen.getToken(activeUser)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.method.name").value("cash"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currency.symbol").value("PLN"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.methodOfPayment").value("cash"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.currencySymbol").value("PLN"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.language").value("pl"));
     }
 
@@ -76,8 +76,8 @@ public class PreferencesControllerIT {
                 .content(jsonBody)
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.method.name").value("debit card"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currency.symbol").value("PLN"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.methodOfPayment").value("debit card"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.currencySymbol").value("PLN"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.language").value("pl"));
     }
 
@@ -92,10 +92,7 @@ public class PreferencesControllerIT {
                         }
                         """)
                 .contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.method.name").value("crypto"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currency.symbol").value("PLN"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.language").value("pl"));
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Transactional
@@ -110,8 +107,8 @@ public class PreferencesControllerIT {
                         """)
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.method.name").value("cash"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currency.symbol").value("USD"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.methodOfPayment").value("cash"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.currencySymbol").value("USD"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.language").value("pl"));
     }
 
@@ -126,7 +123,7 @@ public class PreferencesControllerIT {
                         }
                         """)
                         .contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Transactional
@@ -140,10 +137,7 @@ public class PreferencesControllerIT {
                         }
                         """)
                 .contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.method.name").value("cash"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currency.symbol").value("THB"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.language").value("pl"));
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
 
@@ -160,8 +154,8 @@ public class PreferencesControllerIT {
                         """)
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.method.name").value("cash"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currency.symbol").value("PLN"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.methodOfPayment").value("cash"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.currencySymbol").value("PLN"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.language").value("en"));
     }
 }

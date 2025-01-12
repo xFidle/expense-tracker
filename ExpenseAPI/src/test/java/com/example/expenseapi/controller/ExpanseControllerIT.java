@@ -121,6 +121,59 @@ public class ExpanseControllerIT {
     }
 
     @Test
+    void testCreate_InvalidCategory() throws Exception {
+        String jsonBody = """
+                {
+                    "title": "Test",
+                    "price": 100,
+                    "categoryName": "ABCDEF",
+                    "groupName": "family"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/expense/create")
+                        .header("Authorization", "Bearer " + gen.getToken(activeUser))
+                        .contentType("application/json")
+                        .content(jsonBody))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    void testCreate_InvalidCurrency() throws Exception {
+        String jsonBody = """
+                {
+                    "title": "Test",
+                    "price": 100,
+                    "categoryName": "food",
+                    "groupName": "family",
+                    "currencyCode": "ABC"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/expense/create")
+                        .header("Authorization", "Bearer " + gen.getToken(activeUser))
+                        .contentType("application/json")
+                        .content(jsonBody))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    void testCreate_InvalidMethod() throws Exception {
+        String jsonBody = """
+                {
+                    "title": "Test",
+                    "price": 100,
+                    "categoryName": "food",
+                    "groupName": "family",
+                    "methodOfPayment": "ABC"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.post("/expense/create")
+                        .header("Authorization", "Bearer " + gen.getToken(activeUser))
+                        .contentType("application/json")
+                        .content(jsonBody))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
     void testCreate_EmptyBody() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/expense/create")
                         .header("Authorization", "Bearer " + gen.getToken(activeUser))
@@ -195,18 +248,14 @@ public class ExpanseControllerIT {
     void testMyGroupExpenses_UnknownGroup() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/expense/my/group/unknown")
                         .header("Authorization", "Bearer " + gen.getToken(activeUser)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0]").doesNotExist());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
     void testMyGroupExpenses_NoExpensesPresent() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/expense/my/group/any")
                         .header("Authorization", "Bearer " + gen.getToken(inactiveUser)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0]").doesNotExist());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -261,18 +310,14 @@ public class ExpanseControllerIT {
     void testStateGroup_UnknownGroup() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/expense/state/unknown")
                         .header("Authorization", "Bearer " + gen.getToken(activeUser)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userExpenses").value(0))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groupExpenses").value(0));
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
     void testStateGroup_NoExpensesPresent() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/expense/state/any")
                         .header("Authorization", "Bearer " + gen.getToken(inactiveUser)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userExpenses").value(0))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groupExpenses").value(0));
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -287,25 +332,22 @@ public class ExpanseControllerIT {
                         .header("Authorization", "Bearer " + gen.getToken(activeUser)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isMap())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.*", Matchers.hasSize(3)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").isMap())
+                .andExpect((MockMvcResultMatchers.jsonPath("$.data.keys()", Matchers.containsInAnyOrder("2024-10-10", "2025-11-30", "2024-12-22"))));
     }
 
     @Test
     void testDateMap_UnknownGroup() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/expense/dateMap/group/unknown")
                         .header("Authorization", "Bearer " + gen.getToken(activeUser)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").isMap())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.*").doesNotExist());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
-    void tesDateMap_NoExpensesPresent() throws Exception {
+    void tesDateMap_UserNotInGroup() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/expense/dateMap/group/family")
                         .header("Authorization", "Bearer " + gen.getToken(inactiveUser)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").isMap())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.*").doesNotExist());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -320,25 +362,22 @@ public class ExpanseControllerIT {
                         .header("Authorization", "Bearer " + gen.getToken(activeUser)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isMap())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.*", Matchers.hasSize(2)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").isMap())
+                .andExpect(MockMvcResultMatchers.jsonPath(("$.data.keys()"), Matchers.containsInAnyOrder("food", "transport")));
     }
 
     @Test
     void testCategoryMap_UnknownGroup() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/expense/categoryMap/group/unknown")
                         .header("Authorization", "Bearer " + gen.getToken(activeUser)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").isMap())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.*").doesNotExist());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
-    void testCategoryMap_NoExpensesPresent() throws Exception {
+    void testCategoryMap_NotUserGroup() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/expense/categoryMap/group/family")
                         .header("Authorization", "Bearer " + gen.getToken(inactiveUser)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").isMap())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.*").doesNotExist());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -360,7 +399,13 @@ public class ExpanseControllerIT {
     void testRecent_NoExpensesPresent() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/expense/recent/any")
                         .header("Authorization", "Bearer " + gen.getToken(inactiveUser)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
+    void testRecent_UnknownGroup() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/expense/recent/unknown")
+                        .header("Authorization", "Bearer " + gen.getToken(activeUser)))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 }

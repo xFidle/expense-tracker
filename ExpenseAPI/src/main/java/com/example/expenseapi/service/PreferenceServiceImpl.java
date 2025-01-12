@@ -1,7 +1,9 @@
 package com.example.expenseapi.service;
 
-import com.example.expenseapi.dto.PreferenceUpdateDTO;
-import com.example.expenseapi.exception.BadRequestException;
+import com.example.expenseapi.dto.PreferenceDTO;
+import com.example.expenseapi.exception.CurrencyNotFoundException;
+import com.example.expenseapi.exception.MethodNotFoundException;
+import com.example.expenseapi.mapper.PreferenceMapper;
 import com.example.expenseapi.pojo.Currency;
 import com.example.expenseapi.pojo.MethodOfPayment;
 import com.example.expenseapi.pojo.Preference;
@@ -9,50 +11,49 @@ import com.example.expenseapi.repository.CurrencyRepository;
 import com.example.expenseapi.repository.MethodOfPaymentRepository;
 import com.example.expenseapi.repository.PreferenceRepository;
 import com.example.expenseapi.utils.AuthHelper;
-import com.example.expenseapi.utils.CurrencyRatesFetcher;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class PreferenceServiceImpl extends GenericServiceImpl<Preference, Long> implements PreferenceService {
     private final PreferenceRepository preferenceRepository;
     private final CurrencyRepository currencyRepository;
     private final MethodOfPaymentRepository methodOfPaymentRepository;
+    private final PreferenceMapper preferenceMapper;
 
-    public PreferenceServiceImpl(PreferenceRepository repository, CurrencyRepository currencyRepository, MethodOfPaymentRepository methodOfPaymentRepository) {
+    public PreferenceServiceImpl(PreferenceRepository repository, CurrencyRepository currencyRepository, MethodOfPaymentRepository methodOfPaymentRepository, PreferenceMapper preferenceMapper) {
         super(repository);
         this.preferenceRepository = repository;
         this.currencyRepository = currencyRepository;
         this.methodOfPaymentRepository = methodOfPaymentRepository;
+        this.preferenceMapper = preferenceMapper;
     }
 
     @Override
-    public Preference getUserPreferences() {
-        return preferenceRepository.getPreferenceById(AuthHelper.getUser().getId());
+    public PreferenceDTO getUserPreferences() {
+        return preferenceMapper.preferenceToPreferenceDTO(preferenceRepository.getPreferenceById(AuthHelper.getUser().getId()));
     }
 
     @Override
-    public Preference updateUserPreferences(PreferenceUpdateDTO preferenceUpdateDTO) {
-        Preference pref = getUserPreferences();
-        Optional<Currency> currency = currencyRepository.findBySymbol(preferenceUpdateDTO.getCurrencySymbol());
-        if (currency.isEmpty() && preferenceUpdateDTO.getCurrencySymbol() != null) {
-            String symbol = preferenceUpdateDTO.getCurrencySymbol();
-            double rate = CurrencyRatesFetcher.getCurrencyRates(symbol);
-            if (rate == -1) throw new BadRequestException("Invalid currency symbol");
-            Currency newCurrency = new Currency(symbol, rate);
-            currencyRepository.save(newCurrency);
-            pref.setCurrency(newCurrency);
-        } else currency.ifPresent(pref::setCurrency);
-        Optional<MethodOfPayment> method = methodOfPaymentRepository.findByName(preferenceUpdateDTO.getMethodOfPayment());
-        if (method.isEmpty() && preferenceUpdateDTO.getMethodOfPayment() != null) {
-            MethodOfPayment newMethod = new MethodOfPayment(preferenceUpdateDTO.getMethodOfPayment());
-            methodOfPaymentRepository.save(newMethod);
-            pref.setMethod(newMethod);
+    @CacheEvict(value = {
+            "expInfoGroup",
+            "expInfoAllGroups",
+            "expensesMap"
+    }, allEntries = true)
+    public PreferenceDTO updateUserPreferences(PreferenceDTO preferenceDTO) {
+        Preference pref = preferenceRepository.getPreferenceById(AuthHelper.getUser().getId());
+        if (preferenceDTO.getCurrencySymbol() != null) {
+            Currency currency = currencyRepository.findBySymbol(preferenceDTO.getCurrencySymbol())
+                    .orElseThrow(() -> new CurrencyNotFoundException(preferenceDTO.getCurrencySymbol()));
+            pref.setCurrency(currency);
         }
-        else method.ifPresent(pref::setMethod);
-        if (preferenceUpdateDTO.getLanguage() != null)
-            pref.setLanguage(preferenceUpdateDTO.getLanguage());
-        return preferenceRepository.save(pref);
+        if (preferenceDTO.getMethodOfPayment() != null) {
+            MethodOfPayment method = methodOfPaymentRepository.findByName(preferenceDTO.getMethodOfPayment())
+                    .orElseThrow(() -> new MethodNotFoundException(preferenceDTO.getMethodOfPayment()));
+            pref.setMethod(method);
+        }
+        if (preferenceDTO.getLanguage() != null)
+            pref.setLanguage(preferenceDTO.getLanguage());
+        return preferenceMapper.preferenceToPreferenceDTO(preferenceRepository.save(pref));
     }
 }

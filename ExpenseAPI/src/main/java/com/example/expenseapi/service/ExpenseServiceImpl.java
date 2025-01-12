@@ -3,8 +3,7 @@ package com.example.expenseapi.service;
 import com.example.expenseapi.dto.CursorPageResponse;
 import com.example.expenseapi.dto.ExpenseCreateDTO;
 import com.example.expenseapi.dto.ExpenseDTO;
-import com.example.expenseapi.exception.BadRequestException;
-import com.example.expenseapi.exception.ForbiddenRequestException;
+import com.example.expenseapi.exception.*;
 import com.example.expenseapi.filter.ExpenseFilter;
 import com.example.expenseapi.mapper.UserMapper;
 import com.example.expenseapi.pojo.*;
@@ -44,9 +43,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     private final MethodOfPaymentRepository methodOfPaymentRepository;
     private final ExpenseMapper expenseMapper;
     private final UserMapper userMapper;
-    private final PreferenceRepository preferenceRepository;
 
-    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository, MembershipRepository membershipRepository, MethodOfPaymentRepository methodOfPaymentRepository, ExpenseMapper expenseMapper, UserMapper userMapper, PreferenceRepository preferenceRepository) {
+    public ExpenseServiceImpl(ExpenseRepository repository, CategoryRepository categoryRepository, CurrencyRepository currencyRepository, MembershipRepository membershipRepository, MethodOfPaymentRepository methodOfPaymentRepository, ExpenseMapper expenseMapper, UserMapper userMapper) {
         super(repository);
         this.expenseRepository = repository;
         this.categoryRepository = categoryRepository;
@@ -55,7 +53,6 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
         this.methodOfPaymentRepository = methodOfPaymentRepository;
         this.expenseMapper = expenseMapper;
         this.userMapper = userMapper;
-        this.preferenceRepository = preferenceRepository;
     }
 
     @CacheEvict(value = {
@@ -100,25 +97,25 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     public ExpenseDTO createExpense(ExpenseCreateDTO createDTO) {
         User user = AuthHelper.getUser();
         if (!hasAllRequiredFields(createDTO)) {
-            throw new BadRequestException("Title, price, category name and group name are required");
+            throw new RequiredFieldsMissingException();
         }
         fillDefaultsFromUserPreferences(createDTO, user);
         Expense expense = expenseMapper.expenseCreateDTOToExpense(createDTO);
         Membership membership = membershipRepository
                 .findByUserIdAndGroupName(createDTO.getUser().getId(), createDTO.getGroupName())
-                .orElseThrow(() -> new ForbiddenRequestException("User is not a member of the group"));
+                .orElseThrow(() -> new UserNotInGroupException(createDTO.getGroupName(), createDTO.getUser().getId()));
         expense.setMembership(membership);
         if (createDTO.getCategoryName() != null) {
-            Category category = categoryRepository.findByName(createDTO.getCategoryName());
-            expense.setCategory(category);
+            expense.setCategory(categoryRepository.findByName(createDTO.getCategoryName())
+                    .orElseThrow(() -> new CategoryNotFoundException(createDTO.getCategoryName())));
         }
         if (createDTO.getExpenseDate() != null) {
             expense.setDate(createDTO.getExpenseDate());
         }
         expense.setMethod(methodOfPaymentRepository.findByName(createDTO.getMethodOfPayment())
-                .orElseThrow(() -> new BadRequestException("Method of payment not found: " + createDTO.getMethodOfPayment())));
+                .orElseThrow(() -> new MethodNotFoundException(createDTO.getMethodOfPayment())));
         expense.setCurrency(currencyRepository.findBySymbol(createDTO.getCurrencyCode())
-                .orElseThrow(() -> new BadRequestException("Currency not found: " + createDTO.getCurrencyCode())));
+                .orElseThrow(() -> new CurrencyNotFoundException(createDTO.getCurrencyCode())));
         Expense savedExpense = expenseRepository.save(expense);
         return expenseMapper.expenseToExpenseDTO(savedExpense);
     }
@@ -178,12 +175,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     private ExpInfo calculateExpInfo(Collection<ExpenseDTO> groupExpenses, Collection<ExpenseDTO> userExpenses) {
-        Currency currency = preferenceRepository
-                .getPreferenceById(AuthHelper.getUser().getId())
-                .getCurrency();
+        Currency currency = AuthHelper.getUser().getPreference().getCurrency();
         double groupSum = sumExpensesInCurrency(groupExpenses, currency);
         double userSum = sumExpensesInCurrency(userExpenses, currency);
-
         return new ExpInfo(userSum, groupSum);
     }
 
@@ -191,10 +185,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     @Cacheable(value = "expensesMap", key = "#filter.toString() + '_' + #keyType")
     public Map<String, Double> getMapResult(ExpenseFilter filter,  String keyType) {
         List<ExpenseDTO> result = searchExpensesDTO(filter);
-        Currency currency = currencyRepository.findBySymbol(AuthHelper.getUser().getPreference().getCurrency().getSymbol())
-                .orElseThrow(() -> new BadRequestException("Currency not found " + AuthHelper.getUser().getPreference().getCurrency().getSymbol()));
+        Currency currency = AuthHelper.getUser().getPreference().getCurrency();
         Function<ExpenseDTO, String> keyExtractor = findKeyExtractor(keyType);
-        if (keyExtractor == null) throw new BadRequestException("Invalid key type");
+        if (keyExtractor == null) throw new InvalidKeyTypeException(keyType);
         return totalExpensesMap(result, keyExtractor, currency);
     }
 
@@ -252,7 +245,15 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
 
-    public List<ExpenseDTO> getExpensesForGroupDateCursorBased(String name, Long lastId, LocalDate lastDate, int size, boolean desc) {
+    public List<ExpenseDTO> getExpensesForGroupDateCursorBased(
+            String name,
+            Long lastId,
+            LocalDate lastDate,
+            int size,
+            boolean desc
+    ) {
+        if (AuthHelper.isGroupNameInvalid(name))
+            throw new UserNotInGroupException(name, AuthHelper.getUser().getId());
         return getExpensesForGroupCursorBased(
                 name,
                 lastId,
@@ -295,6 +296,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
             int size,
             boolean desc
     ) {
+        if (AuthHelper.isGroupNameInvalid(name))
+            throw new UserNotInGroupException(name, AuthHelper.getUser().getId());
         return getExpensesForGroupCursorBased(
                 name,
                 lastId,
@@ -307,12 +310,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     private List<ExpenseDTO> searchExpensesDTO(ExpenseFilter filter) {
-        if (filter.getGroupName() == null || filter.getGroupName().isEmpty()) {
-            filter.setGroupName(AuthHelper.getGroupName());
-        }
-        if (AuthHelper.isGroupNameInvalid(filter.getGroupName())) {
-            return Collections.emptyList();
-        }
+        handleGroupFilter(filter);
         Specification<Expense> spec = prepareSpecification(filter);
         return expenseRepository.findAll(spec).stream()
                 .map(expenseMapper::expenseToExpenseDTO)
@@ -322,16 +320,20 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     @Override
     @Cacheable(value = "searchExpensesPagesDTO", key = "#filter.toString() + '_' + #page + '_' + #size")
     public Page<ExpenseDTO> searchExpensesPagesDTO(ExpenseFilter filter, int page, int size) {
-        if (filter.getGroupName() == null || filter.getGroupName().isEmpty()) {
-            filter.setGroupName(AuthHelper.getGroupName());
-        }
-        if (AuthHelper.isGroupNameInvalid(filter.getGroupName())) {
-            return Page.empty();
-        }
+        handleGroupFilter(filter);
         Specification<Expense> spec = prepareSpecification(filter);
         Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
         return expenseRepository.findAll(spec, pageable)
                 .map(expenseMapper::expenseToExpenseDTO);
+    }
+
+    private void handleGroupFilter(ExpenseFilter filter) {
+        if (filter.getGroupName() == null || filter.getGroupName().isEmpty()) {
+            filter.setGroupName(AuthHelper.getGroupName());
+        }
+        if (AuthHelper.isGroupNameInvalid(filter.getGroupName())) {
+            throw new UserNotInGroupException(filter.getGroupName(), AuthHelper.getUser().getId());
+        }
     }
 
     private Specification<Expense> prepareSpecification(ExpenseFilter filter) {
@@ -408,11 +410,11 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     })
     public ExpenseDTO updateExpense(Long id, ExpenseDTO expenseDTO) {
         Expense expense = expenseRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Expense not found"));
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
         Expense updatedExpense = expenseMapper.expenseDTOToExpense(expenseDTO);
         BeanUtils.copyProperties(updatedExpense, expense, getNullPropertyNames(updatedExpense));
         expense.setMethod(methodOfPaymentRepository.findByName(updatedExpense.getMethod().getName())
-                .orElseThrow(()->new BadRequestException("Method does not exist")));
+                .orElseThrow(() -> new MethodNotFoundException(updatedExpense.getMethod().getName())));
         return expenseMapper.expenseToExpenseDTO(expenseRepository.save(expense));
     }
 
@@ -429,7 +431,10 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     public Page<ExpenseDTO> getExpensesForUser(int page, int size) {
         ExpenseFilter filter = new ExpenseFilter();
         filter.setEmail(AuthHelper.getUserEmail());
-        return searchExpensesPagesDTO(filter, page, size);
+        Specification<Expense> spec = prepareSpecification(filter);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+        return expenseRepository.findAll(spec, pageable)
+                .map(expenseMapper::expenseToExpenseDTO);
     }
 
     @Caching(evict = {
@@ -487,4 +492,43 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     public void deleteAllExpensesForUserId(Long id) {
         expenseRepository.deleteAllByMembershipUserId(id);
     }
+
+    @Override
+    @CacheEvict(value = {
+            "expensesPage",
+            "expInfoGroup",
+            "expInfoAllGroups",
+            "expensesMap",
+            "recentExpense",
+            "groupExpenseDateMap",
+            "groupExpenseCategoryMap",
+            "searchExpensesDTO",
+            "searchExpensesPagesDTO",
+            "expensesUserPage",
+            "ExpenseID"
+    }, allEntries = true)
+    @Transactional
+    public void deleteAllExpensesForUserIdAndGroupName(Long userId, String groupName) {
+        expenseRepository.deleteAllByMembership_User_IdAndMembership_Group_Name(userId, groupName);
+    }
+
+    @Override
+    @CacheEvict(value = {
+            "expensesPage",
+            "expInfoGroup",
+            "expInfoAllGroups",
+            "expensesMap",
+            "recentExpense",
+            "groupExpenseDateMap",
+            "groupExpenseCategoryMap",
+            "searchExpensesDTO",
+            "searchExpensesPagesDTO",
+            "expensesUserPage",
+            "ExpenseID"
+    }, allEntries = true)
+    @Transactional
+    public void deleteAllByGroupId(Long id) {
+        expenseRepository.deleteAllByMembershipGroupId(id);
+    }
 }
+

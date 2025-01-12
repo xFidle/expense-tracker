@@ -1,14 +1,14 @@
 package com.example.expenseapi.service;
 
 import com.example.expenseapi.dto.UserDTO;
-import com.example.expenseapi.exception.BadRequestException;
-import com.example.expenseapi.exception.ForbiddenRequestException;
+import com.example.expenseapi.exception.*;
 import com.example.expenseapi.mapper.UserMapper;
 import com.example.expenseapi.pojo.BaseGroup;
 import com.example.expenseapi.pojo.Group;
 import com.example.expenseapi.pojo.Membership;
 import com.example.expenseapi.pojo.User;
 import com.example.expenseapi.repository.MembershipRepository;
+import com.example.expenseapi.repository.RoleRepository;
 import com.example.expenseapi.utils.AuthHelper;
 import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,10 +22,15 @@ import java.util.function.Function;
 public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> implements MembershipService {
     private final MembershipRepository membershipRepository;
     private final UserMapper userMapper;
-    public MembershipServiceImpl(MembershipRepository repository, UserMapper userMapper) {
+    private final RoleRepository roleRepository;
+    private final ExpenseService expenseService;
+
+    public MembershipServiceImpl(MembershipRepository repository, UserMapper userMapper, RoleRepository roleRepository, ExpenseService expenseService) {
         super(repository);
         this.membershipRepository = repository;
         this.userMapper = userMapper;
+        this.roleRepository = roleRepository;
+        this.expenseService = expenseService;
     }
     @Override
     @Cacheable(value = "baseGroups", keyGenerator = "userBasedKeyGenerator")
@@ -58,7 +63,7 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
                 .stream()
                 .filter(membership -> membership.getGroup().getId().equals(group.getId()))
                 .findFirst()
-                .orElseThrow(()->new BadRequestException("Membership not found for userId=" + user.getId() + " and groupId=" + group.getId()))
+                .orElseThrow(()->new MembershipNotFoundException(user.getId(), group.getId()))
                 .getRole()
                 .getName();
     }
@@ -83,6 +88,20 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
 
     @Override
     @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
+    @Transactional
+    public void deleteMembership(Long userId, String groupName) {
+        if(!isAdmin(groupName) && !userId.equals(AuthHelper.getUser().getId())) {
+            throw new PermissionNeededException(groupName);
+        }
+        if (membershipRepository.findByUserIdAndGroupName(userId, groupName).isEmpty()) {
+            throw new UserNotInGroupException(groupName, userId);
+        }
+        expenseService.deleteAllExpensesForUserIdAndGroupName(userId, groupName);
+        membershipRepository.deleteByUserIdAndGroupName(userId, groupName);
+    }
+
+    @Override
+    @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
     public void deleteAllData() {
         super.deleteAllData();
     }
@@ -102,13 +121,41 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
                 .anyMatch(memberId -> memberId.equals(user.getId()));
     }
 
+    @Override
+    @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
+    public void changeRole(String groupName, String role, Long userId) {
+        if (!isAdmin(groupName)) {
+            throw new PermissionNeededException(groupName);
+        }
+        Membership membership = membershipRepository.findByUserIdAndGroupName(userId, groupName)
+                .orElseThrow(() -> new UserNotInGroupException(groupName, userId));
+        membership.setRole(roleRepository.findByName(role)
+                .orElseThrow(() -> new RoleNotFoundException(role)));
+        membershipRepository.save(membership);
+    }
+
     private List<UserDTO> findUsersForGroup(String group, Function<String, List<User>> repoMethod) {
         if (AuthHelper.isGroupNameInvalid(group)) {
-            throw new ForbiddenRequestException("User is not a member of the group");
+            throw new UserNotInGroupException(group, AuthHelper.getUser().getId());
         }
         return repoMethod.apply(group)
                 .stream()
                 .map(userMapper::userToUserDTO)
                 .toList();
+    }
+
+    @Override
+    public String getCurrentRole(String groupName, Long userId) {
+        return membershipRepository.findByUserIdAndGroupName(userId, groupName)
+                .map(membership -> membership.getRole().getName())
+                .orElseThrow(() -> new MembershipNotFoundException(userId, groupName));
+    }
+
+    @Override
+    @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
+    @Transactional
+    public void deleteAllMembershipsForGroupId(Long id) {
+        expenseService.deleteAllByGroupId(id);
+        membershipRepository.deleteAllByGroupId(id);
     }
 }

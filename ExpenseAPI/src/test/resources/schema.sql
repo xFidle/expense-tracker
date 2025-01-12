@@ -44,11 +44,33 @@ CREATE TABLE roles (
     name VARCHAR2(255) NOT NULL
 );
 
+CREATE TABLE base_memberships (
+    id LONG AUTO_INCREMENT PRIMARY KEY,
+    user_id LONG NOT NULL,
+    group_id LONG NOT NULL,
+    role_id LONG NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (group_id) REFERENCES groups(id),
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
 CREATE TABLE memberships (
     id LONG AUTO_INCREMENT PRIMARY KEY,
     user_id LONG NOT NULL,
     group_id LONG NOT NULL,
     role_id LONG NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (group_id) REFERENCES groups(id),
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
+CREATE TABLE temporary_memberships (
+    id LONG AUTO_INCREMENT PRIMARY KEY,
+    sender_id LONG NOT NULL,
+    user_id LONG NOT NULL,
+    group_id LONG NOT NULL,
+    role_id LONG NOT NULL,
+    FOREIGN KEY (sender_id) references users(id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (group_id) REFERENCES groups(id),
     FOREIGN KEY (role_id) REFERENCES roles(id)

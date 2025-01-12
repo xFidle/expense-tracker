@@ -1,10 +1,12 @@
 package com.example.expenseapi.service;
 
-import com.example.expenseapi.exception.BadRequestException;
+import com.example.expenseapi.exception.RoleNotFoundException;
+import com.example.expenseapi.exception.UserNotFoundException;
 import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.repository.GroupRepository;
 import com.example.expenseapi.repository.RoleRepository;
 import com.example.expenseapi.utils.AuthHelper;
+import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,7 @@ public class GroupServiceImpl extends GenericServiceImpl<Group, Long> implements
     public List<BaseGroup> getBaseGroups() {
         String email = AuthHelper.getUserEmail();
         User userEntity = userService.findByEmail(email)
-                .orElseThrow(() -> new BadRequestException("User not found for email: " + email));
+                .orElseThrow(() -> new UserNotFoundException(email));
         return membershipService.getBaseGroupsByUserId(userEntity.getId());
     }
 
@@ -50,9 +52,9 @@ public class GroupServiceImpl extends GenericServiceImpl<Group, Long> implements
     public Group save(Group entity) {
         String email = AuthHelper.getUserEmail();
         User userEntity = userService.findByEmail(email)
-                .orElseThrow(() -> new BadRequestException("User not found for email: " + email));
+                .orElseThrow(() -> new UserNotFoundException(email));
         Role role = roleRepository.findById(1L)
-                .orElseThrow(() -> new BadRequestException("Role not found with ID=1"));
+                .orElseThrow(() -> new RoleNotFoundException(1L));
         Group newGroup = super.save(entity);
         membershipService.save(new Membership(userEntity, newGroup, role));
         return newGroup;
@@ -61,7 +63,9 @@ public class GroupServiceImpl extends GenericServiceImpl<Group, Long> implements
 
     @Override
     @CacheEvict(value = {"baseGroups", "activeGroups"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
+    @Transactional
     public void delete(Long id) {
+        membershipService.deleteAllMembershipsForGroupId(id);
         super.delete(id);
     }
 

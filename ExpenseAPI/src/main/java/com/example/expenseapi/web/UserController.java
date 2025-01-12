@@ -80,4 +80,22 @@ public class UserController extends GenericController<User, Long>{
     public ResponseEntity<UserDTO> getCurrent() {
         return new ResponseEntity<>(userMapper.userToUserDTO(AuthHelper.getUser()), HttpStatus.OK);
     }
+
+    @PutMapping("/changeRole/{groupName}/{userId}/{role}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role successfully changed", content = @Content(schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Role was not changed")
+    })
+    @Operation(summary = "Changes role if done by admin")
+    public ResponseEntity<Void> changeRole(@PathVariable String groupName, @PathVariable String role, @PathVariable Long userId) {
+        membershipService.changeRole(groupName, role, userId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/getRole/{groupName}/{userId}")
+    @Operation(summary = "Current userRole")
+    public ResponseEntity<String> getRole(@PathVariable String groupName, @PathVariable Long userId) {
+        return new ResponseEntity<>(membershipService.getCurrentRole(groupName, userId), HttpStatus.OK);
+    }
+
 }
