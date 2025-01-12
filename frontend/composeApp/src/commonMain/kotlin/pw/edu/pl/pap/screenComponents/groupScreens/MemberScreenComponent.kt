@@ -108,5 +108,6 @@ class MemberScreenComponent(
     private suspend fun kickMember() {
         runBlocking { membershipRepository.kickMember(user, currentUserGroup.value!!) }
         groupRepository.getUsersInCurrentGroup()
+        //TODO test it
     }
 }

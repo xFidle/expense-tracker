@@ -30,10 +30,6 @@ class GroupScreenComponent(
 
     private val currentGroup = groupRepository.currentUserGroup
 
-    //temp
-    private val balances = listOf(70.0, 45.0, -115.0)
-    //TODO remove balances
-
     init {
         coroutineScope.launch {
             updateUsers()
@@ -55,11 +51,10 @@ class GroupScreenComponent(
     fun setupInputFields() {
         _inputFieldsData.clear()
         _inputFieldsData.addAll(
-            userNames.zip(balances).mapIndexed { index, (username, balance) ->
+            userNames.mapIndexed { index, username ->
                 val user = users[index]
-                InputFieldData.UserBalanceButtonData(
+                InputFieldData.UserButtonData(
                     title = username,
-                    balance = balance.toFloat(),
                     onClick = { onUserClicked(currentGroup.value!!, user) }
                 )
             }

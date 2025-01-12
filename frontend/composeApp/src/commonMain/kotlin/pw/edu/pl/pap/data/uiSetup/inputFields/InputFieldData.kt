@@ -44,9 +44,8 @@ sealed class InputFieldData(open val title: String) {
         val onConfirm: (List<Int>?) -> Unit
     ) : InputFieldData(title)
 
-    data class UserBalanceButtonData (
+    data class UserButtonData (
         override val title: String,
-        val balance: Float,
         val onClick: () -> Unit,
     ) : InputFieldData(title)
 }
