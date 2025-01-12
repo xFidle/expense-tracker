@@ -48,7 +48,7 @@ public class PreferenceServiceImpl extends GenericServiceImpl<Preference, Long> 
         }
         if (preferenceDTO.getMethodOfPayment() != null) {
             MethodOfPayment method = methodOfPaymentRepository.findByName(preferenceDTO.getMethodOfPayment())
-                    .orElseThrow(() -> new MethodNotFoundException((preferenceDTO.getMethodOfPayment())));
+                    .orElseThrow(() -> new MethodNotFoundException(preferenceDTO.getMethodOfPayment()));
             pref.setMethod(method);
         }
         if (preferenceDTO.getLanguage() != null)

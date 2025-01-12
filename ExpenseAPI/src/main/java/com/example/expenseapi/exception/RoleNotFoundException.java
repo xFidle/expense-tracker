@@ -5,4 +5,5 @@ public class RoleNotFoundException extends RuntimeException {
         super("Role with id " + id + " not found");
     }
     public RoleNotFoundException(String role) {super("Role " + role + " not found");}
+    public RoleNotFoundException() {super("No role for this user in this group");}
 }
