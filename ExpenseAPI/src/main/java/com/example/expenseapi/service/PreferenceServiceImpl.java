@@ -1,7 +1,8 @@
 package com.example.expenseapi.service;
 
 import com.example.expenseapi.dto.PreferenceUpdateDTO;
-import com.example.expenseapi.exception.BadRequestException;
+import com.example.expenseapi.exception.CurrencyNotFoundException;
+import com.example.expenseapi.exception.MethodNotFoundException;
 import com.example.expenseapi.pojo.Currency;
 import com.example.expenseapi.pojo.MethodOfPayment;
 import com.example.expenseapi.pojo.Preference;
@@ -34,12 +35,12 @@ public class PreferenceServiceImpl extends GenericServiceImpl<Preference, Long> 
         Preference pref = getUserPreferences();
         if (preferenceUpdateDTO.getCurrencySymbol() != null) {
             Currency currency = currencyRepository.findBySymbol(preferenceUpdateDTO.getCurrencySymbol())
-                    .orElseThrow(() -> new BadRequestException("Currency not found " + preferenceUpdateDTO.getCurrencySymbol()));
+                    .orElseThrow(() -> new CurrencyNotFoundException(preferenceUpdateDTO.getCurrencySymbol()));
             pref.setCurrency(currency);
         }
         if (preferenceUpdateDTO.getMethodOfPayment() != null) {
             MethodOfPayment method = methodOfPaymentRepository.findByName(preferenceUpdateDTO.getMethodOfPayment())
-                    .orElseThrow(() -> new BadRequestException(("Method of payment not found ")));
+                    .orElseThrow(() -> new MethodNotFoundException(preferenceUpdateDTO.getMethodOfPayment()));
             pref.setMethod(method);
         }
         if (preferenceUpdateDTO.getLanguage() != null)
