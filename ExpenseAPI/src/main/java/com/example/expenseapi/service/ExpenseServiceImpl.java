@@ -109,8 +109,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
                 .orElseThrow(() -> new ForbiddenRequestException("User is not a member of the group"));
         expense.setMembership(membership);
         if (createDTO.getCategoryName() != null) {
-            Category category = categoryRepository.findByName(createDTO.getCategoryName());
-            expense.setCategory(category);
+            expense.setCategory(categoryRepository.findByName(createDTO.getCategoryName())
+                    .orElseThrow(() -> new BadRequestException("Category not found " + createDTO.getCategoryName())));
         }
         if (createDTO.getExpenseDate() != null) {
             expense.setDate(createDTO.getExpenseDate());
@@ -178,12 +178,9 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     }
 
     private ExpInfo calculateExpInfo(Collection<ExpenseDTO> groupExpenses, Collection<ExpenseDTO> userExpenses) {
-        Currency currency = preferenceRepository
-                .getPreferenceById(AuthHelper.getUser().getId())
-                .getCurrency();
+        Currency currency = AuthHelper.getUser().getPreference().getCurrency();
         double groupSum = sumExpensesInCurrency(groupExpenses, currency);
         double userSum = sumExpensesInCurrency(userExpenses, currency);
-
         return new ExpInfo(userSum, groupSum);
     }
 
@@ -191,8 +188,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     @Cacheable(value = "expensesMap", key = "#filter.toString() + '_' + #keyType")
     public Map<String, Double> getMapResult(ExpenseFilter filter,  String keyType) {
         List<ExpenseDTO> result = searchExpensesDTO(filter);
-        Currency currency = currencyRepository.findBySymbol(AuthHelper.getUser().getPreference().getCurrency().getSymbol())
-                .orElseThrow(() -> new BadRequestException("Currency not found " + AuthHelper.getUser().getPreference().getCurrency().getSymbol()));
+        Currency currency = AuthHelper.getUser().getPreference().getCurrency();
         Function<ExpenseDTO, String> keyExtractor = findKeyExtractor(keyType);
         if (keyExtractor == null) throw new BadRequestException("Invalid key type");
         return totalExpensesMap(result, keyExtractor, currency);
