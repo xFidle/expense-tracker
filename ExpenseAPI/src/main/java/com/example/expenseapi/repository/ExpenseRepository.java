@@ -9,4 +9,5 @@ import java.util.List;
 public interface ExpenseRepository extends JpaRepository<Expense, Long>, JpaSpecificationExecutor<Expense> {
     List<Expense> findByMembershipUserEmail(String email);
     void deleteAllByMembershipUserId(Long id);
+    void deleteAllByMembership_User_IdAndMembership_Group_Name(Long userId, String groupName);
 }
