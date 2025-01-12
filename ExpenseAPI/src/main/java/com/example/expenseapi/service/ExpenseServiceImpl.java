@@ -511,5 +511,24 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     public void deleteAllExpensesForUserIdAndGroupName(Long userId, String groupName) {
         expenseRepository.deleteAllByMembership_User_IdAndMembership_Group_Name(userId, groupName);
     }
+
+    @Override
+    @CacheEvict(value = {
+            "expensesPage",
+            "expInfoGroup",
+            "expInfoAllGroups",
+            "expensesMap",
+            "recentExpense",
+            "groupExpenseDateMap",
+            "groupExpenseCategoryMap",
+            "searchExpensesDTO",
+            "searchExpensesPagesDTO",
+            "expensesUserPage",
+            "ExpenseID"
+    }, allEntries = true)
+    @Transactional
+    public void deleteAllByGroupId(Long id) {
+        expenseRepository.deleteAllByMembershipGroupId(id);
+    }
 }
 
