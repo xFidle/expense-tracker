@@ -174,4 +174,4 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
     }
 }
 
-//TODO there is a strange bug when if users invited only in certain order, sent invitations are showing incorrectly
+//TODO there is a strange bug when if users invited only in certain order, sent invitations are showing incorrectly (overlapping?)
