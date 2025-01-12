@@ -40,9 +40,7 @@ class UserRepository(val api: UserApi) {
 
     suspend fun updateUser(user: UpdatedUserData){
         try {
-            println(api.updateUserResponse(user))
             _currentUserInfo.value = api.updateUser(user)
-            //TODO remove print when debugged
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -54,8 +52,7 @@ class UserRepository(val api: UserApi) {
 
     suspend fun changePassword(newPassword: NewPassword){
         try {
-            println(api.changePassword(newPassword))
-            //TODO remove print when debugged
+            api.changePassword(newPassword)
         } catch (e: Exception) {
             e.printStackTrace()
         }

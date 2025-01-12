@@ -13,10 +13,10 @@ import pw.edu.pl.pap.repositories.data.ConfigRepository
 import pw.edu.pl.pap.repositories.data.UserRepository
 
 class UserPersonalDataScreenComponent(
+    private val logOut: () -> Unit,
     baseSettingsScreenComponent: BaseSettingsScreenComponent
 ) : BaseSettingsScreenComponentImpl(baseSettingsScreenComponent) {
 
-    private val configRepository: ConfigRepository by inject()
     private val userRepository: UserRepository by inject()
 
     private var email: MutableState<String> = mutableStateOf(userRepository.currentUserInfo.value!!.email)
@@ -25,12 +25,12 @@ class UserPersonalDataScreenComponent(
 
     override var confirmationData = ConfirmationDialogConfig(
         mainText = "Change Personal Data",
-        subText = "Are you sure you want to change your personals?",
+        subText = "Are you sure you want to change your personals?\n        This will log you out of your account!",
         onNo = { showConfirmationDialog.value = false },
         onYes = {
             showConfirmationDialog.value = false
             coroutineScope.launch { postChanges() }
-            onBack()
+            logOut()
         }
     )
 

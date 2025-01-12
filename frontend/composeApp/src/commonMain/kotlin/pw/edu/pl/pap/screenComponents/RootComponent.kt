@@ -347,7 +347,8 @@ class RootComponent(
             is Configuration.UserPersonalDataScreen -> {
                 Child.UserPersonalDataScreen(
                     component = UserPersonalDataScreenComponent(
-                        baseSettingsScreenComponent = createSettingsScreenComponent(componentContext)
+                        baseSettingsScreenComponent = createSettingsScreenComponent(componentContext),
+                        logOut = { navigation.replaceAll(Configuration.LogInSignUpSelectionScreen) }
                     )
                 )
             }

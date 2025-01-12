@@ -23,10 +23,6 @@ interface UserApi {
     @PUT("user/update")
     suspend fun updateUser(@Body user: UpdatedUserData): User
 
-    @PUT("user/update")
-    suspend fun updateUserResponse(@Body user: UpdatedUserData): HttpResponse
-    //TODO remove this function when debugged
-
     @PUT("user/changePass")
     suspend fun changePassword(@Body newPass: NewPassword): HttpResponse
 }
