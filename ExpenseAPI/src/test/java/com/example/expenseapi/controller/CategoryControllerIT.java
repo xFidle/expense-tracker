@@ -15,8 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @AutoConfigureMockMvc
 public class CategoryControllerIT {
     private final MockMvc mockMvc;
-    private final String activeUser = "herkules1@gmail.com"; // This user has certain expenses and belongs to two groups - family and workers
-    private final String inactiveUser = "herkules4@gmail.com"; // This user has no expenses and doesn't belong to any groups
+    private final String activeUser = "herkules1@gmail.com";
     private final TokenGenerator gen;
 
     @Autowired
