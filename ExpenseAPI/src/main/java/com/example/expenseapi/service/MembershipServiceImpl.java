@@ -148,6 +148,14 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     public String getCurrentRole(String groupName, Long userId) {
         return membershipRepository.findByUserIdAndGroupName(userId, groupName)
                 .map(membership -> membership.getRole().getName())
-                .orElseThrow(RoleNotFoundException::new);
+                .orElseThrow(() -> new MembershipNotFoundException(userId, groupName));
+    }
+
+    @Override
+    @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
+    @Transactional
+    public void deleteAllMembershipsForGroupId(Long id) {
+        expenseService.deleteAllByGroupId(id);
+        membershipRepository.deleteAllByGroupId(id);
     }
 }

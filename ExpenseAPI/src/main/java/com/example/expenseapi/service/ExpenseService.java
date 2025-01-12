@@ -32,4 +32,6 @@ public interface ExpenseService extends GenericService<Expense, Long> {
     void deleteAllExpensesForUserId(Long id);
 
     void deleteAllExpensesForUserIdAndGroupName(Long userId, String groupName);
+
+    void deleteAllByGroupId(Long id);
 }
