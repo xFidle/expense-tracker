@@ -3,11 +3,8 @@ package pw.edu.pl.pap.ui.groupScreens
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import pw.edu.pl.pap.screenComponents.groupScreens.EditGroupScreenComponent
-import pw.edu.pl.pap.ui.common.BackDeleteAddButtonRow
-import pw.edu.pl.pap.ui.common.ConfirmationPopup
+import pw.edu.pl.pap.ui.common.*
 import pw.edu.pl.pap.ui.common.DialogFactory.ConfirmationDialogFactory
-import pw.edu.pl.pap.ui.common.Header
-import pw.edu.pl.pap.ui.common.InputFields
 import pw.edu.pl.pap.ui.common.DialogFactory.ConfirmationDialogState
 
 @Composable
@@ -20,7 +17,6 @@ fun EditGroupScreen(
         onDismiss = component.onDismiss,
         onDelete = { component.deleteGroup() }
     ) }
-    //TODO check confirmation dialogs
 
     Header("Edit Group")
 
@@ -40,7 +36,7 @@ fun EditGroupScreen(
             }
         },
         onDelete = {
-            confirmDialogState = ConfirmationDialogState.Delete
+            component.showDeleteGroupConfirmationDialog.value = true
         },
         isConfirmEnabled = component.canConfirm
     )
@@ -60,6 +56,10 @@ fun EditGroupScreen(
                 }
             }
         )
+    }
+
+    if (component.showDeleteGroupConfirmationDialog.value) {
+        showConfirmationPopup(component.deleteGroupConfirmationData)
     }
 }
 

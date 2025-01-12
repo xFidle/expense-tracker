@@ -20,10 +20,9 @@ class EditGroupScreenComponent(
 
     val noChange by derivedStateOf { canConfirm && name.value == name.value }
 
-    //TODO add confirmation popup to delete
     var showDeleteGroupConfirmationDialog: MutableState<Boolean> = mutableStateOf(false)
 
-    val changeRoleConfirmationData = ConfirmationDialogConfig(
+    val deleteGroupConfirmationData = ConfirmationDialogConfig(
         mainText = "Delete group",
         subText = "Are you sure you want to delete group ${groupRepository.getCurrentGroupName()}?\n" +
                   "All expenses in ${groupRepository.getCurrentGroupName()} will be gone!",
