@@ -42,7 +42,7 @@ class PreferencesScreenComponent(
         }
     }
 
-    override fun postChanges() {
+    override suspend fun postChanges() {
         //TODO
     }
 
