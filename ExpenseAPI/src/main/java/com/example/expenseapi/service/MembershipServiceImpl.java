@@ -93,6 +93,9 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
         if(!isAdmin(groupName) && !userId.equals(AuthHelper.getUser().getId())) {
             throw new PermissionNeededException(groupName);
         }
+        if (membershipRepository.findByUserIdAndGroupName(userId, groupName).isEmpty()) {
+            throw new UserNotInGroupException(groupName, userId);
+        }
         expenseService.deleteAllExpensesForUserIdAndGroupName(userId, groupName);
         membershipRepository.deleteByUserIdAndGroupName(userId, groupName);
     }
