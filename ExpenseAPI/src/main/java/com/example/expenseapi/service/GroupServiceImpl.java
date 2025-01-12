@@ -1,6 +1,6 @@
 package com.example.expenseapi.service;
 
-import com.example.expenseapi.exception.RoleNotFound;
+import com.example.expenseapi.exception.RoleNotFoundException;
 import com.example.expenseapi.exception.UserNotFoundException;
 import com.example.expenseapi.pojo.*;
 import com.example.expenseapi.repository.GroupRepository;
@@ -53,7 +53,7 @@ public class GroupServiceImpl extends GenericServiceImpl<Group, Long> implements
         User userEntity = userService.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
         Role role = roleRepository.findById(1L)
-                .orElseThrow(() -> new RoleNotFound(1L));
+                .orElseThrow(() -> new RoleNotFoundException(1L));
         Group newGroup = super.save(entity);
         membershipService.save(new Membership(userEntity, newGroup, role));
         return newGroup;
