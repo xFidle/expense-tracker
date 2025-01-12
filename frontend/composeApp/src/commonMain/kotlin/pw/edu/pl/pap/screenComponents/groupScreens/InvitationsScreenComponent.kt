@@ -34,8 +34,10 @@ class InvitationsScreenComponent(
     val isAdmin = userRepository.isAdmin
 
     init{
-        runBlocking {
-            userRepository.checkIsAdmin(currentUserGroup.value!!)
+        if (currentUserGroup.value != null){
+            runBlocking {
+                userRepository.checkIsAdmin(currentUserGroup.value!!)
+            }
         }
     }
 

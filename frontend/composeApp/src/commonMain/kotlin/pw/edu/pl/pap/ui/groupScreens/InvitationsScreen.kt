@@ -21,7 +21,9 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
 
     component.fetchCurrentInvites()
 
-    if (component.isAdmin.value){
+    //TODO test for empty groups list
+
+    if (component.isAdmin.value && component.currentUserGroup.value != null){
         TwoChoiceClickableHeader(
             text = "  NEW  ",
             onClick = { component.isNewInvitationsScreen.value = true },
@@ -79,7 +81,20 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
             component.availableNewInvitationsData,
             Modifier.offset(x = 0.dp, y = 100.dp)
         )
-        //TODO add text if nothing found
+        if (component.availableNewInvitationsData.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "No one found",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .offset(x = 0.dp, y = 100.dp)
+                )
+            }
+        }
     } else {
         component.isPostSearchClicked.value = false
 
@@ -150,7 +165,6 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
                         .offset(x = 0.dp, y = offset.dp)
                 )
             }
-            offset += 40
         } else {
             InvitationFields(
                 component.sentInvitationData,
@@ -159,3 +173,5 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
         }
     }
 }
+
+//TODO there is a strange bug when if users invited only in certain order, sent invitations are showing incorrectly
