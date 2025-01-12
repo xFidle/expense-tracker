@@ -435,7 +435,10 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, Long> implem
     public Page<ExpenseDTO> getExpensesForUser(int page, int size) {
         ExpenseFilter filter = new ExpenseFilter();
         filter.setEmail(AuthHelper.getUserEmail());
-        return searchExpensesPagesDTO(filter, page, size);
+        Specification<Expense> spec = prepareSpecification(filter);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+        return expenseRepository.findAll(spec, pageable)
+                .map(expenseMapper::expenseToExpenseDTO);
     }
 
     @Caching(evict = {
