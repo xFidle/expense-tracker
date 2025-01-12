@@ -28,4 +28,6 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
     void deleteAllByUserId(Long userId);
 
     void deleteByUserIdAndGroupName(Long userId, String groupName);
+
+    void deleteAllByGroupId(Long id);
 }

@@ -147,4 +147,12 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
                 .map(membership -> membership.getRole().getName())
                 .orElseThrow(() -> new MembershipNotFoundException(userId, groupName));
     }
+
+    @Override
+    @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
+    @Transactional
+    public void deleteAllMembershipsForGroupId(Long id) {
+        expenseService.deleteAllByGroupId(id);
+        membershipRepository.deleteAllByGroupId(id);
+    }
 }
