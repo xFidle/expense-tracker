@@ -64,7 +64,7 @@ class MemberScreenComponent(
         onNo = { showChangeRoleConfirmationDialog.value = false },
         onYes = {
             showChangeRoleConfirmationDialog.value = false
-            coroutineScope.launch { kick() }
+            coroutineScope.launch { kickMember() }
             onBack()
         }
     )
@@ -101,11 +101,12 @@ class MemberScreenComponent(
         )
     }
 
-    private fun changeRole() {
-        //TODO
+    private suspend fun changeRole() {
+        userRepository.changeRole(currentUserGroup.value!!, user, roles.value[roleIndex.value])
     }
 
-    private fun kick() {
-        //TODO
+    private suspend fun kickMember() {
+        runBlocking { membershipRepository.kickMember(user, currentUserGroup.value!!) }
+        groupRepository.getUsersInCurrentGroup()
     }
 }
