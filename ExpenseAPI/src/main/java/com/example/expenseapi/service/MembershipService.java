@@ -20,4 +20,5 @@ public interface MembershipService extends GenericService<Membership, Long> {
     void deleteAllMembershipsForUserId(Long id);
 
     void changeRole(String groupName, String role, Long userId);
+    void deleteMembership(Long userId, String groupName);
 }

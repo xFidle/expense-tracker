@@ -24,12 +24,14 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     private final MembershipRepository membershipRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+    private final ExpenseService expenseService;
 
-    public MembershipServiceImpl(MembershipRepository repository, UserMapper userMapper, RoleRepository roleRepository) {
+    public MembershipServiceImpl(MembershipRepository repository, UserMapper userMapper, RoleRepository roleRepository, ExpenseService expenseService) {
         super(repository);
         this.membershipRepository = repository;
         this.userMapper = userMapper;
         this.roleRepository = roleRepository;
+        this.expenseService = expenseService;
     }
     @Override
     @Cacheable(value = "baseGroups", keyGenerator = "userBasedKeyGenerator")
@@ -83,6 +85,17 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
     public void delete(Long id) {
         super.delete(id);
+    }
+
+    @Override
+    @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
+    @Transactional
+    public void deleteMembership(Long userId, String groupName) {
+        if(!isAdmin(groupName)) {
+            throw new BadRequestException("User does not have admin privileges");
+        }
+        expenseService.deleteAllExpensesForUserIdAndGroupName(userId, groupName);
+        membershipRepository.deleteByUserIdAndGroupName(userId, groupName);
     }
 
     @Override
