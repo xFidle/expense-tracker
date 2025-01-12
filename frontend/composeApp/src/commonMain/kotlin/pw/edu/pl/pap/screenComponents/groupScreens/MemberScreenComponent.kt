@@ -2,11 +2,13 @@ package pw.edu.pl.pap.screenComponents.groupScreens
 
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.core.component.inject
 import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.uiSetup.ConfirmationDialogConfig
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
 import pw.edu.pl.pap.repositories.data.GroupRepository
+import pw.edu.pl.pap.repositories.data.UserRepository
 import pw.edu.pl.pap.screenComponents.BaseComponent
 
 class MemberScreenComponent(
@@ -14,8 +16,18 @@ class MemberScreenComponent(
     val user: User,
     val onBack: () -> Unit
 ) : BaseComponent by baseComponent {
+    private val userRepository: UserRepository by inject()
 
     private val groupRepository: GroupRepository by inject()
+    private val currentUserGroup = groupRepository.currentUserGroup
+
+    private val isAdmin = userRepository.isAdmin
+
+    init{
+        runBlocking {
+            userRepository.checkIsAdmin(currentUserGroup.value!!)
+        }
+    }
 
     private val _inputFieldsData = mutableStateListOf<InputFieldData>()
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
@@ -26,8 +38,7 @@ class MemberScreenComponent(
     private var initialIndex: MutableState<Int> = mutableStateOf(0)
     private var roleIndex: MutableState<Int> = mutableStateOf(0)
 
-    private val isAdmin: Boolean = true
-    //TODO fetch if is admin
+
 
     var showChangeRoleConfirmationDialog: MutableState<Boolean> = mutableStateOf(false)
     var showKickConfirmationDialog: MutableState<Boolean> = mutableStateOf(false)
@@ -64,13 +75,13 @@ class MemberScreenComponent(
                     title = "Role: ",
                     itemList = roles,
                     selectedIndex = roleIndex,
-                    onItemClick = if (isAdmin) {
+                    onItemClick = if (isAdmin.value) {
                         { coroutineScope.launch { roleIndex.value = it } }
                     } else {
                         {}
                     }
                 )
-            ) + if (isAdmin) {
+            ) + if (isAdmin.value) {
                 listOf(
                     InputFieldData.ButtonData(
                         title = "KICK",

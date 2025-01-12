@@ -6,6 +6,7 @@ import pw.edu.pl.pap.api.data.ConfigApi
 import pw.edu.pl.pap.data.databaseAssociatedData.Category
 import pw.edu.pl.pap.data.databaseAssociatedData.Currency
 import pw.edu.pl.pap.data.databaseAssociatedData.PaymentMethod
+import pw.edu.pl.pap.data.databaseAssociatedData.User
 
 class ConfigRepository(private val api: ConfigApi) {
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
@@ -20,11 +21,15 @@ class ConfigRepository(private val api: ConfigApi) {
     private val _keyPatterns = MutableStateFlow<List<String>>(emptyList())
     val keyPatterns: StateFlow<List<String>> get() = _keyPatterns
 
+    private val _currentUserInfo = MutableStateFlow<User?>(null)
+    val currentUserInfo : StateFlow<User?> get() = _currentUserInfo
+
     suspend fun loadConfig() {
         getCategories()
         getCurrencies()
         getPaymentMethods()
         getChartKeys()
+        getCurrentUserInfo()
     }
 
     private suspend fun getCategories() {
@@ -41,5 +46,9 @@ class ConfigRepository(private val api: ConfigApi) {
 
     private suspend fun getChartKeys() {
         _keyPatterns.value = api.getChartKeys()
+    }
+
+    private suspend fun getCurrentUserInfo() {
+        _currentUserInfo.value = api.getCurrentUserInfo()
     }
 }

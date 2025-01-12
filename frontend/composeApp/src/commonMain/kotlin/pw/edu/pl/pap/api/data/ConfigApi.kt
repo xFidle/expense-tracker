@@ -4,6 +4,7 @@ import de.jensklingenberg.ktorfit.http.GET
 import pw.edu.pl.pap.data.databaseAssociatedData.Category
 import pw.edu.pl.pap.data.databaseAssociatedData.Currency
 import pw.edu.pl.pap.data.databaseAssociatedData.PaymentMethod
+import pw.edu.pl.pap.data.databaseAssociatedData.User
 
 interface ConfigApi {
 
@@ -19,4 +20,6 @@ interface ConfigApi {
     @GET("chart/keys")
     suspend fun getChartKeys(): List<String>
 
+    @GET("user/current")
+    suspend fun getCurrentUserInfo(): User
 }
