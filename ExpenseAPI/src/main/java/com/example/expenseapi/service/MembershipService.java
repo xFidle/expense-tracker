@@ -22,5 +22,5 @@ public interface MembershipService extends GenericService<Membership, Long> {
     void changeRole(String groupName, String role, Long userId);
     void deleteMembership(Long userId, String groupName);
 
-    String getCurrentRole(String groupName);
+    String getCurrentRole(String groupName, Long userId);
 }
