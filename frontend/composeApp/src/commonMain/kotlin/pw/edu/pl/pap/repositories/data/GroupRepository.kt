@@ -67,10 +67,6 @@ class GroupRepository(val api: GroupApi) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-//        _allGroups.value = _allGroups.value.filter { existingGroup ->
-//            existingGroup.id != group.id
-//        }
-        //TODO test and remove this comment if working
     }
 
     suspend fun addGroup(group: NewGroup) {
