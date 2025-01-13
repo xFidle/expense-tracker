@@ -42,13 +42,18 @@ class RootComponent(
     private val navigation = StackNavigation<Configuration>()
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    private fun loadConfig() {
-        val configRepository: ConfigRepository by inject()
+    private fun loadUserData() {
         val userRepository: UserRepository by inject()
         coroutineScope.launch {
-            configRepository.loadConfig()
             userRepository.getCurrentUserInfo()
             userRepository.getCurrentPreferences()
+        }
+    }
+
+    fun loadConfigData() {
+        val configRepository: ConfigRepository by inject()
+        coroutineScope.launch {
+            configRepository.loadConfig()
         }
     }
 
@@ -116,7 +121,7 @@ class RootComponent(
             coroutineScope = coroutineScope,
             onConfirm = {
                 loadAdditionalModules(apiModule, repoModule)
-                loadConfig()
+                loadUserData()
                 navigation.replaceAll(Configuration.HomeScreen)
             },
             onBack = { navigation.pop() },

@@ -6,7 +6,6 @@ import pw.edu.pl.pap.api.data.ConfigApi
 import pw.edu.pl.pap.data.databaseAssociatedData.Category
 import pw.edu.pl.pap.data.databaseAssociatedData.Currency
 import pw.edu.pl.pap.data.databaseAssociatedData.PaymentMethod
-import pw.edu.pl.pap.data.databaseAssociatedData.User
 
 class ConfigRepository(private val api: ConfigApi) {
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
@@ -23,7 +22,6 @@ class ConfigRepository(private val api: ConfigApi) {
 
     private val _roles = MutableStateFlow<List<String>>(emptyList())
     val roles: StateFlow<List<String>> get() = _roles
-
 
     suspend fun loadConfig() {
         getCategories()
