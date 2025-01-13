@@ -41,7 +41,7 @@ class NewExpenseScreenComponent(
 
         coroutineScope.launch {
             expenseRepository.addExpense(newExpense)
-            expenseRepository.getRecentExpense(groupRepository.currentUserGroup.value?.name!!)
+//            expenseRepository.getRecentExpense(groupRepository.currentUserGroup.value?.name!!)
             onBack()
         }
     }

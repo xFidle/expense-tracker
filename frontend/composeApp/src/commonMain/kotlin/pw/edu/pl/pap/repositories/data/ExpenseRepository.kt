@@ -115,7 +115,9 @@ class ExpenseRepository(val api: ExpenseApi) {
 
     suspend fun addExpense(expense: NewExpense) {
         try {
-            api.postNewExpense(expense)
+            val newExpense = api.postNewExpense(expense)
+            val newMap = _groupedExpenses.value
+            newMap.addExpense(getKeyFromExpense(newExpense), newExpense)
         } catch (e: Exception) {
             e.printStackTrace()
         }

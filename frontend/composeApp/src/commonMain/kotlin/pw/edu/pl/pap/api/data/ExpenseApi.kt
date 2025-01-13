@@ -28,7 +28,7 @@ interface ExpenseApi {
     ): StringKeyExpensePage
 
     @POST("expense/create")
-    suspend fun postNewExpense(@Body newExpense: NewExpense): HttpResponse
+    suspend fun postNewExpense(@Body newExpense: NewExpense): Expense
 
     @PUT("expense/modify/{id}")
     suspend fun updateExpense(@Path("id") id: Long, @Body expense: Expense): HttpResponse

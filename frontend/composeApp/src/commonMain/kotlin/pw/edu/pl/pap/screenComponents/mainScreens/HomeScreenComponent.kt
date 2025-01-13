@@ -55,7 +55,7 @@ class HomeScreenComponent(
             }
 
             is NavigationState.FromNewExpenseScreen -> {
-                getRecentExpense()
+//                getRecentExpense()
             }
 
             is NavigationState.Empty -> {
