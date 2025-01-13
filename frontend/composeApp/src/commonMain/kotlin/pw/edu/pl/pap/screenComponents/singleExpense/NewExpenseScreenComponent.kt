@@ -29,7 +29,7 @@ class NewExpenseScreenComponent(
 
     override fun confirm() {
         val newExpense = NewExpense(
-            title = title.value,
+            title = title.value.ifEmpty { categories[categoryIndex.value].name },
             price = price.value.toFloat(),
             user = users[userIndex.value],
             groupName = currentUserGroup.name,
