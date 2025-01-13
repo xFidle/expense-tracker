@@ -19,7 +19,7 @@ class LoginScreenComponent(
 //        val userLoginData = UserLoginData(email.value, password.value)
 
         //temp
-        val userLoginData = UserLoginData("herkules1@gmail.com", "123")
+        val userLoginData = UserLoginData("Marcin@gmail.com", "123")
 
 
         coroutineScope.launch {
