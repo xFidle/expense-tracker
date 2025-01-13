@@ -11,7 +11,9 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email")
+})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,22 +21,26 @@ public class User {
     private Long id;
 
     @NonNull
-    @Column(name = "name", nullable = false, columnDefinition = "VARCHAR2(255)")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @NonNull
-    @Column(name = "surname", nullable = false, columnDefinition = "VARCHAR2(255)")
+    @Column(name = "surname", nullable = false)
     private String surname;
 
     @NonNull
-    @Column(name = "email", nullable = false, columnDefinition = "VARCHAR2(255)")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "creationDate", nullable = false)
+    @Column(name = "creation_date", nullable = false)
     private LocalDate creationDate = LocalDate.now();
 
     @NonNull
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_group_id", referencedColumnName = "id", nullable = false)
-    private UserGroup userGroup;
+    @JoinColumn(name = "preferences_id", referencedColumnName = "id")
+    @OneToOne(optional = false, cascade = CascadeType.REMOVE)
+    private Preference preference;
+
+    @NonNull
+    @Column(nullable = false)
+    private String password;
 }

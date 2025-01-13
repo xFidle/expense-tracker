@@ -1,4 +1,7 @@
 package com.example.expenseapi.web;
+import com.example.expenseapi.dto.CursorPageResponse;
+import com.example.expenseapi.dto.ExpenseCreateDTO;
+import com.example.expenseapi.dto.ExpenseDTO;
 import com.example.expenseapi.pojo.Category;
 import com.example.expenseapi.pojo.ExpInfo;
 import com.example.expenseapi.pojo.Expense;
@@ -9,8 +12,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,46 +34,90 @@ public class ExpenseController extends GenericController<Expense, Long> {
         super(service);
     }
 
-    @GetMapping("/email/{email}")
-    @Operation(summary = "Retrieves expenses from user with given email")
-    @ApiResponse(responseCode = "200", description = "List of expense objects from the user with given email", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
-    public ResponseEntity<List<Expense>> getByEmail(@PathVariable String email) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesByEmail(email), HttpStatus.OK);
+    @GetMapping("/get/{id}")
+    public ResponseEntity<ExpenseDTO> getExpense(@PathVariable Long id) {
+        return new ResponseEntity<>(((ExpenseService) service).getMapped(id), HttpStatus.OK);
     }
 
-    @GetMapping("/group/{name}")
-    @Operation(summary = "Retrieves expenses for given user group")
-    @ApiResponse(responseCode = "200", description = "List of expense object for given user group", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expense.class))))
-    public ResponseEntity<List<Expense>> getByGroup(@PathVariable String name) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpensesForGroup(name), HttpStatus.OK);
+    @PostMapping("/create")
+    @Operation(summary = "Create a new expense using DTO")
+    @ApiResponse(responseCode = "201", description = "Expense successfully created.",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ExpenseDTO.class)))
+    public ResponseEntity<ExpenseDTO> createExpense(@RequestBody ExpenseCreateDTO expenseCreateDTO) {
+        return new ResponseEntity<>(((ExpenseService) service).createExpense(expenseCreateDTO), HttpStatus.CREATED);
     }
 
-    @GetMapping("/state/group/{name}/user/{userId}")
-    @Operation(summary = "Returns sum of expenses for given group and user")
-    @ApiResponse(responseCode = "200", description = "Sum of expenses for given group and user", content = @Content(schema = @Schema(implementation = ExpInfo.class)))
-    public ResponseEntity<ExpInfo> getState(@PathVariable String name, @PathVariable String userId) {
-        return new ResponseEntity<>(((ExpenseService) service).getExpInfo(name, userId), HttpStatus.OK);
+    @GetMapping("/my/expenses")
+    @Operation(summary = "Retrieves expenses from logged-in user")
+    @ApiResponse(responseCode = "200", description = "List of expense objects from logged user", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ExpenseDTO.class))))
+    public ResponseEntity<Page<ExpenseDTO>> getMyExpenses(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return new ResponseEntity<>(((ExpenseService) service).getExpensesForUser(page, size), HttpStatus.OK);
     }
 
-    @GetMapping("/all/dateMap")
-    @Operation(summary = "Returns all objects grouped by date")
+    @GetMapping("/my/group/{name}")
+    @Operation(summary = "Retrieves expenses for group of logged-in user")
+    @ApiResponse(responseCode = "200", description = "List of expense object for group of logged-in user", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ExpenseDTO.class))))
+    public ResponseEntity<Page<ExpenseDTO>> getByGroup(@PathVariable String name, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+        return new ResponseEntity<>(((ExpenseService) service).getExpensesForGroup(name, page, size), HttpStatus.OK);
+    }
+
+    @GetMapping("/state/allGroups")
+    @Operation(summary = "Returns sum of expenses for logged-in user and his group")
+    @ApiResponse(responseCode = "200", description = "Sum of expenses for logged-in user and his group", content = @Content(schema = @Schema(implementation = ExpInfo.class)))
+    public ResponseEntity<ExpInfo> getState() {
+        return new ResponseEntity<>(((ExpenseService) service).getExpInfo(), HttpStatus.OK);
+    }
+
+    @GetMapping("/state/{group}")
+    @Operation(summary = "Get expense summary for a specific group")
+    @ApiResponse(responseCode = "200", description = "Sum of expenses for logged-in user and specific group", content = @Content(schema = @Schema(implementation = ExpInfo.class)))
+    public ResponseEntity<ExpInfo> getState(@PathVariable String group) {
+        return new ResponseEntity<>(((ExpenseService) service).getExpInfo(group), HttpStatus.OK);
+    }
+
+    @GetMapping("/dateMap/group/{name}")
+    @Operation(summary = "Returns objects grouped by date for group of logged-in user")
     @ApiResponse(responseCode = "200", description = "All expenses grouped by date")
-    public ResponseEntity<Map<LocalDate, List<Expense>>> getDateExpensesMap() {
-        return new ResponseEntity<>(((ExpenseService) service).getDateExpenseAsMap(), HttpStatus.OK);
+    public ResponseEntity<CursorPageResponse<Map<LocalDate, List<ExpenseDTO>>>> getDateExpensesMap(
+            @PathVariable String name,
+            @RequestParam(defaultValue = "0") Long lastId,
+            @RequestParam(defaultValue = "") String lastKey,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "desc") String order) {
+        boolean desc = order.equals("desc");
+        LocalDate lastDateParsed = lastKey.isEmpty() ? null : LocalDate.parse(lastKey);
+        return new ResponseEntity<>(((ExpenseService) service).getGroupExpenseAsDateMap(
+                name, lastId, lastDateParsed, size, desc), HttpStatus.OK);
     }
 
-    @GetMapping("/all/categoryMap")
-    @Operation(summary = "Returns all objects grouped by category")
+    @GetMapping("/categoryMap/group/{name}")
+    @Operation(summary = "Returns objects grouped by category for group of logged-in user")
     @ApiResponse(responseCode = "200", description = "All expenses grouped by category")
-    public ResponseEntity<Map<Category, List<Expense>>> getCategoryExpenseMap() {
-        return new ResponseEntity<>(((ExpenseService) service).getCategoryExpenseAsMap(), HttpStatus.OK);
+    public ResponseEntity<CursorPageResponse<Map<Category, List<ExpenseDTO>>>> getCategoryExpenseMap(
+            @PathVariable String name,
+            @RequestParam(defaultValue = "0") Long lastId,
+            @RequestParam(defaultValue = "") String lastKey,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "asc") String order) {
+        boolean desc = order.equals("desc");
+        return new ResponseEntity<>(((ExpenseService) service).getGroupExpenseAsCategoryMap(name, lastId, lastKey, size, desc), HttpStatus.OK);
     }
 
-    @GetMapping("/recent")
+    @GetMapping("/recent/{groupName}")
     @Operation(summary = "Returns recent Expense object")
-    @ApiResponse(responseCode = "200", description = "The most recent Expense object", content = @Content(schema = @Schema(implementation = Expense.class)))
-    public ResponseEntity<Optional<Expense>> getRecent() {
-        return new ResponseEntity<>(((ExpenseService) service).getRecentExpense(), HttpStatus.OK);
+    @ApiResponse(responseCode = "200", description = "The most recent Expense object", content = @Content(schema = @Schema(implementation = ExpenseDTO.class)))
+    public ResponseEntity<Optional<ExpenseDTO>> getRecent(@PathVariable String groupName) {
+        return new ResponseEntity<>(((ExpenseService) service).getRecentExpense(groupName), HttpStatus.OK);
     }
 
+    @PutMapping("/modify/{id}")
+    @Operation(summary = "Update endpoint with mapping")
+    @ApiResponse(responseCode = "200", description = "Updated expense", content = @Content(schema = @Schema(implementation = ExpenseDTO.class)))
+    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable Long id, @RequestBody ExpenseDTO expenseDTO) {
+        return new ResponseEntity<>(((ExpenseService) service).updateExpense(id, expenseDTO), HttpStatus.OK);
+    }
 }
