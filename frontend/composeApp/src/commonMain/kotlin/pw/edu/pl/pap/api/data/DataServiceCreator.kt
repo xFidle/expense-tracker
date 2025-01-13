@@ -13,15 +13,15 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import pw.edu.pl.pap.api.ServiceCreator
 import pw.edu.pl.pap.data.databaseAssociatedData.RefreshToken
 import pw.edu.pl.pap.repositories.auth.TokenRepository
-import java.lang.reflect.Member
 
-class DataServiceCreator(tokenRepository: TokenRepository, baseUrl: String) {
+class DataServiceCreator(tokenRepository: TokenRepository, baseUrl: String) : ServiceCreator() {
     private val bearerTokenStorage =
         mutableListOf(BearerTokens(tokenRepository.getAccessToken(), tokenRepository.getRefreshToken()))
 
-    private val httpClient = HttpClient(CIO) {
+    override val httpClient: HttpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
                 prettyPrint = true
@@ -55,10 +55,7 @@ class DataServiceCreator(tokenRepository: TokenRepository, baseUrl: String) {
         install(HttpCache)
     }
 
-    private val ktorfit = Ktorfit.Builder()
-        .baseUrl(baseUrl)
-        .httpClient(httpClient)
-        .build()
+    private val ktorfit: Ktorfit = Ktorfit.Builder().baseUrl(baseUrl).httpClient(httpClient).build()
 
     fun createExpenseApi(): ExpenseApi {
         return ktorfit.createExpenseApi()
@@ -70,10 +67,6 @@ class DataServiceCreator(tokenRepository: TokenRepository, baseUrl: String) {
 
     fun createChartApi(): ChartApi {
         return ktorfit.createChartApi()
-    }
-
-    fun createConfigApi(): ConfigApi {
-        return ktorfit.createConfigApi()
     }
 
     fun createUserApi(): UserApi {

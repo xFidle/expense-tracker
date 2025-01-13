@@ -4,42 +4,43 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.core.component.inject
+import pw.edu.pl.pap.data.databaseAssociatedData.UpdatedUserData
+import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.uiSetup.ConfirmationDialogConfig
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
+import pw.edu.pl.pap.repositories.data.ConfigRepository
+import pw.edu.pl.pap.repositories.data.UserRepository
 
 class UserPersonalDataScreenComponent(
+    private val logOut: () -> Unit,
     baseSettingsScreenComponent: BaseSettingsScreenComponent
 ) : BaseSettingsScreenComponentImpl(baseSettingsScreenComponent) {
 
+    private val userRepository: UserRepository by inject()
 
-    private var email: MutableState<String> = mutableStateOf("")
-    private var name: MutableState<String> = mutableStateOf("")
-    private var surname: MutableState<String> = mutableStateOf("")
+    private var email: MutableState<String> = mutableStateOf(userRepository.currentUserInfo.value!!.email)
+    private var name: MutableState<String> = mutableStateOf(userRepository.currentUserInfo.value!!.name)
+    private var surname: MutableState<String> = mutableStateOf(userRepository.currentUserInfo.value!!.surname)
 
     override var confirmationData = ConfirmationDialogConfig(
         mainText = "Change Personal Data",
-        subText = "Are you sure you want to change your personals?",
+        subText = "Are you sure you want to change your personals?\n        This will log you out of your account!",
         onNo = { showConfirmationDialog.value = false },
         onYes = {
             showConfirmationDialog.value = false
             coroutineScope.launch { postChanges() }
-            onBack()
+            logOut()
         }
     )
 
-    override fun postChanges() {
-        //TODO
-    }
-
-    private fun fetchUserData() {
-        runBlocking {
-            //TODO
-        }
+    override suspend fun postChanges() {
+        val updatedUser = UpdatedUserData(name.value, surname.value ,email.value)
+        userRepository.updateUser(updatedUser)
     }
 
     override fun setupInputFields() {
         _inputFieldsData.clear()
-        fetchUserData()
         _inputFieldsData.addAll(
             listOf(
                 InputFieldData.TextFieldData(

@@ -9,9 +9,6 @@ interface ExpenseApi {
     @GET("expense/get/{id}")
     suspend fun getExpense(@Path("id") id: Long): Expense
 
-    @GET("expense/recent/{group}")
-    suspend fun getRecentExpense(@Path("group") group: String): Expense
-
     @GET("expense/state/{group}")
     suspend fun getTotalExpenses(@Path("group") group: String): TotalExpenses
 
@@ -28,7 +25,7 @@ interface ExpenseApi {
     ): StringKeyExpensePage
 
     @POST("expense/create")
-    suspend fun postNewExpense(@Body newExpense: NewExpense): HttpResponse
+    suspend fun postNewExpense(@Body newExpense: NewExpense): Expense
 
     @PUT("expense/modify/{id}")
     suspend fun updateExpense(@Path("id") id: Long, @Body expense: Expense): HttpResponse

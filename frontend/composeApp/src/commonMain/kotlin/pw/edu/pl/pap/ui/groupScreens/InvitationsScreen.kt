@@ -21,7 +21,7 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
 
     component.fetchCurrentInvites()
 
-    if (component.isAdmin){
+    if (component.isAdmin.value && component.currentUserGroup.value != null){
         TwoChoiceClickableHeader(
             text = "  NEW  ",
             onClick = { component.isNewInvitationsScreen.value = true },
@@ -79,6 +79,20 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
             component.availableNewInvitationsData,
             Modifier.offset(x = 0.dp, y = 100.dp)
         )
+        if (component.availableNewInvitationsData.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "No one found",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .offset(x = 0.dp, y = 100.dp)
+                )
+            }
+        }
     } else {
         component.isPostSearchClicked.value = false
 
@@ -120,6 +134,8 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
             )
             offset += (component.receivedInvitationData.size * 58)
         }
+        
+        offset += 40
 
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -149,7 +165,6 @@ fun InvitationsScreen (component: InvitationsScreenComponent) {
                         .offset(x = 0.dp, y = offset.dp)
                 )
             }
-            offset += 40
         } else {
             InvitationFields(
                 component.sentInvitationData,

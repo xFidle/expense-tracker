@@ -74,7 +74,6 @@ fun GroupKeyPopup(
                 }
 
                 GroupAndSortButton(groupKey, isSelected, currentOrder, onGroupClick, onOrderClick)
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
@@ -89,7 +88,7 @@ private fun GroupAndSortButton(
     onOrderChange: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(padding),
+        modifier = Modifier.fillMaxWidth().padding(ButtonDefaults.TextButtonContentPadding),
     ) {
         GroupButton(groupKey, isSelected, onGroupKeyChange)
         Spacer(modifier = Modifier.weight(1f))

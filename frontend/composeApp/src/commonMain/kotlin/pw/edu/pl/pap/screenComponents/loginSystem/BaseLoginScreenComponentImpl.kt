@@ -13,8 +13,6 @@ open class BaseLoginScreenComponentImpl(
     baseLoginScreenComponent: BaseLoginScreenComponent
 ) : BaseLoginScreenComponent by baseLoginScreenComponent {
 
-    protected val loginRepository: LoginRepository by inject()
-
     protected open val _inputFieldsData = mutableStateListOf<InputFieldData>()
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
 

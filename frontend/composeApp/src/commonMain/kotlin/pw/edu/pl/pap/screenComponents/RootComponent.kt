@@ -19,6 +19,7 @@ import pw.edu.pl.pap.di.apiModule
 import pw.edu.pl.pap.di.loadAdditionalModules
 import pw.edu.pl.pap.di.repoModule
 import pw.edu.pl.pap.repositories.data.ConfigRepository
+import pw.edu.pl.pap.repositories.data.UserRepository
 import pw.edu.pl.pap.screenComponents.chartsScreens.ChartsFilterScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.EditGroupScreenComponent
 import pw.edu.pl.pap.screenComponents.groupScreens.InvitationsScreenComponent
@@ -41,7 +42,15 @@ class RootComponent(
     private val navigation = StackNavigation<Configuration>()
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    private fun loadConfig() {
+    private fun loadUserData() {
+        val userRepository: UserRepository by inject()
+        coroutineScope.launch {
+            userRepository.getCurrentUserInfo()
+            userRepository.getCurrentPreferences()
+        }
+    }
+
+    fun loadConfigData() {
         val configRepository: ConfigRepository by inject()
         coroutineScope.launch {
             configRepository.loadConfig()
@@ -112,7 +121,7 @@ class RootComponent(
             coroutineScope = coroutineScope,
             onConfirm = {
                 loadAdditionalModules(apiModule, repoModule)
-                loadConfig()
+                loadUserData()
                 navigation.replaceAll(Configuration.HomeScreen)
             },
             onBack = { navigation.pop() },
@@ -280,39 +289,14 @@ class RootComponent(
             is Configuration.EditGroupScreen -> Child.EditGroupScreen(
                 component = EditGroupScreenComponent(
                     baseComponent = createMainScreenComponent(componentContext),
-                    onDismiss = { navigation.pop() },
-//                    onSave = {
-//                        navigation.pop()
-//                        (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
-//                            HomeScreenComponent.NavigationState.FromExpenseDetailsScreenEdit(configuration.expense)
-//                        )
-//                    },
-//                    onDelete = {
-//                        navigation.pop()
-//                        (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
-//                            HomeScreenComponent.NavigationState.FromExpenseDetailsScreenDelete(configuration.expense)
-//                        )
-//                    },
-                    onSave = {},
-                    onDelete = {},
-                    //TODO
+                    onDismiss = { navigation.pop() }
                 )
             )
 
             is Configuration.NewGroupScreen -> Child.NewGroupScreen(
                 component = NewGroupScreenComponent(
-                    baseComponent = createMainScreenComponent(
-                        componentContext
-                    ),
-                    onDismiss = { navigation.pop() },
-                    onSave = {}
-//                            onSave = {
-//                        navigation.pop()
-//                        (childStack.value.active.instance as Child.HomeScreen).component.updateNavigationState(
-//                            HomeScreenComponent.NavigationState.FromNewExpenseScreen
-//                        )
-//                    },
-                    //TODO
+                    baseComponent = createMainScreenComponent(componentContext),
+                    onDismiss = { navigation.pop() }
                 ))
 
             is Configuration.InvitationsScreen -> Child.InvitationsScreen(
@@ -344,7 +328,8 @@ class RootComponent(
             is Configuration.UserPersonalDataScreen -> {
                 Child.UserPersonalDataScreen(
                     component = UserPersonalDataScreenComponent(
-                        baseSettingsScreenComponent = createSettingsScreenComponent(componentContext)
+                        baseSettingsScreenComponent = createSettingsScreenComponent(componentContext),
+                        logOut = { navigation.replaceAll(Configuration.LogInSignUpSelectionScreen) }
                     )
                 )
             }

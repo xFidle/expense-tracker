@@ -2,6 +2,8 @@ package pw.edu.pl.pap.repositories.data
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.runBlocking
+import org.koin.java.KoinJavaComponent.inject
 import pw.edu.pl.pap.api.data.GroupApi
 import pw.edu.pl.pap.data.databaseAssociatedData.NewGroup
 import pw.edu.pl.pap.data.databaseAssociatedData.User
@@ -15,11 +17,15 @@ class GroupRepository(val api: GroupApi) {
     private val _currentUserGroup = MutableStateFlow<UserGroup?>(null)
     val currentUserGroup: StateFlow<UserGroup?> get() = _currentUserGroup
 
-    private lateinit var users: Pair<UserGroup, List<User>>
+    private val _usersInCurrentGroup = MutableStateFlow<List<User>>(listOf())
+    val usersInCurrentGroup : StateFlow<List<User>> get() = _usersInCurrentGroup
 
     fun updateCurrentGroup(key: UserGroup) {
         _currentUserGroup.value = key
+        runBlocking { getUsersInCurrentGroup() }
     }
+
+
 
     suspend fun getGroups(force: Boolean = false) {
         if (_currentUserGroup.value == null || force) {
@@ -42,7 +48,8 @@ class GroupRepository(val api: GroupApi) {
     suspend fun updateGroup(group: UserGroup) {
         try {
             api.updateGroup(group.id, group)
-            getGroups()
+            _currentUserGroup.value = group
+            getGroups(true)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -51,6 +58,7 @@ class GroupRepository(val api: GroupApi) {
     suspend fun deleteGroup(group: UserGroup) {
         try {
             api.deleteGroup(group.id)
+            _currentUserGroup.value = null
             getGroups()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -60,23 +68,27 @@ class GroupRepository(val api: GroupApi) {
     suspend fun addGroup(group: NewGroup) {
         try {
             api.postNewGroup(group)
-            getGroups()
+            getGroups(true)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    suspend fun getUsersInCurrentGroup(): List<User> {
-        val groupName = _currentUserGroup.value?.name ?: ""
-        if (!this::users.isInitialized || groupName != users.first.name) {
-            var newUsers = listOf<User>()
-            try {
-                newUsers = api.getUsersInGroup(groupName)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            return newUsers
+    suspend fun getUsersInCurrentGroup() {
+        try {
+            _usersInCurrentGroup.value = api.getUsersInGroup(currentUserGroup.value!!.name)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        return users.second
+    }
+
+    suspend fun refreshGroups() {
+        getGroups(true)
+        if (_allGroups.value.isEmpty()) {
+            _currentUserGroup.value = null
+        } else if (_currentUserGroup.value !in _allGroups.value) {
+            _currentUserGroup.value = _allGroups.value.first()
+        }
+        getUsersInCurrentGroup()
     }
 }

@@ -15,11 +15,12 @@ class ExpenseRepository(val api: ExpenseApi) {
     private val _groupedExpenses = MutableStateFlow(ExpenseMap())
     val groupedExpenses: StateFlow<ExpenseMap> get() = _groupedExpenses
 
-    private val _moreToLoad = MutableStateFlow(true)
+    private val _moreToLoad = MutableStateFlow(false)
     val moreToLoad: StateFlow<Boolean> get() = _moreToLoad
 
     private val _currentGroupingKey = MutableStateFlow(GroupKey.DATE)
     val currentGroupingKey: StateFlow<GroupKey> get() = _currentGroupingKey
+
 
     fun updateGroupingKey(key: GroupKey) {
         _currentGroupingKey.value = key
@@ -34,8 +35,7 @@ class ExpenseRepository(val api: ExpenseApi) {
     val currentGroupingOrder: StateFlow<Order> get() = _currentGroupingOrder
 
     fun switchGroupingOrder() {
-        val newOrder =
-            if (_currentGroupingOrder.value == Order.ASCENDING) Order.DESCENDING else Order.ASCENDING
+        val newOrder = if (_currentGroupingOrder.value == Order.ASCENDING) Order.DESCENDING else Order.ASCENDING
         setGroupingOrder(newOrder)
     }
 
@@ -53,6 +53,7 @@ class ExpenseRepository(val api: ExpenseApi) {
     }
 
     private suspend fun loadPage(group: String): ExpenseMap {
+//        _loadingData.value = true
         val page = when (_currentGroupingKey.value) {
             GroupKey.DATE -> getExpenseDateMap(group)
             GroupKey.CATEGORY -> getExpenseCatMap(group)
@@ -66,6 +67,7 @@ class ExpenseRepository(val api: ExpenseApi) {
         nextPageInfo = nextPageInfo.copy(lastId = page.nextLastId, lastKey = page.nextLastKey)
         _moreToLoad.value = page.hasMore
         val newMap = page.data.toMap(ExpenseMap(comparator = comparator))
+//        _loadingData.value = false
         return newMap
     }
 
@@ -76,6 +78,7 @@ class ExpenseRepository(val api: ExpenseApi) {
             _groupedExpenses.value = newMap
         } catch (e: Exception) {
             e.printStackTrace()
+//            _loadingData.value = false
         }
     }
 
@@ -86,6 +89,7 @@ class ExpenseRepository(val api: ExpenseApi) {
             _groupedExpenses.value = nextMap
         } catch (e: Exception) {
             e.printStackTrace()
+//            _loadingData.value = false
         }
     }
 
@@ -111,18 +115,9 @@ class ExpenseRepository(val api: ExpenseApi) {
 
     suspend fun addExpense(expense: NewExpense) {
         try {
-            api.postNewExpense(expense)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    suspend fun getRecentExpense(group: String) {
-        try {
-            val recentExpense = api.getRecentExpense(group)
+            val newExpense = api.postNewExpense(expense)
             val newMap = _groupedExpenses.value
-            newMap.addExpense(getKeyFromExpense(recentExpense), recentExpense)
-            _groupedExpenses.value = newMap
+            newMap.addExpense(getKeyFromExpense(newExpense), newExpense)
         } catch (e: Exception) {
             e.printStackTrace()
         }

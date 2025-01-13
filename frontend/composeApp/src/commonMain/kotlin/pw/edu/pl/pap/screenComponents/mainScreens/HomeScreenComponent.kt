@@ -9,6 +9,7 @@ import pw.edu.pl.pap.data.databaseAssociatedData.Expense
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.repositories.data.ExpenseRepository
 import pw.edu.pl.pap.repositories.data.GroupRepository
+import pw.edu.pl.pap.repositories.data.UserRepository
 import pw.edu.pl.pap.screenComponents.BaseComponent
 import pw.edu.pl.pap.util.sortingSystem.GroupKey
 
@@ -26,13 +27,20 @@ class HomeScreenComponent(
 
     private val expenseRepository: ExpenseRepository by inject()
     private val groupRepository: GroupRepository by inject()
+    private val userRepository: UserRepository by inject()
+
+    val preferences = userRepository.currentPreferences
 
     private val _navigationState = MutableStateFlow<NavigationState>(NavigationState.InitialLoad)
     val navigationState: StateFlow<NavigationState> get() = _navigationState
 
+    private val _loadingData = MutableStateFlow(true)
+    val loadingData: StateFlow<Boolean> get() = _loadingData
+
     init {
         if (groupRepository.currentUserGroup.value == null) {
             runBlocking { populateGroupList() }
+            runBlocking { groupRepository.getUsersInCurrentGroup() }
         }
     }
 
@@ -43,11 +51,11 @@ class HomeScreenComponent(
     fun getDataBasedOnState() {
         when (_navigationState.value) {
             is NavigationState.InitialLoad -> {
-                fetchAllExpenses()
+                fetchInitialPageExpenses()
             }
 
             is NavigationState.FromNewExpenseScreen -> {
-                getRecentExpense()
+//                getRecentExpense()
             }
 
             is NavigationState.Empty -> {
@@ -72,6 +80,7 @@ class HomeScreenComponent(
 
     val homeInfo = expenseRepository.homeInfo
     val groupedExpenses = expenseRepository.groupedExpenses
+    val moreToLoad = expenseRepository.moreToLoad
 
     val currentGroupingKey = expenseRepository.currentGroupingKey
     val currentGroupingOrder = expenseRepository.currentGroupingOrder
@@ -86,22 +95,26 @@ class HomeScreenComponent(
         }
     }
 
-    private fun fetchAllExpenses() {
+    private fun fetchInitialPageExpenses() {
+        _loadingData.value = true
         coroutineScope.launch {
             expenseRepository.loadInitialPage(groupRepository.getCurrentGroupName())
-        }
+        }.invokeOnCompletion { _loadingData.value = false }
     }
 
-    private fun getRecentExpense() {
+    fun fetchNextPage() {
+        _loadingData.value = true
         coroutineScope.launch {
-            expenseRepository.getRecentExpense(groupRepository.getCurrentGroupName())
-        }
+            println("next page")
+            expenseRepository.loadNextPage(groupRepository.getCurrentGroupName())
+        }.invokeOnCompletion { _loadingData.value = false }
     }
 
     fun sortGroups() {
         expenseRepository.switchGroupingOrder()
+        _loadingData.value = false
         coroutineScope.launch {
             expenseRepository.loadInitialPage(groupRepository.getCurrentGroupName())
-        }
+        }.invokeOnCompletion { _loadingData.value = false }
     }
 }

@@ -26,7 +26,7 @@ open class BaseSettingsScreenComponentImpl(
         showConfirmationDialog.value = true
     }
 
-    protected open fun postChanges() {
+    protected open suspend fun postChanges() {
         throw NotImplementedError("Subclasses must override confirm")
     }
 }

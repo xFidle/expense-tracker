@@ -20,11 +20,15 @@ class ConfigRepository(private val api: ConfigApi) {
     private val _keyPatterns = MutableStateFlow<List<String>>(emptyList())
     val keyPatterns: StateFlow<List<String>> get() = _keyPatterns
 
+    private val _roles = MutableStateFlow<List<String>>(emptyList())
+    val roles: StateFlow<List<String>> get() = _roles
+
     suspend fun loadConfig() {
         getCategories()
         getCurrencies()
         getPaymentMethods()
         getChartKeys()
+        getRoles()
     }
 
     private suspend fun getCategories() {
@@ -41,5 +45,9 @@ class ConfigRepository(private val api: ConfigApi) {
 
     private suspend fun getChartKeys() {
         _keyPatterns.value = api.getChartKeys()
+    }
+
+    private suspend fun getRoles() {
+        _roles.value = api.getRoles()
     }
 }

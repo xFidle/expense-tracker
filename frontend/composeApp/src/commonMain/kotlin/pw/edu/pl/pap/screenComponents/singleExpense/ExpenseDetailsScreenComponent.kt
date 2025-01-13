@@ -43,7 +43,7 @@ class ExpenseDetailsScreenComponent(
 
     override fun confirm() {
         val newExpense = expense.copy(
-            title = title.value,
+            title = title.value.ifEmpty { categories[categoryIndex.value].name },
             price = price.value.toFloat(),
             user = users[userIndex.value],
             expenseDate = date.value,

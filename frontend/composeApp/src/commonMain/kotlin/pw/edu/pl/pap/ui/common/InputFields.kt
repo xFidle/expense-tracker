@@ -43,7 +43,7 @@ fun InputFields(inputFieldsData: List<InputFieldData>) {
 private fun createField(data: InputFieldData) {
     if (data is InputFieldData.ButtonData) {
         createClickableCard(data)
-    } else if (data is InputFieldData.UserBalanceButtonData) {
+    } else if (data is InputFieldData.UserButtonData) {
         createClickableUserCard(data)
     } else {
         Card(
@@ -100,7 +100,6 @@ private fun createDropdownList(
     data: InputFieldData.DropdownListData
 ) {
     var showDropdown by remember { mutableStateOf(false) }
-    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
@@ -331,7 +330,7 @@ private fun createCheckBox(data: InputFieldData.CheckboxData) {
 }
 
 @Composable
-private fun createClickableUserCard(data: InputFieldData.UserBalanceButtonData) {
+private fun createClickableUserCard(data: InputFieldData.UserButtonData) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -347,24 +346,12 @@ private fun createClickableUserCard(data: InputFieldData.UserBalanceButtonData) 
                 .padding(horizontal = 6.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = data.title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-
-                Text(
-                    text = if (data.balance >= 0) "+ ${data.balance} PLN" else "- ${-data.balance} PLN",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (data.balance >= 0) Color.Green else Color.Red
-                )
-            }
+            Text(
+                text = data.title,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
         }
     }
 }

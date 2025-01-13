@@ -2,11 +2,13 @@ package pw.edu.pl.pap.screenComponents.mainScreens
 
 import androidx.compose.runtime.mutableStateListOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.core.component.inject
 import pw.edu.pl.pap.data.databaseAssociatedData.User
 import pw.edu.pl.pap.data.databaseAssociatedData.UserGroup
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
 import pw.edu.pl.pap.repositories.data.GroupRepository
+import pw.edu.pl.pap.repositories.data.UserRepository
 import pw.edu.pl.pap.screenComponents.BaseComponent
 
 class GroupScreenComponent(
@@ -18,44 +20,52 @@ class GroupScreenComponent(
 ) : BaseComponent by baseComponent {
 
     private val groupRepository: GroupRepository by inject()
-    val currentUserGroup = groupRepository.currentUserGroup
+    var currentUserGroup = groupRepository.currentUserGroup
 
     private val _inputFieldsData = mutableStateListOf<InputFieldData>()
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
 
-    private lateinit var users: List<User>
-    private lateinit var userNames: List<String>
-
-    private val currentGroup = groupRepository.currentUserGroup
-
-    //temp
-    private val balances = listOf(70.0, 45.0, -115.0)
-    //TODO fetch balances
+    private var users = groupRepository.usersInCurrentGroup.value
+    private var userNames = users.map { "${it.name} ${it.surname}" }
 
     init {
         coroutineScope.launch {
-            getUsers()
-            userNames = users.map { "${it.name} ${it.surname}" }
-            setupInputFields()
+            updateUsers()
         }
     }
 
+    fun updateUsers() {
+        runBlocking{ getUsers() }
+        users = groupRepository.usersInCurrentGroup.value
+        userNames = users.map { "${it.name} ${it.surname}" }
+        setupInputFields()
+    }
+
     private suspend fun getUsers() {
-        users = groupRepository.getUsersInCurrentGroup()
+        groupRepository.getUsersInCurrentGroup()
     }
 
 
     fun setupInputFields() {
         _inputFieldsData.clear()
         _inputFieldsData.addAll(
-            userNames.zip(balances).mapIndexed { index, (username, balance) ->
+            userNames.mapIndexed { index, username ->
                 val user = users[index]
-                InputFieldData.UserBalanceButtonData(
+                InputFieldData.UserButtonData(
                     title = username,
-                    balance = balance.toFloat(),
-                    onClick = { onUserClicked(currentGroup.value!!, user) }
+                    onClick = { onUserClicked(currentUserGroup.value!!, user) }
                 )
             }
         )
+    }
+
+    fun refreshGroup() {
+        runBlocking { groupRepository.refreshGroups() }
+        users = groupRepository.usersInCurrentGroup.value
+        userNames = users.map { "${it.name} ${it.surname}" }
+        currentUserGroup = groupRepository.currentUserGroup
+        if (currentUserGroup.value != null){
+            setupInputFields()
+        }
     }
 }
