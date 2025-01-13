@@ -27,7 +27,7 @@ class UserRepository(val api: UserApi) {
 
     suspend fun searchUsers(group: UserGroup, name: String, surname:String){
         try {
-            _usersFound.value = api.searchUsers(group.name, listOf(name, surname))
+            _usersFound.value = api.searchUsers(group.name, mapOf(name to surname))
         } catch (e: Exception) {
             e.printStackTrace()
         }
