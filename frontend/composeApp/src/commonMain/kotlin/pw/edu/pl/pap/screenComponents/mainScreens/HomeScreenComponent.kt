@@ -110,12 +110,6 @@ class HomeScreenComponent(
         }.invokeOnCompletion { _loadingData.value = false }
     }
 
-    private fun getRecentExpense() {
-        coroutineScope.launch {
-            expenseRepository.getRecentExpense(groupRepository.getCurrentGroupName())
-        }.invokeOnCompletion { _loadingData.value = false }
-    }
-
     fun sortGroups() {
         expenseRepository.switchGroupingOrder()
         _loadingData.value = false

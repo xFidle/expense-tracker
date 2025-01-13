@@ -123,17 +123,6 @@ class ExpenseRepository(val api: ExpenseApi) {
         }
     }
 
-    suspend fun getRecentExpense(group: String) {
-        try {
-            val recentExpense = api.getRecentExpense(group)
-            val newMap = _groupedExpenses.value
-            newMap.addExpense(getKeyFromExpense(recentExpense), recentExpense)
-            _groupedExpenses.value = newMap
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     suspend fun deleteExpense(expense: Expense) {
         if (api.deleteExpense(expense.id).status.isSuccess()) {
             _groupedExpenses.value.deleteExpense(getKeyFromExpense(expense), expense.id)
