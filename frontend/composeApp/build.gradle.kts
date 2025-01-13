@@ -8,47 +8,68 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    kotlin("plugin.serialization") version "2.0.20"
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.ktorfit)
 }
 
 kotlin {
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-    
     jvm("desktop")
-    
+
     sourceSets {
         val desktopMain by getting
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.decompose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.auth)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.cio)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.decompose)
+            implementation(libs.decompose.compose)
+            implementation(libs.serialization.json)
+            implementation(libs.koalaplot.core)
+            implementation(libs.ktorfit.lib)
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.core)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
         }
+        commonTest.dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.ktor.mock)
+        }
+    }
+    sourceSets.commonMain.dependencies {
+        implementation(kotlin("reflect"))
+    }
+
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
     }
 }
+
+
 
 val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties()
@@ -102,7 +123,7 @@ compose.desktop {
         mainClass = "pw.edu.pl.pap.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.AppImage, TargetFormat.Exe, TargetFormat.Deb)
+            targetFormats(TargetFormat.AppImage, TargetFormat.Exe, TargetFormat.Deb, TargetFormat.Rpm)
             packageName = "pw.edu.pl.pap"
             packageVersion = "1.0.0"
         }
@@ -111,6 +132,14 @@ compose.desktop {
 
 tasks.withType<ProcessResources> {
     filesMatching("res/xml/network_security_config.xml") {
-        expand("ip" to localProperties.getProperty("baseUrl", "localhost:8090"))
+        expand("ip" to localProperties.getProperty("baseUrl", "localhost:8080"))
+    }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+    jvmArgs = listOf("-Dorg.gradle.parallel=true")
+    testLogging {
+        events("passed", "skipped", "failed")
     }
 }

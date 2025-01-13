@@ -1,68 +1,90 @@
 package pw.edu.pl.pap.ui.home
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import pw.edu.pl.pap.viewmodel.HomeViewModel
-import pw.edu.pl.pap.ui.common.LoadingScreen
-import androidx.compose.foundation.lazy.items
-import pw.edu.pl.pap.ui.addExpense.NewExpenseScreen
-import pw.edu.pl.pap.viewmodel.NewExpenseViewModel
-import androidx.compose.material3.Text
-import androidx.compose.ui.text.style.TextAlign
-import pw.edu.pl.pap.data.NewExpense
+import pw.edu.pl.pap.screenComponents.mainScreens.HomeScreenComponent
+import pw.edu.pl.pap.ui.common.PaginatedLazyColumn
+import pw.edu.pl.pap.ui.common.UserGroupPopup
+import pw.edu.pl.pap.ui.home.sortingSystem.GroupKeyPopup
 
+private const val buffer = 5
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
-    var showAddExpenseScreen by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(true) }
-    val homeInfo = viewModel.expensesInfo.collectAsState().value
-    val groupedRecords = viewModel.groupedRecords.collectAsState().value
+fun HomeScreen(component: HomeScreenComponent) {
+    var showGroupingKeyMenu by remember { mutableStateOf(false) }
+    var showUserGroupMenu by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
-
-//    var homeInfo by remember { mutableStateOf(viewModel.expensesInfo.collectAsState().value)}
-//    var groupedRecords by remember { mutableStateOf(viewModel.groupedRecords.collectAsState().value)}
-
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchHomeInfo()
-        viewModel.fetchRecords()
-        isLoading = false
+    LaunchedEffect(component.navigationState.collectAsState().value) {
+        listState.animateScrollToItem(0)
+        component.getDataBasedOnState()
     }
 
-    if (isLoading) {
-        LoadingScreen()
-    } else if (homeInfo != null && !showAddExpenseScreen) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(16.dp)
-        ) {
-            item {
-                TopSection(homeInfo)
-            }
+    Scaffold(
+        modifier = Modifier.nestedScroll(
+            scrollBehavior.nestedScrollConnection
+        ),
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    TopSection(
+                        component,
+                        onGroupKeyClick = { showGroupingKeyMenu = true },
+                        onUserGroupClick = { showUserGroupMenu = true })
 
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            item {
-                GroupedRecordsList(groupedRecords) {}
-            }
-        }
-        PlusButton(showAddExpenseScreen, onUpdate = { showAddExpenseScreen = !showAddExpenseScreen })
-    } else if (showAddExpenseScreen) {
-        NewExpenseScreen(
-            viewModel = NewExpenseViewModel(viewModel.passApiClient()),
-            onClose =  {
-                viewModel.updateRecentRecord()
-                showAddExpenseScreen = false
+                },
+                scrollBehavior = scrollBehavior,
+                expandedHeight = 100.dp,
+            )
+        }, floatingActionButton = {
+            PlusButton(onUpdate = {
+                component.currentUserGroup.value?.let { userGroup ->
+                    component.onAddExpenseButtonClicked(userGroup)
+                } ?: run {
+                    println("No UserGroup is set!")
+                }
             })
-    } else {
-        Text(
-            text = "No data available",
-            modifier = Modifier.fillMaxSize(),
-            textAlign = TextAlign.Center
+        }) { paddingValues ->
+        Box(
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            PaginatedLazyColumn(
+                component = component,
+                listState = listState,
+                buffer = buffer,
+            )
+        }
+    }
+
+    AnimatedVisibility(
+        visible = showGroupingKeyMenu, enter = slideInVertically(
+            initialOffsetY = { fullHeight -> fullHeight }), exit = slideOutVertically(
+            targetOffsetY = { fullHeight -> fullHeight })
+    ) {
+        GroupKeyPopup(
+            component = component,
+            onDismiss = { showGroupingKeyMenu = false },
         )
+    }
+
+
+    AnimatedVisibility(
+        visible = showUserGroupMenu, enter = slideInVertically(
+            initialOffsetY = { fullHeight -> fullHeight }), exit = slideOutVertically(
+            targetOffsetY = { fullHeight -> fullHeight })
+    ) {
+        UserGroupPopup(
+            component = component, onDismiss = { showUserGroupMenu = false })
     }
 }
