@@ -87,7 +87,7 @@ public class MembershipServiceImpl extends GenericServiceImpl<Membership, Long> 
     }
 
     @Override
-    @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
+    @CacheEvict(value = {"baseGroups", "activeGroups", "membershipsByUserId", "admins", "users"}, keyGenerator = "userBasedKeyGenerator", allEntries = true)
     @Transactional
     public void deleteMembership(Long userId, String groupName) {
         if(!isAdmin(groupName) && !userId.equals(AuthHelper.getUser().getId())) {
