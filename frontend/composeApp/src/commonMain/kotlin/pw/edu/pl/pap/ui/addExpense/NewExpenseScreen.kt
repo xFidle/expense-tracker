@@ -1,23 +1,28 @@
 package pw.edu.pl.pap.ui.addExpense
 
 import androidx.compose.runtime.*
-import pw.edu.pl.pap.data.Record
-import pw.edu.pl.pap.data.User
-import pw.edu.pl.pap.data.InputFieldData
-import pw.edu.pl.pap.viewmodel.NewExpenseViewModel
-import pw.edu.pl.pap.apiclient.NewExpenseApiClient
+import kotlinx.coroutines.launch
+import pw.edu.pl.pap.screenComponents.singleExpense.NewExpenseScreenComponent
+import pw.edu.pl.pap.ui.common.ConfirmOrBackButtonRow
+import pw.edu.pl.pap.ui.common.Header
+import pw.edu.pl.pap.ui.common.InputFields
 
 @Composable
-fun NewExpenseScreen(viewModel: NewExpenseViewModel, onClose: () -> Unit){
-    var addButtonClicked by remember { mutableStateOf(false) }
+fun NewExpenseScreen(
+    component: NewExpenseScreenComponent
+    ){
+    val scope = rememberCoroutineScope()
 
-    Header()
-    InputFields(viewModel.inputFieldsData)
+    Header("New expense")
 
-    AddButton(addButtonClicked, onUpdate = {addButtonClicked = !addButtonClicked})
+    LaunchedEffect(Unit) { component.setupInputFields() }
 
+    InputFields(component.inputFieldsData)
 
-    if (addButtonClicked) {
-        viewModel.expenseConfirmed(onClose = onClose)
-    }
+    ConfirmOrBackButtonRow(
+        text = "ADD",
+        onBack = { scope.launch { component.onBack() } },
+        onConfirm = { scope.launch { component.confirm() } },
+        isConfirmEnabled = component.canConfirm
+    )
 }

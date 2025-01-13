@@ -1,0 +1,41 @@
+package pw.edu.pl.pap.api.data
+
+import de.jensklingenberg.ktorfit.http.*
+import io.ktor.client.statement.*
+import pw.edu.pl.pap.data.databaseAssociatedData.NewPassword
+import pw.edu.pl.pap.data.databaseAssociatedData.Preferences
+import pw.edu.pl.pap.data.databaseAssociatedData.UpdatedUserData
+import pw.edu.pl.pap.data.databaseAssociatedData.User
+
+interface UserApi {
+
+    @GET("user/current")
+    suspend fun getCurrentUserInfo(): User
+
+    @GET("user/search/{group}")
+    suspend fun searchUsers(@Path("group") group: String, @QueryMap user: Map<String, String?>): List<User>
+
+    @GET("user/isAdmin/{group}")
+    suspend fun isAdmin(@Path("group") group: String): Boolean
+
+    @PUT("user/update")
+    suspend fun updateUser(@Body user: UpdatedUserData): User
+
+    @PUT("user/changePass")
+    suspend fun changePassword(@Body newPass: NewPassword): HttpResponse
+
+    @GET("preferences/current")
+    suspend fun getCurrentPreferences(): Preferences
+
+    @PUT("preferences/update")
+    suspend fun updatePreferences(@Body newPreferences: Preferences): Preferences
+
+    @DELETE("user/delete/{id}")
+    suspend fun deleteUser(@Path id: Long): HttpResponse
+
+    @GET("user/getRole/{groupName}/{userId}")
+    suspend fun getRole(@Path("groupName") groupName: String, @Path("userId") userId: Long): String
+
+    @PUT("user/changeRole/{groupName}/{userId}/{role}")
+    suspend fun changeRole(@Path("groupName") groupName: String, @Path("userId") userId: Long, @Path("role") role: String) :HttpResponse
+}

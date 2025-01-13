@@ -1,17 +1,143 @@
 package pw.edu.pl.pap
 
-import androidx.compose.material3.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
-import pw.edu.pl.pap.apiclient.ApiClient
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import pw.edu.pl.pap.di.authModule
+import pw.edu.pl.pap.di.configModule
+import pw.edu.pl.pap.screenComponents.RootComponent
+import pw.edu.pl.pap.ui.addExpense.NewExpenseScreen
+import pw.edu.pl.pap.ui.chartsScreen.ChartsScreen
+import pw.edu.pl.pap.ui.chartsScreen.filterScreen.ChartsFilterScreen
+import pw.edu.pl.pap.ui.expenseDetails.ExpenseDetailsScreen
+import pw.edu.pl.pap.ui.groupScreens.*
 import pw.edu.pl.pap.ui.home.HomeScreen
-import pw.edu.pl.pap.viewmodel.HomeViewModel
+import pw.edu.pl.pap.ui.loginSystem.LogInScreen
+import pw.edu.pl.pap.ui.loginSystem.LogInSignUpSelectionScreen
+import pw.edu.pl.pap.ui.loginSystem.SignUpScreen
+import pw.edu.pl.pap.ui.navBar.BottomNavBar
+import pw.edu.pl.pap.ui.navBar.NavBarItem
+import pw.edu.pl.pap.ui.settingsScreens.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App(baseUrl: String) {
-    val apiClient = remember { ApiClient(baseUrl) }
-    val viewModel = remember(apiClient) { HomeViewModel(apiClient) }
+fun App(rootComponent: RootComponent, baseUrl: String) {
+
+//    val newUrl = "http://192.168.0.102:8080/"
+
+    remember {
+        startKoin {
+//            properties(mapOf("baseUrl" to newUrl))
+            properties(mapOf("baseUrl" to baseUrl))
+            modules(authModule, configModule)
+            rootComponent.loadConfigData()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            stopKoin()
+        }
+    }
+
+    val childStack = rootComponent.childStack.subscribeAsState()
+    val activeNavBarItem by rootComponent.activeNavBarItem.collectAsState()
+
 
     MaterialTheme(colorScheme = darkColorScheme()) {
-        Scaffold { HomeScreen(viewModel) }
+        Scaffold(
+            modifier = Modifier.systemBarsPadding(),
+            bottomBar = {
+                AnimatedVisibility(
+                    visible = showBottomBar(childStack.value.active.instance), enter = fadeIn(), exit = fadeOut()
+                ) {
+                    BottomNavBar(
+                        items = listOf(
+                            NavBarItem.Home, NavBarItem.Charts, NavBarItem.Groups, NavBarItem.Settings
+                        ),
+                        selectedItem = activeNavBarItem,
+                        onSelect = { rootComponent.navBarItemClicked(it) },
+                    )
+                }
+            },
+        ) { innerPadding ->
+            SystemBarsColors(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.colorScheme.surfaceContainer)
+            AnimatedContent(
+                targetState = childStack.value.active.instance
+            ) { targetInstance ->
+
+                val padding = if (showBottomBar(targetInstance)) innerPadding else PaddingValues(0.dp)
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                ) {
+                    Children(
+                        stack = childStack.value,
+                        animation = stackAnimation(slide()),
+                    ) { child ->
+                        when (val instance = child.instance) {
+                            is RootComponent.Child.LogInSignUpSelectionScreen -> LogInSignUpSelectionScreen(instance.component)
+                            is RootComponent.Child.LogInScreen -> LogInScreen(instance.component)
+                            is RootComponent.Child.SignUpScreen -> SignUpScreen(instance.component)
+
+                            is RootComponent.Child.HomeScreen -> HomeScreen(instance.component)
+                            is RootComponent.Child.NewExpenseScreen -> NewExpenseScreen(instance.component)
+                            is RootComponent.Child.ExpenseDetailsScreen -> ExpenseDetailsScreen(instance.component)
+
+                            is RootComponent.Child.ChartsScreen -> ChartsScreen(instance.component)
+
+                            is RootComponent.Child.ChartsFilterScreen -> ChartsFilterScreen(instance.component)
+
+                            is RootComponent.Child.GroupScreen -> GroupScreen(instance.component)
+
+                            is RootComponent.Child.SettingsScreen -> SettingsScreen(instance.component)
+
+                            is RootComponent.Child.MemberScreen -> MemberScreen(instance.component)
+                            is RootComponent.Child.NewGroupScreen -> NewGroupScreen(instance.component)
+                            is RootComponent.Child.EditGroupScreen -> EditGroupScreen(instance.component)
+                            is RootComponent.Child.InvitationsScreen -> InvitationsScreen(instance.component)
+
+                            is RootComponent.Child.ServerAddressScreen -> ServerAddressScreen(instance.component)
+                            is RootComponent.Child.UserPersonalDataScreen -> UserPersonalDataScreen(instance.component)
+                            is RootComponent.Child.ChangePasswordScreen -> ChangePasswordScreen(instance.component)
+                            is RootComponent.Child.PreferencesScreen -> PreferencesScreen(instance.component)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
+
+fun showBottomBar(instance: RootComponent.Child): Boolean {
+    return when (instance) {
+        is RootComponent.Child.HomeScreen,
+        is RootComponent.Child.ChartsScreen,
+        is RootComponent.Child.GroupScreen,
+        is RootComponent.Child.SettingsScreen -> true
+
+        else -> false
+    }
+}
+
+
+@Composable
+expect fun SystemBarsColors(statusBarColor: Color, navBarColor: Color)

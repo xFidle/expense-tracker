@@ -1,46 +1,35 @@
 package pw.edu.pl.pap.ui.home
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonColors
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.*
+import pw.edu.pl.pap.util.constants.padding
 
 @Composable
-fun PlusButton(buttonClicked: Boolean, onUpdate: (Boolean) -> Unit): Unit {
+fun PlusButton(onUpdate: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Button(
-            shape = RoundedCornerShape(100),
+        FloatingActionButton(
             modifier = Modifier
-                .width(60.dp)
-                .height(60.dp)
                 .align(Alignment.BottomEnd)
-                .offset(x= (-20).dp, y= (-20).dp),
-            colors = ButtonColors(Color.DarkGray, Color.Cyan, Color.DarkGray, Color.Cyan),
-            contentPadding = PaddingValues(0.dp),
-            onClick = {onUpdate(buttonClicked)}
+                .padding(padding),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            onClick = { onUpdate() }
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ){
-                Text(
-                    text = "+",
-                    fontSize = 50.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .offset(x = 0.dp, y = (-10).dp)
-                )
-            }
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "Add Expense",
+            )
         }
     }
 }
