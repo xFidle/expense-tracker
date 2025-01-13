@@ -57,6 +57,12 @@ class RootComponent(
         }
     }
 
+    private fun onLogin() {
+        loadAdditionalModules(apiModule, repoModule)
+        loadUserData()
+        navigation.replaceAll(Configuration.HomeScreen)
+    }
+
     @Serializable
     sealed class Configuration {
         @Serializable
@@ -119,11 +125,7 @@ class RootComponent(
         return LoginScreenComponentHelper(
             componentContext = componentContext,
             coroutineScope = coroutineScope,
-            onConfirm = {
-                loadAdditionalModules(apiModule, repoModule)
-                loadUserData()
-                navigation.replaceAll(Configuration.HomeScreen)
-            },
+            onConfirm = ::onLogin,
             onBack = { navigation.pop() },
         )
     }
@@ -196,7 +198,9 @@ class RootComponent(
                         },
                         onSignupButtonClicked = {
                             navigation.pushNew(Configuration.SignUpScreen)
-                        })
+                        },
+                        onTokenFound = ::onLogin,
+                    )
                 )
             }
 
@@ -248,7 +252,8 @@ class RootComponent(
             is Configuration.ChartsScreen -> Child.ChartsScreen(
                 ChartsScreenComponent(
                     baseComponent = createMainScreenComponent(componentContext),
-                    onFilterClick = { navigation.pushNew(Configuration.ChartsFilterScreen)
+                    onFilterClick = {
+                        navigation.pushNew(Configuration.ChartsFilterScreen)
                     })
             )
 
