@@ -4,6 +4,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import pw.edu.pl.pap.data.databaseAssociatedData.UserLoginData
 import pw.edu.pl.pap.repositories.auth.LoginRepository
+import pw.edu.pl.pap.util.validateEmail
 
 class LoginScreenComponent(
     baseScreenComponent: BaseLoginScreenComponent,
@@ -12,14 +13,11 @@ class LoginScreenComponent(
     private val loginRepository: LoginRepository by inject()
 
     override fun confirm() {
-//        if (!validateEmail(email.value)) {
-//            showEmailWarning.value = true
-//            return
-//        }
-//        val userLoginData = UserLoginData(email.value, password.value)
-
-        //temp
-        val userLoginData = UserLoginData("Marcin@gmail.com", "123")
+        if (!validateEmail(email.value)) {
+            showEmailWarning.value = true
+            return
+        }
+        val userLoginData = UserLoginData(email.value, password.value)
 
 
         coroutineScope.launch {

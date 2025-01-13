@@ -60,17 +60,15 @@ class SignupScreenComponent(
     }
 
     override fun confirm() {
-//        if (!validateEmail(email.value)) {
-//            showEmailWarning.value = true
-//            return
-//        }
-//        if (password.value != confirmedPassword.value || password.value == "") {
-//            showPasswordsWarning.value = true
-//            return
-//        }
-//        val userSignUpData = UserSignUpData(name.value, surname.value, email.value, password.value)
-
-        val userSignUpData = UserSignUpData("Marcin", "Marcin", "Marcin@gmail.com", "123")
+        if (!validateEmail(email.value)) {
+            showEmailWarning.value = true
+            return
+        }
+        if (password.value != confirmedPassword.value || password.value == "") {
+            showPasswordsWarning.value = true
+            return
+        }
+        val userSignUpData = UserSignUpData(name.value, surname.value, email.value, password.value)
 
         coroutineScope.launch {
             val response = signupRepository.signup(userSignUpData)
