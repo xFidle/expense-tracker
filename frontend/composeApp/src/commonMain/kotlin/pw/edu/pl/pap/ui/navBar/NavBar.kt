@@ -6,14 +6,17 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import pw.edu.pl.pap.util.constants.horizontalPadding
 import pw.edu.pl.pap.util.constants.verticalPadding
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,13 +25,20 @@ fun BottomNavBar(
     items: List<NavBarItem>,
     onSelect: (NavBarItem) -> Unit,
     selectedItem: NavBarItem,
-    scrollBehavior: BottomAppBarScrollBehavior
+    scrollBehavior: BottomAppBarScrollBehavior? = null
 ) {
-//    var selectedItem: NavBarItem? by remember { mutableStateOf(NavBarItem.Home) }
 
-    BottomAppBar(
-        modifier = modifier.fillMaxWidth(),
-        scrollBehavior = scrollBehavior
+    NavigationBar(
+        modifier = modifier
+            .fillMaxWidth()
+            .layout { measurable, constraints ->
+                scrollBehavior?.state?.heightOffsetLimit =
+                    -NavigationBarTokens.ContainerHeight.toPx()
+
+                val placeable = measurable.measure(constraints)
+                val height = placeable.height + (scrollBehavior?.state?.heightOffset ?: 0f)
+                layout(placeable.width, height.roundToInt()) { placeable.place(0, 0) }
+            },
     ) {
         items.forEach { item ->
             Box(
@@ -71,4 +81,8 @@ private fun NavBarItem(
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
         )
     }
+}
+
+private object NavigationBarTokens {
+    val ContainerHeight = 80.0.dp
 }

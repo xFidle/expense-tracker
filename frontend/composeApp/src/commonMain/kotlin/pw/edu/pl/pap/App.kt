@@ -1,6 +1,9 @@
 package pw.edu.pl.pap
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,22 +15,21 @@ import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import pw.edu.pl.pap.di.authModule
 import pw.edu.pl.pap.screenComponents.RootComponent
-import pw.edu.pl.pap.ui.settingsScreens.SettingsScreen
 import pw.edu.pl.pap.ui.addExpense.NewExpenseScreen
+import pw.edu.pl.pap.ui.chartsScreen.ChartsScreen
+import pw.edu.pl.pap.ui.chartsScreen.filterScreen.ChartsFilterScreen
 import pw.edu.pl.pap.ui.expenseDetails.ExpenseDetailsScreen
+import pw.edu.pl.pap.ui.groupScreens.*
 import pw.edu.pl.pap.ui.home.HomeScreen
 import pw.edu.pl.pap.ui.loginSystem.LogInScreen
 import pw.edu.pl.pap.ui.loginSystem.LogInSignUpSelectionScreen
 import pw.edu.pl.pap.ui.loginSystem.SignUpScreen
 import pw.edu.pl.pap.ui.navBar.BottomNavBar
 import pw.edu.pl.pap.ui.navBar.NavBarItem
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import pw.edu.pl.pap.di.authModule
-import pw.edu.pl.pap.ui.chartsScreen.ChartsScreen
-import pw.edu.pl.pap.ui.chartsScreen.filterScreen.ChartsFilterScreen
-import pw.edu.pl.pap.ui.groupScreens.*
 import pw.edu.pl.pap.ui.settingsScreens.*
 
 // Todo refactor function, tweak animations
@@ -127,6 +129,7 @@ fun showBottomBar(instance: RootComponent.Child): Boolean {
         is RootComponent.Child.ChartsScreen,
         is RootComponent.Child.GroupScreen,
         is RootComponent.Child.SettingsScreen -> true
+
         else -> false
     }
 }

@@ -35,19 +35,20 @@ fun HomeScreen(component: HomeScreenComponent) {
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.nestedScroll(
+            scrollBehavior.nestedScrollConnection
+        ),
         topBar = {
             TopAppBar(
                 title = {
                     TopSection(
                         component,
                         onGroupKeyClick = { showGroupingKeyMenu = true },
-                        onUserGroupClick = { showUserGroupMenu = true }
-                    )
+                        onUserGroupClick = { showUserGroupMenu = true })
 
                 },
                 scrollBehavior = scrollBehavior,
-                expandedHeight = 100.dp
+                expandedHeight = 100.dp,
             )
         }, floatingActionButton = {
             PlusButton(onUpdate = {
@@ -59,8 +60,7 @@ fun HomeScreen(component: HomeScreenComponent) {
             })
         }) { paddingValues ->
         Box(
-            modifier = Modifier
-                .padding(paddingValues)
+            modifier = Modifier.padding(paddingValues)
         ) {
             PaginatedLazyColumn(
                 component = component,
