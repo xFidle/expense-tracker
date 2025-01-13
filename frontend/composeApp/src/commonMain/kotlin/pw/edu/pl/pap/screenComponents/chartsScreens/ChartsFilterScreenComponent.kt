@@ -99,11 +99,4 @@ class ChartsFilterScreenComponent(
         chartsRepository.updateKeyPattern(patternKeys[selectedKeyPattern.value])
         onSave()
     }
-
-    //TODO find a way to force recomposition after reset
-//    fun reset() {
-//        chartsRepository.resetFilters()
-//        initializeSelected()
-//        initializeInputFieldsData()
-//    }
 }

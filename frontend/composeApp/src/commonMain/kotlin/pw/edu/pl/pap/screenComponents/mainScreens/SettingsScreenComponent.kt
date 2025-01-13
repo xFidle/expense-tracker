@@ -93,7 +93,6 @@ class SettingsScreenComponent(
 
     private suspend fun deleteAccount() {
         userRepository.deleteUser()
-        //TODO test it
     }
 }
 

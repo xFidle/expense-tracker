@@ -35,7 +35,6 @@ class ChartsScreenComponent(
         _navigationState.value = newState
     }
 
-    //TODO refactor or remove
     fun getDataBasedOnState() {
         when (_navigationState.value) {
             is NavigationState.LoadData -> {
