@@ -4,10 +4,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.core.component.inject
 import pw.edu.pl.pap.data.uiSetup.ConfirmationDialogConfig
 import pw.edu.pl.pap.data.uiSetup.inputFields.InputFieldData
+import pw.edu.pl.pap.repositories.auth.TokenRepository
 import pw.edu.pl.pap.repositories.data.UserRepository
 import pw.edu.pl.pap.screenComponents.BaseComponent
 
@@ -21,6 +21,7 @@ class SettingsScreenComponent(
 ) : BaseComponent by baseComponent {
 
     private val userRepository: UserRepository by inject()
+    private val tokenRepository: TokenRepository by inject()
 
     private val _inputFieldsData = mutableStateListOf<InputFieldData>()
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
@@ -32,6 +33,7 @@ class SettingsScreenComponent(
         onNo = { showLogOutDialog.value = false },
         onYes = {
             showLogOutDialog.value = false
+            tokenRepository.cleanTokens()
             onLogOut()
         })
 
@@ -39,7 +41,7 @@ class SettingsScreenComponent(
     val deleteAccountConfirmationData = ConfirmationDialogConfig(
         mainText = "Delete account",
         subText = "Are you sure you want to delete your account?\n" +
-                  "     You will not be able to recover it",
+                "     You will not be able to recover it",
         onNo = { showDeleteAccountDialog.value = false },
         onYes = {
             showDeleteAccountDialog.value = false
@@ -64,31 +66,31 @@ class SettingsScreenComponent(
         _inputFieldsData.clear()
         _inputFieldsData.addAll(
             listOf(
-            InputFieldData.ButtonData(
-                title = "Edit personal user data",
-                onClick = {
-                    coroutineScope.launch { onUserPersonalsClicked() }
-                },
-            ),
-            InputFieldData.ButtonData(
-                title = "Change password",
-                onClick = {
-                    coroutineScope.launch { onChangePasswordClicked() }
-                },
-            ),
-            InputFieldData.ButtonData(
-                title = "Edit preferences",
-                onClick = {
-                    coroutineScope.launch { onEditPreferencesClicked() }
-                },
-            ),
-            InputFieldData.ButtonData(
-                title = "LOG OUT", isColored = true, onClick = { showLogOutDialog.value = true }
-            ),
-            InputFieldData.ButtonData(
-                title = "DELETE ACCOUNT", isColored = true, onClick = { showDeleteAccountDialog.value = true }
-            )
-        ))
+                InputFieldData.ButtonData(
+                    title = "Edit personal user data",
+                    onClick = {
+                        coroutineScope.launch { onUserPersonalsClicked() }
+                    },
+                ),
+                InputFieldData.ButtonData(
+                    title = "Change password",
+                    onClick = {
+                        coroutineScope.launch { onChangePasswordClicked() }
+                    },
+                ),
+                InputFieldData.ButtonData(
+                    title = "Edit preferences",
+                    onClick = {
+                        coroutineScope.launch { onEditPreferencesClicked() }
+                    },
+                ),
+                InputFieldData.ButtonData(
+                    title = "LOG OUT", isColored = true, onClick = { showLogOutDialog.value = true }
+                ),
+                InputFieldData.ButtonData(
+                    title = "DELETE ACCOUNT", isColored = true, onClick = { showDeleteAccountDialog.value = true }
+                )
+            ))
     }
 
     private suspend fun deleteAccount() {

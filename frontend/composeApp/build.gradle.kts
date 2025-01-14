@@ -47,6 +47,8 @@ kotlin {
             implementation(libs.ktorfit.lib)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
+            implementation(libs.multiplatform.settings)
+            implementation(libs.multiplatform.settings.no.arg)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

@@ -14,4 +14,8 @@ class AuthServiceCreator(baseUrl: String) : ServiceCreator() {
     fun createSignupApi(): SignUpApi {
         return ktorfit.createSignUpApi()
     }
+
+    fun createRefreshTokenApi(): RefreshTokenApi {
+        return ktorfit.createRefreshTokenApi()
+    }
 }
