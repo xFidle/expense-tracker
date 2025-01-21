@@ -19,7 +19,11 @@ fun GroupScreen(component: GroupScreenComponent) {
     val currentUserGroup by component.currentUserGroup.collectAsState()
 
     if (currentUserGroup != null) {
-        ClickableHeader(currentUserGroup?.name!!) { component.onEditGroupClicked() }
+        if (component.isAdmin.value){
+            ClickableHeader(currentUserGroup?.name!!) { component.onEditGroupClicked() }
+        } else {
+            Header(currentUserGroup?.name!!)
+        }
 
         LaunchedEffect(component.currentUserGroup.value) {
             runBlocking { component.updateUsers() }

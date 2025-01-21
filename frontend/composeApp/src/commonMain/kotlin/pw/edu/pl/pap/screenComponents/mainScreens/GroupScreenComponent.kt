@@ -19,11 +19,14 @@ class GroupScreenComponent(
     baseComponent: BaseComponent,
 ) : BaseComponent by baseComponent {
 
+    private val userRepository: UserRepository by inject()
     private val groupRepository: GroupRepository by inject()
     var currentUserGroup = groupRepository.currentUserGroup
 
     private val _inputFieldsData = mutableStateListOf<InputFieldData>()
     val inputFieldsData: List<InputFieldData> get() = _inputFieldsData
+
+    val isAdmin = userRepository.isAdmin
 
     private var users = groupRepository.usersInCurrentGroup.value
     private var userNames = users.map { "${it.name} ${it.surname}" }
