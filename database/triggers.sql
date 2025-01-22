@@ -1,12 +1,19 @@
 /*
 Trigger to archive deleted groups
  */
-CREATE OR REPLACE TRIGGER ARCHIVE_GROUP
-BEFORE DELETE ON GROUPS
+CREATE OR REPLACE TRIGGER archive_group
+BEFORE DELETE ON groups
 FOR EACH ROW
 BEGIN
-INSERT INTO ARCHIVED_GROUPS (ID, NAME)
-VALUES (BASE_GROUP_SEQ.NEXTVAL, :OLD.NAME);
+INSERT INTO archived_groups (id, name)
+VALUES (:old.id, :old.name);
+
+INSERT INTO archived_memberships (id, group_id, user_id, role_id)
+SELECT base_membership_seq.NEXTVAL, m.group_id, m.user_id, m.role_id
+FROM memberships m
+WHERE m.group_id = :old.id;
+
+DELETE FROM memberships WHERE group_id = :old.id;
 END;
 /
 
@@ -14,12 +21,31 @@ END;
 /*
 Trigger to archive deleted memberships
  */
-CREATE OR REPLACE TRIGGER ARCHIVE_MEMBERSHIP
-BEFORE DELETE ON MEMBERSHIPS
+CREATE OR REPLACE TRIGGER archive_membership
+BEFORE DELETE ON memberships
 FOR EACH ROW
+DECLARE
+v_grp_name groups.name%TYPE;
+  v_count     NUMBER;
 BEGIN
-INSERT INTO ARCHIVED_MEMBERSHIPS (ID, GROUP_ID, USER_ID, ROLE_ID)
-VALUES (BASE_MEMBERSHIP_SEQ.NEXTVAL, :OLD.GROUP_ID, :OLD.USER_ID, :OLD.ROLE_ID);
+SELECT COUNT(*) INTO v_count
+FROM archived_groups
+WHERE id = :OLD.group_id;
+
+IF v_count = 0 THEN
+SELECT g.name INTO v_grp_name
+FROM groups g
+WHERE g.id = :OLD.group_id;
+
+INSERT INTO archived_groups (id, name)
+VALUES (:OLD.group_id, v_grp_name);
+END IF;
+
+INSERT INTO archived_memberships (id, group_id, user_id, role_id)
+VALUES (base_membership_seq.NEXTVAL,
+        :OLD.group_id,
+        :OLD.user_id,
+        :OLD.role_id);
 END;
 /
 
@@ -35,28 +61,3 @@ BEGIN
     :NEW.CREATION_DATE := SYSDATE;
 END;
 /
-
-/*
-Trigger to set new admins for group
- */
-CREATE OR REPLACE TRIGGER SET_NEW_ADMIN
-BEFORE DELETE ON MEMBERSHIPS
-FOR EACH ROW
-WHEN (OLD.ROLE_ID = 3)
-BEGIN
-    IF NOT EXISTS (SELECT * FROM MEMBERSHIPS WHERE GROUP_ID = :OLD.GROUP_ID AND ROLE_ID = 3) THEN
-        IF EXISTS (SELECT * FROM MEMBERSHIPS WHERE GROUP_ID = :OLD.GROUP_ID AND ROLE_ID = 2) THEN
-UPDATE MEMBERSHIPS
-SET ROLE_ID = 3
-WHERE GROUP_ID = :OLD.GROUP_ID AND ROLE_ID = 2;
-ELSIF EXISTS (SELECT * FROM MEMBERSHIPS WHERE GROUP_ID = :OLD.GROUP_ID AND ROLE_ID = 1) THEN
-UPDATE MEMBERSHIPS
-SET ROLE_ID = 3
-WHERE GROUP_ID = :OLD.GROUP_ID AND ROLE_ID = 1;
-ELSIF EXISTS (SELECT * FROM MEMBERSHIPS WHERE GROUP_ID = :OLD.GROUP_ID AND ROLE_ID = 4) THEN
-UPDATE MEMBERSHIPS
-SET ROLE_ID = 3
-WHERE GROUP_ID = :OLD.GROUP_ID AND ROLE_ID = 4;
-END IF;
-END IF;
-END;
