@@ -362,6 +362,28 @@ JOIN expenses e ON m.id = e.membership_id
 WHERE e.expense_date = GET_DATE_WITH_MOST_SPENDING(g.id)
 ORDER BY g.name, e.expense_date;
 
+-- show sum of expenses for group in PLN
+BEGIN
+    CALCULATE_GROUP_EXPENSES(1);
+END;
+/
+
+-- show sum of expenses for group in USD
+BEGIN
+    CALCULATE_GROUP_EXPENSES(2);
+END;
+/
+
+-- show sum of expenses for group in EUR
+BEGIN
+    CALCULATE_GROUP_EXPENSES(3);
+END;
+/
+
+BEGIN
+    REMOVE_EXPIRED_TOKENS;
+END;
+
 
 
 
