@@ -264,6 +264,109 @@ LEFT JOIN archived_memberships am ON ag.id = am.group_id
 GROUP BY ag.name
 ORDER BY archived_members_count DESC;
 
+-- users, who have spent the most in a group
+
+SELECT
+    g.id AS group_id,
+    g.name AS group_name,
+    MOST_SPENDING_USER_IN_GROUP(g.id) AS most_spending_user_id
+FROM groups g;
+
+-- date with the most spending in a group
+
+SELECT
+    g.id AS group_id,
+    g.name AS group_name,
+    GET_DATE_WITH_MOST_SPENDING(g.id) AS date_with_most_spending
+FROM groups g;
+
+-- users with the highest spendings in a group with their preferences
+
+SELECT
+    g.id AS group_id,
+    g.name AS group_name,
+    u.id AS user_id,
+    u.name AS user_name,
+    u.surname AS user_surname,
+    c.symbol AS preferred_currency,
+    mp.name AS preferred_payment_method
+FROM groups g
+JOIN users u ON u.id = MOST_SPENDING_USER_IN_GROUP(g.id)
+LEFT JOIN preferences p ON u.preferences_id = p.id
+LEFT JOIN currencies c ON p.currency_id = c.id
+LEFT JOIN methods_of_payment mp ON p.method_id = mp.id;
+
+-- comparison of expenses between groups based on the day with highest spendings
+
+SELECT
+    g.id AS group_id,
+    g.name AS group_name,
+    d.date_with_most_spending,
+    (
+        SELECT SUM(GET_EXPENSE_PRICE_IN_ANOTHER_CURR(e.id, 1))
+        FROM expenses e
+        JOIN memberships m ON e.membership_id = m.id
+        WHERE m.group_id = g.id
+          AND e.expense_date = d.date_with_most_spending
+    ) AS total_spending_on_date
+FROM groups g
+JOIN (
+    SELECT
+        g_inner.id AS group_id,
+        GET_DATE_WITH_MOST_SPENDING(g_inner.id) AS date_with_most_spending
+    FROM groups g_inner
+) d ON g.id = d.group_id;
+
+-- users with the highest spendings in a group with the sum of their expenses
+
+SELECT
+    g.name AS group_name,
+    u.name AS user_name,
+    u.surname AS user_surname,
+    (
+        SELECT SUM(GET_EXPENSE_PRICE_IN_ANOTHER_CURR(e.id, 1))
+        FROM expenses e
+        JOIN memberships m ON e.membership_id = m.id
+        WHERE m.user_id = MOST_SPENDING_USER_IN_GROUP(g.id)
+          AND m.group_id = g.id
+    ) AS total_spending
+FROM groups g
+JOIN users u ON u.id = MOST_SPENDING_USER_IN_GROUP(g.id);
+
+-- order group by spendings in a day with the most spendings
+
+SELECT
+    g.name AS group_name,
+    (
+        SELECT SUM(GET_EXPENSE_PRICE_IN_ANOTHER_CURR(e.id, 1))
+        FROM expenses e
+        JOIN memberships m ON e.membership_id = m.id
+        WHERE m.group_id = g.id
+          AND e.expense_date = GET_DATE_WITH_MOST_SPENDING(g.id)
+    ) AS spending_on_best_day
+FROM groups g
+ORDER BY spending_on_best_day DESC;
+
+-- find users who have made expenses in a day with the most spendings in a group
+
+SELECT
+    g.name AS group_name,
+    u.name AS user_name,
+    u.surname AS user_surname,
+    e.expense_date,
+    GET_EXPENSE_PRICE_IN_ANOTHER_CURR(e.id, 1) AS expense_in_usd
+FROM groups g
+JOIN memberships m ON g.id = m.group_id
+JOIN users u ON m.user_id = u.id
+JOIN expenses e ON m.id = e.membership_id
+WHERE e.expense_date = GET_DATE_WITH_MOST_SPENDING(g.id)
+ORDER BY g.name, e.expense_date;
+
+
+
+
+
+
 
 
 
