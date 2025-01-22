@@ -19,12 +19,14 @@ public class GroupServiceImpl extends GenericServiceImpl<Group, Long> implements
     private final UserService userService;
     private final MembershipService membershipService;
     private final RoleRepository roleRepository;
+    private final TemporaryMembershipService temporaryMembershipService;
 
-    public GroupServiceImpl(GroupRepository repository, UserService userService, MembershipService membershipService, RoleRepository roleRepository) {
+    public GroupServiceImpl(GroupRepository repository, UserService userService, MembershipService membershipService, RoleRepository roleRepository, TemporaryMembershipService temporaryMembershipService) {
         super(repository);
         this.userService = userService;
         this.membershipService = membershipService;
         this.roleRepository = roleRepository;
+        this.temporaryMembershipService = temporaryMembershipService;
     }
 
     @Override
@@ -53,8 +55,8 @@ public class GroupServiceImpl extends GenericServiceImpl<Group, Long> implements
         String email = AuthHelper.getUserEmail();
         User userEntity = userService.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
-        Role role = roleRepository.findById(1L)
-                .orElseThrow(() -> new RoleNotFoundException(1L));
+        Role role = roleRepository.findByName("admin")
+                .orElseThrow(() -> new RoleNotFoundException(3L));
         Group newGroup = super.save(entity);
         membershipService.save(new Membership(userEntity, newGroup, role));
         return newGroup;
@@ -66,6 +68,7 @@ public class GroupServiceImpl extends GenericServiceImpl<Group, Long> implements
     @Transactional
     public void delete(Long id) {
         membershipService.deleteAllMembershipsForGroupId(id);
+        temporaryMembershipService.deleteAllTemporaryMembershipsForGroupId(id);
         super.delete(id);
     }
 
