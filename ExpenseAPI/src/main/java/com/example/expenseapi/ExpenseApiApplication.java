@@ -59,6 +59,17 @@ public class ExpenseApiApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        List<User> users = userRepository.findAll();
+
+        users.forEach(user -> {
+            String currentPassword = user.getPassword();
+            if (!currentPassword.startsWith("$2a$")) {
+                user.setPassword(passwordEncoder.encode(currentPassword));
+            }
+        });
+
+        userRepository.saveAll(users);
+
         initMethodOfPayments();
         initCurrencies();
         initGroups();
