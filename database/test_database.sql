@@ -168,8 +168,101 @@ ORDER BY
     g.name, total_spent DESC;
 
 
+-- users, who spent the most in every group, with their total expenses in USD
 
+SELECT
+    g.name AS group_name,
+    u.name AS user_name,
+    u.surname AS user_surname,
+    SUM(GET_EXPENSE_PRICE_IN_ANOTHER_CURR(e.id, 2)) AS total_spending_in_usd
+FROM groups g
+JOIN memberships m ON g.id = m.group_id
+JOIN users u ON m.user_id = u.id
+JOIN expenses e ON m.id = e.membership_id
+GROUP BY g.name, u.name, u.surname
+ORDER BY total_spending_in_usd DESC;
 
+-- day, when expenses in all groups were the highest
+
+SELECT
+    e.expense_date,
+    g.name AS group_name,
+    SUM(GET_EXPENSE_PRICE_IN_ANOTHER_CURR(e.id, 2)) AS total_spending_in_usd
+FROM expenses e
+JOIN memberships m ON e.membership_id = m.id
+JOIN groups g ON m.group_id = g.id
+GROUP BY e.expense_date, g.name
+ORDER BY total_spending_in_usd DESC
+FETCH FIRST 1 ROWS ONLY;
+
+-- groups with the biggest number of members
+
+SELECT
+    g.name AS group_name,
+    COUNT(m.user_id) AS total_members
+FROM groups g
+LEFT JOIN memberships m ON g.id = m.group_id
+GROUP BY g.name
+ORDER BY total_members DESC;
+
+-- users, who have not made any expenses
+
+SELECT
+    g.name AS group_name,
+    u.name AS user_name,
+    u.surname AS user_surname
+FROM groups g
+JOIN memberships m ON g.id = m.group_id
+JOIN users u ON m.user_id = u.id
+LEFT JOIN expenses e ON m.id = e.membership_id
+WHERE e.id IS NULL;
+
+-- find groups, where the most money was spent in a given currency
+
+SELECT
+    g.name AS group_name,
+    c.symbol AS currency_symbol,
+    SUM(e.price) AS total_spending
+FROM groups g
+JOIN memberships m ON g.id = m.group_id
+JOIN expenses e ON m.id = e.membership_id
+JOIN currencies c ON e.currency_id = c.id
+WHERE c.symbol = 'PLN'
+GROUP BY g.name, c.symbol
+ORDER BY total_spending DESC;
+
+-- users, who are members of the group with the most money spent
+
+SELECT
+    u.name AS user_name,
+    u.surname AS user_surname,
+    g.name AS group_name,
+    SUM(GET_EXPENSE_PRICE_IN_ANOTHER_CURR(e.id, 1)) AS total_spending_in_usd
+FROM groups g
+JOIN memberships m ON g.id = m.group_id
+JOIN users u ON m.user_id = u.id
+JOIN expenses e ON m.id = e.membership_id
+WHERE g.id = (
+    SELECT g2.id
+    FROM groups g2
+    JOIN memberships m2 ON g2.id = m2.group_id
+    JOIN expenses e2 ON m2.id = e2.membership_id
+    GROUP BY g2.id
+    ORDER BY SUM(GET_EXPENSE_PRICE_IN_ANOTHER_CURR(e2.id, 1)) DESC
+    FETCH FIRST 1 ROWS ONLY
+)
+GROUP BY u.name, u.surname, g.name
+ORDER BY total_spending_in_usd DESC;
+
+-- archived groups with the number of archived_memberships
+
+SELECT
+    ag.name AS archived_group_name,
+    COUNT(am.id) AS archived_members_count
+FROM archived_groups ag
+LEFT JOIN archived_memberships am ON ag.id = am.group_id
+GROUP BY ag.name
+ORDER BY archived_members_count DESC;
 
 
 
