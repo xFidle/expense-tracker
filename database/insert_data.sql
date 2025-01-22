@@ -10,11 +10,12 @@ INSERT INTO categories (name) VALUES ('Clothing');
 INSERT INTO categories (name) VALUES ('Sports');
 INSERT INTO categories (name) VALUES ('Furniture');
 INSERT INTO categories (name) VALUES ('Books');
-INSERT INTO categories (name) VALUES ('Laisure');
+INSERT INTO categories (name) VALUES ('Leisure');
 INSERT INTO categories (name) VALUES ('Food');
 INSERT INTO categories (name) VALUES ('Healthcare');
 INSERT INTO categories (name) VALUES ('Transport');
 INSERT INTO categories (name) VALUES ('Garden');
+INSERT INTO categories (name) VALUES ('Bills');
 COMMIT;
 
 --------------------------------------------------------
