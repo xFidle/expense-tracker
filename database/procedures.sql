@@ -1,44 +1,49 @@
-CREATE OR REPLACE PROCEDURE remove_expired_tokens
+/**
+  Procedure which removes expired refresh tokens from the database, it is scheduled to run every day at midnight.
+ */
+CREATE OR REPLACE PROCEDURE REMOVE_EXPIRED_TOKENS
 AS
 BEGIN
-DELETE FROM refresh_tokens
-WHERE expiry_date < SYSTIMESTAMP;
+    DELETE FROM REFRESH_TOKENS
+    WHERE EXPIRY_DATE < SYSTIMESTAMP;
 END;
 /
 
 BEGIN
-    dbms_scheduler.create_job (
-        job_name => 'remove_expired_tokens',
-        job_type => 'PLSQL_BLOCK',
-        job_action => 'BEGIN remove_expired_tokens; END;',
-        start_date => TRUNC(SYSDATE) + 1,
-        repeat_interval => 'FREQ=DAILY; BYHOUR=0; BYMINUTE=0; BYSECOND=0',
-        enabled => TRUE,
-        comments => 'Job to remove expired tokens every day at midnight'
+    DBMS_SCHEDULER.CREATE_JOB (
+            JOB_NAME => 'REMOVE_EXPIRED_TOKENS',
+            JOB_TYPE => 'PLSQL_BLOCK',
+            JOB_ACTION => 'BEGIN REMOVE_EXPIRED_TOKENS; END;',
+            START_DATE => TRUNC(SYSDATE) + 1,
+            REPEAT_INTERVAL => 'FREQ=DAILY; BYHOUR=0; BYMINUTE=0; BYSECOND=0',
+            ENABLED => TRUE,
+            COMMENTS => 'Job to remove expired tokens every day at midnight'
     );
 END;
 /
 
-
-CREATE OR REPLACE PROCEDURE calculate_group_expenses(curr_id currencies.id%TYPE)
+/**
+  Procedure which calculates total expenses of each group in given currency.
+ */
+CREATE OR REPLACE PROCEDURE CALCULATE_GROUP_EXPENSES(CURR_ID CURRENCIES.ID%TYPE)
 AS
-    CURSOR cr IS
-        SELECT g.name, ROUND(SUM(get_expense_price_in_another_curr(e.id, curr_id)), 2) FROM expenses e
-        JOIN memberships m ON (e.membership_id = m.id)
-        JOIN groups g ON (m.group_id = g.id)
-        GROUP BY g.id, g.name
-        ORDER BY SUM(e.price) DESC;
-    v_name groups.name%TYPE;
-    v_sum expenses.price%TYPE;
-    v_code currencies.symbol%TYPE;
+    CURSOR CR IS
+        SELECT G.NAME, ROUND(SUM(GET_EXPENSE_PRICE_IN_ANOTHER_CURR(E.ID, CURR_ID)), 2) FROM EXPENSES E
+        JOIN MEMBERSHIPS M ON (E.MEMBERSHIP_ID = M.ID)
+        JOIN GROUPS G ON (M.GROUP_ID = G.ID)
+        GROUP BY G.ID, G.NAME
+        ORDER BY SUM(E.PRICE) DESC;
+    V_NAME VARCHAR2(30);
+    V_SUM NUMBER;
+    V_CODE VARCHAR2(30);
 BEGIN
-    SELECT symbol INTO v_code FROM currencies WHERE curr_id = id;
-    OPEN cr;
+    SELECT SYMBOL INTO V_CODE FROM CURRENCIES WHERE CURR_ID = ID;
+    OPEN CR;
     LOOP
-        FETCH cr into v_name, v_sum;
-        EXIT WHEN cr%NOTFOUND;
-        dbms_output.put_line('Group named ' || v_name || ' has total expenses equal to ' || v_sum || ' ' || v_code);
+        FETCH CR INTO V_NAME, V_SUM;
+        EXIT WHEN CR%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Group named ' || V_NAME || ' has total expenses equal to ' || V_SUM || ' ' || V_CODE);
     END LOOP;
-    CLOSE cr;
+    CLOSE CR;
 END;
 /

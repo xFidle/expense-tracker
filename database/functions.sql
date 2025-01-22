@@ -1,17 +1,3 @@
-CREATE OR REPLACE FUNCTION EXPENSE_PRICE_TO_PLN(
-    PRICE NUMBER,
-    CURRENCY_ID NUMBER
-) RETURN NUMBER AS
-    RATE NUMBER;
-BEGIN
-    SELECT EXCHANGE_RATE
-    INTO RATE
-    FROM CURRENCIES
-    WHERE ID = CURRENCY_ID;
-    RETURN PRICE * RATE;
-END;
-/
-
 /**
   Returns id of user who spent the most in given group, returns -1 if no expenses in group
  */
@@ -22,9 +8,9 @@ CREATE OR REPLACE FUNCTION MOST_SPENDING_USER_IN_GROUP(
     V_SPENDING NUMBER;
 BEGIN
     SELECT M.USER_ID,
-           SUM(EXPENSE_PRICE_TO_PLN(
-                   E.PRICE,
-                   E.CURRENCY_ID
+           SUM(GET_EXPENSE_PRICE_IN_ANOTHER_CURR(
+                   E.ID,
+                   1
                )) AS TOTALSPENDING
     INTO
         V_USER_ID,
@@ -53,10 +39,10 @@ END;
   Returns date when given group spent the most, if no expenses in given group returns null
  */
 CREATE OR REPLACE FUNCTION GET_DATE_WITH_MOST_SPENDING(G_ID NUMBER) RETURN DATE AS
-    V_DATE           DATE;
+    V_DATE DATE;
     V_TOTAL_SPENDING NUMBER;
 BEGIN
-    SELECT E.EXPENSE_DATE, SUM(EXPENSE_PRICE_TO_PLN(E.PRICE, E.CURRENCY_ID)) AS TOTAL_SPENDING
+    SELECT E.EXPENSE_DATE, SUM(GET_EXPENSE_PRICE_IN_ANOTHER_CURR(E.ID, 1)) AS TOTAL_SPENDING
     INTO V_DATE, V_TOTAL_SPENDING
     FROM EXPENSES E
              JOIN MEMBERSHIPS M ON E.MEMBERSHIP_ID = M.ID
@@ -77,21 +63,23 @@ BEGIN
 END;
 /
 
-
-CREATE OR REPLACE FUNCTION get_expense_price_in_another_curr(expense_id expenses.id%TYPE, curr_id currencies.id%TYPE)
-    RETURN expenses.price%TYPE
+/**
+  Returns expense price in another currency
+ */
+CREATE OR REPLACE FUNCTION GET_EXPENSE_PRICE_IN_ANOTHER_CURR(EXPENSE_ID NUMBER, CURR_ID NUMBER)
+    RETURN NUMBER
 AS
-    v_price expenses.price%TYPE;
-    v_src_er currencies.exchange_rate%TYPE;
-    v_dest_er currencies.exchange_rate%TYPE;
+    V_PRICE NUMBER;
+    V_SRC_ER NUMBER;
+    V_DEST_ER NUMBER;
 BEGIN
-    SELECT e.price, c.exchange_rate INTO v_price, v_src_er FROM expenses e
-    JOIN currencies c ON (e.currency_id = c.id)
-    WHERE e.id = expense_id;
+    SELECT E.PRICE, C.EXCHANGE_RATE INTO V_PRICE, V_SRC_ER FROM EXPENSES E
+    JOIN CURRENCIES C ON (E.CURRENCY_ID = C.ID)
+    WHERE E.ID = EXPENSE_ID;
 
-    SELECT exchange_rate INTO v_dest_er FROM currencies WHERE id = curr_id;
+    SELECT EXCHANGE_RATE INTO V_DEST_ER FROM CURRENCIES WHERE ID = CURR_ID;
 
-    v_price := ( v_price * v_src_er) / v_dest_er;
-    return v_price;
+    V_PRICE := ( V_PRICE * V_SRC_ER) / V_DEST_ER;
+    RETURN V_PRICE;
 END;
 /
