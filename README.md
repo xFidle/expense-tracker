@@ -1,123 +1,191 @@
-## Uruchomienie aplikacji:
+# Expense Tracker
 
-Dla uruchomienia prototypu konieczne jest posiadanie zaistalowanej Javy w wersji 21.
+## Running the Application
+
+Java 21 is required to run the prototype.
 
 ### Linux
-Zainstalowanie Javy
-```
-sudo apt-get install openjdk-21-jdk     # ubuntu
 
-sudo dnf install java-21-openjdk-devel  # fedora
+Install Java:
+
+```bash
+sudo apt-get install openjdk-21-jdk     # Ubuntu
+sudo dnf install java-21-openjdk-devel  # Fedora
 ```
 
-Uruchomienie
-```
+Run:
+
+```bash
 chmod +x start.sh
 ./start.sh
 ```
 
-### Windows
-```
-./start.bat
-```
+______________________________________________________________________
 
+## PAP Z17
 
+- Michał Suski 331439
+- Michał Szwejk 331445
+- Kamil Marszałek 331401
+- Damian D'Souza 331368
 
-## PAP grupa 17
-- Michał Suski		331439
-- Michał Szwejk		331445
-- Kamil Marszałek	331401
-- Damian D’Souza	331368
+______________________________________________________________________
 
-## Opis projektu
-Celem projektu jest zrealizowanie aplikacji mobilnej lub webowej pozwalającej na śledzenie wydatków. Aplikacja będzie umożliwiała użytkownikom tworzenie kont, łączenie kont w grupy (np. rodziny) oraz wyświetlanie wspólnych wydatków. W aplikacji wydatki będą prezentowane chronologicznie, z możliwością filtrowania i grupowania według różnych kryteriów, takich jak daty, kategorie, czy konkretne grupy użytkowników. Aplikacja będzie opierać się na wykorzystaniu bazy danych do przechowywania informacji o użytkownikach, grupach, wydatkach oraz kategoriach.
+## Project Description
 
-## Przykładowy interfejs
+The goal of the project is to build a mobile or web application for tracking
+expenses. The application allows users to create accounts, join groups (e.g.
+family groups), and view shared expenses. Expenses are presented chronologically
+with support for filtering and grouping by various criteria such as date,
+category, or user group. The application is backed by a database storing
+information about users, groups, expenses, and categories.
+
+______________________________________________________________________
+
+## App Preview
+
+### Login
 
 <p align="center">
-  <img src="prototype/prototype.png" alt="Prototyp interfejsu">
+  <img src="docs/login.png" alt="Login screen">
 </p>
 
+### Expense View
+
+<p align="center">
+  <img src="docs/expense_view_date.png" alt="Expense view – date">
+</p>
+
+### Expense View – Grouped by category
+
+<p align="center">
+  <img src="docs/expense_view_cat_overflow.png" alt="Expense view – category overflow">
+</p>
+
+### Add Expense
+
+<p align="center">
+  <img src="docs/add_expense.png" alt="Add expense">
+</p>
+
+### Expense stats by category
+
+<p align="center">
+  <img src="docs/category_data.png" alt="Category data">
+</p>
+
+### Expense stats by group members
+
+<p align="center">
+  <img src="docs/user_data.png" alt="User data">
+</p>
+
+### Groups
+
+<p align="center">
+  <img src="docs/group.png" alt="Groups">
+</p>
+
+### Invite
+
+<p align="center">
+  <img src="docs/invite.png" alt="Invite">
+</p>
+
+______________________________________________________________________
+
 ## Backend
-### Zakładanie kont użytkowników
-- Rejestracja.
-- Obsługa haseł.
-- Możliwość edycji i usuwania konta.
 
-### System logowania
-- Logowanie przy użyciu loginu i hasła.
+### User Account Management
 
-### Baza danych z użytkownikami
-- Dane użytkownika: imię, login, data utworzenia konta.
+- Registration.
+- Password handling.
+- Ability to edit and delete accounts.
 
-### Baza danych z wydatkami
-- Przechowywanie danych o wydatkach: nazwa, kwota, kategoria, data, opis.
-- Możliwość dodawania wydatków cyklicznych.
-- Relacja użytkownik-wydatek.
+### Authentication System
 
-### Pobieranie danych o wydatkach z bazy
-- API REST do pobierania wydatków w formie paginowanych list.
-- Wsparcie filtrowania według daty, kategorii, kwoty.
+- Login using username and password.
 
-### Grupowanie wydatków
-- Kategoryzacja wydatków (np. jedzenie, transport, rozrywka).
-- Tworzenie niestandardowych kategorii przez użytkownika.
+### User Database
 
-### Statystyki o wydatkach
-- Wykresy miesięcznych wydatków.
-- Porównania wydatków w czasie.
-- Analiza procentowa wydatków w poszczególnych kategoriach.
+- User data: name, login, account creation date.
 
-### Testy jednostkowe
-- Kontrola poprawności działania poszczególnych funkcji.
-- Weryfikacja poprawności przesyłanych danych do i z bazy danych.
+### Expense Database
+
+- Storing expense data: name, amount, category, date, description.
+- Support for recurring expenses.
+- User–expense relationship.
+
+### Fetching Expense Data
+
+- REST API for retrieving expenses as paginated lists.
+- Filtering support by date, category, and amount.
+
+### Expense Grouping
+
+- Expense categorization (e.g. food, transport, entertainment).
+- User-defined custom categories.
+
+### Expense Statistics
+
+- Monthly expense charts.
+- Expense comparisons over time.
+- Percentage breakdown by category.
+
+______________________________________________________________________
 
 ## Frontend
-### Wyświetlanie danych
-- Interfejs użytkownika z wykresami i tabelami.
-- Sortowanie i filtrowanie danych w czasie rzeczywistym.
 
-### Formularz do dodawania wydatków
-- Pola do wprowadzania nazwy, kwoty, kategorii i opisu.
-- Możliwość dodawania wydatków cyklicznych.
+### Data Display
 
-### Menu główne
-- Nawigacja między ekranami: wydatki, statystyki, ustawienia.
+- User interface with charts and tables.
+- Real-time sorting and filtering.
 
-### Ekran główny
-- Szybki podgląd wydatków: ostatnie wydatki, bilans miesięczny.
-- Przycisk dodawania wydatku.
+### Add Expense Form
 
-### Ekran ustawień
-- Edycja profilu użytkownika.
-- Zarządzanie kategoriami wydatków.
+- Fields for name, amount, category, and description.
+- Support for recurring expenses.
 
-## Dodatkowe funkcje do rozważenia
-- Powiadomienia.
-- Tryb offline (przechowywanie lokalne w IndexedDB/SQLite).
-- Funkcja budżetowania miesięcznego.
+### Main Menu
 
-## Technologie
+- Navigation between screens: expenses, statistics, settings.
+
+### Home Screen
+
+- Quick expense overview: recent expenses, monthly balance.
+- Add expense button.
+
+### Settings Screen
+
+- User profile editing.
+- Expense category management.
+
+______________________________________________________________________
+
+## Additional Features to Consider
+
+- Notifications.
+- Offline mode (local storage via IndexedDB/SQLite).
+- Monthly budgeting feature.
+
+______________________________________________________________________
+
+## Technologies
+
 ### Backend
-- **Spring Boot**
-  - Framework do szybkiego budowania aplikacji w języku Java.
-  - Moduły: Spring Security (autoryzacja, szyfrowanie), Spring Data JPA (zarządzanie bazą danych), Spring Web (API REST).
+
+- **Java 21 + Spring Boot**
+  - Modules: Spring Security (authorization, encryption), Spring Data JPA
+    (database management), Spring Web (REST API).
 
 ### Frontend
-- **React.js**
-- **Kotlin Multiplatform** (opcja alternatywna)
 
-### Baza danych
-- **Oracle Database**
-  - Relacyjna baza danych zapewniająca wydajność i skalowalność.
-  - Obsługa procedur przechowywanych (stored procedures) i indeksowania.
-- **SQL**
-  - Realizacja zapytań i obsługa bazy danych.
-- **JDBC**
-  - Komunikacja między Spring Boot a bazą danych Oracle.
+- **Kotlin with Compose Multiplatform**
 
-## Wstępny podział ról
-- **Kamil Marszałek** - backend
-- **Michał Suski** - backend
-- **Michał Szwejk** - baza danych, frontend
-- **Damian D’Souza** - frontend
+### Database
+
+- **Oracle Database** — relational database providing performance and
+  scalability, with support for stored procedures and indexing.
+- **SQL** — query execution and database management.
+- **JDBC** — communication between Spring Boot and the Oracle database.
+
